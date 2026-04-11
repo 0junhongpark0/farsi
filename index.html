@@ -42,12 +42,12 @@
         .btn-mute { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #868e96; transition: 0.2s; }
         .btn-mute:hover { color: #0b2a4a; }
 
-        /* --- 연습 화면 내부 통계 보드 --- */
+        /* --- 연습 화면 내부 통계 보드 (진행도 추가) --- */
         .inner-stats-board {
-            width: 100%; display: flex; justify-content: center; gap: 40px; 
+            width: 100%; display: flex; justify-content: center; gap: 30px; 
             background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #e9ecef; 
         }
-        .stat-item { text-align: center; width: 80px; }
+        .stat-item { text-align: center; width: 90px; }
         .stat-label { font-size: 0.75rem; color: #868e96; margin-bottom: 3px; font-weight: bold; }
         .stat-value { font-size: 1.3rem; font-weight: bold; color: #0b2a4a; font-family: monospace; }
 
@@ -296,6 +296,7 @@
 
     <div id="typingArea" class="section-container" style="padding-top:20px;">
         <div class="inner-stats-board">
+            <div class="stat-item"><div class="stat-label">진행도</div><div class="stat-value" id="statProgress">0 / 0</div></div>
             <div class="stat-item"><div class="stat-label">진행시간</div><div class="stat-value" id="statTime">0:00</div></div>
             <div class="stat-item"><div class="stat-label">현재 타수</div><div class="stat-value" id="statCpm">0</div></div>
             <div class="stat-item"><div class="stat-label">정확도</div><div class="stat-value" id="statAcc">100%</div></div>
@@ -375,13 +376,13 @@
         // 🔴 외부 링크 설정 
         // ==========================================
         // 단어장 시트 CSV 
-        const WORD_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kygc158HJLii5s2jwGoCPNhNRyIoK0GJVM6oZUBMyfbI0FIi7lYd0XN4N6v2PYGxtq22AsBZ6yFX/pub?gid=415354578&single=true&output=csv"; 
+        const WORD_CSV_URL = ""; 
         // 문장 연습 시트 CSV
-        const SENTENCE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRYQTsYanW1hpMlaA5Iq803tPA0VHRYE3bOSzHZ_EsVZmQA8i_C8G8mbS2gb8jkBM3NJQElTjnxtvfH/pub?gid=0&single=true&output=csv"; 
+        const SENTENCE_CSV_URL = ""; 
         // 단어장 열람용 원본 시트 링크
-        const SHEET_VIEW_URL = "https://docs.google.com/spreadsheets/d/16XHGEMyT-9pOR2zKJi7NVqg0aWcT1h1GfW5qOvn8G3k/edit?usp=sharing";
+        const SHEET_VIEW_URL = "";
         // 건의 사항 폼 링크
-        const FEEDBACK_FORM_URL = "https://forms.gle/LFbLLqPWRK3j5mW19";
+        const FEEDBACK_FORM_URL = "";
         // ==========================================
 
         function openGoogleSheet() { window.open(SHEET_VIEW_URL, '_blank'); }
@@ -582,11 +583,35 @@
             document.getElementById('statTime').innerText = "0:00";
             document.getElementById('statCpm').innerText = "0";
             document.getElementById('statAcc').innerText = "100%";
+            document.getElementById('statProgress').innerText = "0 / 0";
         }
 
         function updateStatsUI() {
             let acc = totalKeys > 0 ? Math.floor((correctKeys / totalKeys) * 100) : 100;
             document.getElementById('statAcc').innerText = acc + "%";
+        }
+
+        // --- 📊 통합된 진행도(Progress) UI 업데이트 로직 ---
+        function updateProgressUI() {
+            const progEl = document.getElementById('statProgress');
+            if (!progEl) return;
+            
+            if (currentMode === 'posStep') {
+                let currentProg = Math.min((currentStageIdx * 30) + currentIndex + 1, 90);
+                progEl.innerText = `${currentProg} / 90`;
+            } else if (currentMode === 'posRandom') {
+                let currentProg = Math.min(currentIndex + 1, 50);
+                progEl.innerText = `${currentProg} / 50`;
+            } else if (currentMode === 'word' || currentMode === 'sentence') {
+                if (activePracticeData.length > 0) {
+                    let currentProg = Math.min(currentStageIdx + 1, activePracticeData.length);
+                    progEl.innerText = `${currentProg} / ${activePracticeData.length}`;
+                } else {
+                    progEl.innerText = `0 / 0`;
+                }
+            } else {
+                progEl.innerText = `0 / 0`;
+            }
         }
 
         function changeMode(mode) {
@@ -607,7 +632,6 @@
             else if (mode === 'vocab') { document.getElementById('vocabArea').classList.add('active'); renderVocabList(); }
         }
 
-        // 연습 시작 라우터
         function startPosPractice(type, startLvl = 0) {
             currentMode = (type === 'step') ? 'posStep' : 'posRandom';
             currentStageIdx = startLvl;
@@ -666,7 +690,9 @@
             renderUI();
         }
 
-        function renderUI() {
+function renderUI() {
+            updateProgressUI(); // 매 렌더링 시 상단 진행도 갱신
+            
             const display = document.getElementById('typingDisplay');
             const subDisplay = document.getElementById('subDisplay');
             display.innerHTML = "";
@@ -682,8 +708,10 @@
                         <div class="pos-next-list">${nextList}</div>
                     </div>
                 `;
-                if(currentMode === 'posStep') subDisplay.innerText = `[Level ${currentStageIdx+1}/3] 남은 타수: ${currentTargetArr.length - currentIndex}`;
-                else subDisplay.innerText = `[모의고사] 남은 타수: ${currentTargetArr.length - currentIndex}`;
+                
+                // 💡 자리 연습에서는 우하단 글씨를 아예 비우고 숨김 처리
+                subDisplay.innerText = "";
+                subDisplay.style.display = 'none';
                 
                 updateLed(current);
             } 
@@ -724,11 +752,13 @@
                         updateLed(currentTargetArr[userInput.length]);
                     }
                 }
+                
+                // 💡 단어/문장 연습일 때만 해석이 보이도록 다시 켬
+                subDisplay.style.display = 'block';
             }
-            subDisplay.style.display = 'block';
         }
 
-        // 손가락 UI 업데이트 (Enter, Backspace 추가 반영)
+        // 손가락 UI 업데이트 
         function updateFingerUI(keyId) {
             document.querySelectorAll('.finger').forEach(f => f.classList.remove('active'));
             if (!keyId) return;
@@ -766,6 +796,23 @@
                 if(keyElement) {
                     keyElement.classList.add('target-led');
                     updateFingerUI(targetKeyId);
+                    
+                    if (isShiftCharMap[targetChar]) {
+                        let zoneClass = Array.from(keyElement.classList).find(c => c.startsWith('zone-'));
+                        if (zoneClass) {
+                            if (zoneClass.includes('-r-')) {
+                                let shiftKey = document.getElementById('ShiftLeft');
+                                if (shiftKey) shiftKey.classList.add('target-led');
+                                let leftPinky = document.getElementById('f-l-pinky');
+                                if (leftPinky) leftPinky.classList.add('active');
+                            } else if (zoneClass.includes('-l-')) {
+                                let shiftKey = document.getElementById('ShiftRight');
+                                if (shiftKey) shiftKey.classList.add('target-led');
+                                let rightPinky = document.getElementById('f-r-pinky');
+                                if (rightPinky) rightPinky.classList.add('active');
+                            }
+                        }
+                    }
                 }
             } else if (targetChar !== ' ' && targetChar !== undefined) {
                 // 매핑되지 않은 특수 기호일 경우 (Auto-skip 대비) UI 끄기
@@ -781,16 +828,17 @@
             // 브라우저 기본 동작 차단
             if(e.code === 'Space' || e.code === 'Backspace' || e.code === 'Enter') e.preventDefault();
 
-            // 양쪽 Shift 모두 지원
+            // 순정 버전: 키보드 눌림 UI 처리 (잡다한 Shift 강제 조작 코드 완벽 제거)
+            let keyEl = document.getElementById(e.code);
+            if(keyEl) { keyEl.classList.add('pressed'); setTimeout(() => keyEl.classList.remove('pressed'), 100); }
+
+            // 양쪽 Shift 모두 지원 (자판 전환 로직)
             if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && !isShiftDown) {
                 isShiftDown = true;
                 kbLayout.forEach(row => row.forEach(k => {
                     if(k.s) { let el = document.querySelector(`#${k.id} .p-char`); if(el) el.innerText = k.s; }
                 }));
             }
-
-            let keyEl = document.getElementById(e.code);
-            if(keyEl) { keyEl.classList.add('pressed'); setTimeout(() => keyEl.classList.remove('pressed'), 100); }
 
             if(e.key === 'Shift' || e.key === 'Alt' || e.key === 'Control' || e.key === 'Meta' || e.key === 'Tab' || e.key === 'CapsLock') return;
 
@@ -903,6 +951,7 @@
         });
 
         window.addEventListener('keyup', (e) => {
+            // 순정 버전: Shift 원복 로직 (잡다한 제거 코드 완벽 삭제)
             if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
                 isShiftDown = false;
                 kbLayout.forEach(row => row.forEach(k => {
@@ -950,13 +999,12 @@
         let fcIndex = 0;
         let filteredVocab = [...wordData];
 
-        // 🔀 단어 섞기 함수
         function shuffleVocab() {
             for (let i = wordData.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [wordData[i], wordData[j]] = [wordData[j], wordData[i]];
             }
-            filterVocab(); // 검색어 필터 유지 및 화면 리렌더링
+            filterVocab(); 
         }
 
         function renderVocabList() {
