@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>페르시아 숫자 훈련소</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0b2a4a;
+            --accent: #fa5252;
+            --bg: #e9ecef;
+            --card: #ffffff;
+            --persian-font: 'Noto Sans Arabic', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        /* [V5 수정] 전체 크기 및 최소 높이 확장 */
+        .container { width: 100%; max-width: 1200px; min-height: 750px; background: var(--card); border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); position: relative; overflow: hidden; display: flex; flex-direction: column; transition: 0.2s; }
+        
+        /* [V5 수정] 피격(데미지) 이펙트 */
+        @keyframes damageFlash {
+            0% { box-shadow: inset 0 0 0px 0px rgba(250, 82, 82, 0); }
+            50% { box-shadow: inset 0 0 80px 15px rgba(250, 82, 82, 0.4); }
+            100% { box-shadow: inset 0 0 0px 0px rgba(250, 82, 82, 0); }
+        }
+        .damage-effect { animation: damageFlash 0.5s ease-out; }
+
+        .top-nav { display: none; background: #f8f9fa; padding: 20px 30px; border-bottom: 2px solid #e9ecef; text-align: left; }
+        .btn-home { background: #ffffff; border: 2px solid #dee2e6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--primary); font-size: 1.1rem; }
+        .btn-home:hover { background: #e9ecef; border-color: #adb5bd; }
+
+        header { background: var(--primary); color: white; padding: 25px; text-align: center; }
+        header h2 { font-size: 2.5rem; margin: 0; }
+        header p { margin-top: 15px; opacity: 0.8; font-size: 1.2rem; }
+
+        .screen { display: none; padding: 50px; flex-grow: 1; }
+        .screen.active { display: block; }
+
+        /* --- 홈(Lobby) 화면 --- */
+/* 수정된 2x2 강제 고정 그리드 */
+.home-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; /* 정확히 반반(50% 50%) 나누기 */
+    gap: 25px; 
+    margin-top: 30px; 
+    width: 100%;
+}
+
+/* (선택 사항) 만약 모바일이나 좁은 창에서 볼 때 너무 찌그러지는 걸 막으려면 아래 코드도 추가 */
+@media (max-width: 600px) {
+    .home-grid {
+        grid-template-columns: 1fr; /* 좁은 화면에서는 다시 1줄로 예쁘게 정렬 */
+    }
+}
+        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; }
+        .mode-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(11, 42, 74, 0.1); }
+        .mode-icon { font-size: 3.5rem; color: var(--primary); margin-bottom: 20px; }
+        .mode-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: var(--primary); }
+        .mode-card p { font-size: 1.05rem; color: #666; word-break: keep-all; }
+
+        /* 공통 게임 UI */
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; font-weight: bold; font-size: 1.5rem; padding-bottom: 20px; border-bottom: 2px solid #f1f3f5; position: relative; }
+        .btn-start { display: block; width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 40px; }
+        .btn-start:hover { background: #081e36; transform: translateY(-2px); }
+
+        /* 사칙연산 서바이벌 */
+        .lives { color: var(--accent); letter-spacing: 5px; font-size: 1.8rem; }
+        .combo-text { color: #f59f00; font-weight: bold; font-size: 1.3rem; margin-left: 10px; }
+        
+        /* [V5 수정] 보너스 텍스트 플로팅 애니메이션 */
+        .bonus-float { position: absolute; left: 150px; top: -10px; color: var(--accent); font-weight: bold; font-size: 1.5rem; animation: floatUp 1s ease-out forwards; pointer-events: none; z-index: 10; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
+
+        .math-problem { font-family: var(--persian-font); font-size: 6rem; text-align: center; margin: 50px 0; direction: ltr; }
+        .math-input-wrapper { display: flex; justify-content: center; }
+        .math-input { font-family: var(--persian-font); font-size: 3rem; padding: 20px; width: 350px; text-align: center; border: 3px solid #dee2e6; border-radius: 12px; direction: ltr; transition: 0.2s; outline: none; }
+        .math-input:focus { border-color: var(--primary); }
+        
+        .hint-box { text-align: center; color: #868e96; margin-bottom: 20px; font-size: 1.2rem; }
+        .hint-toggle { cursor: pointer; background: #e9ecef; padding: 8px 20px; border-radius: 20px; display: inline-block; transition: 0.2s; }
+        .hint-toggle:hover { background: #dee2e6; color: var(--primary); }
+        .hint-text { display: none; font-size: 2rem; color: var(--accent); font-weight: bold; margin-top: 15px; direction: ltr; }
+
+        /* 타임어택 MCQ */
+        .mcq-problem { font-family: var(--persian-font); font-size: 3.5rem; text-align: center; margin: 50px 0; direction: rtl; line-height: 1.6; }
+        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .mcq-btn { font-family: var(--persian-font); font-size: 1.8rem; padding: 30px; background: #fff; border: 3px solid #dee2e6; border-radius: 12px; cursor: pointer; transition: 0.1s; direction: rtl; }
+        .mcq-btn:hover { border-color: var(--primary); background: #f8f9fa; transform: scale(1.02); }
+        .mcq-btn.wrong { border-color: var(--accent); background: #fff5f5; animation: shake 0.4s; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        /* 컨닝페이퍼 패널 */
+        .cheat-sheet-wrapper { position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; }
+        .cheat-sheet-btn { background: var(--primary); color: white; border: none; padding: 15px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-size: 1.1rem; transition: 0.2s; }
+        .cheat-sheet-btn:hover { background: #081e36; transform: translateY(-2px); }
+        .cheat-sheet-panel { display: none; background: white; border: 2px solid var(--primary); border-radius: 12px; padding: 25px; margin-bottom: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 280px; }
+        .cheat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; text-align: center; }
+        .cheat-item { font-size: 1.3rem; }
+        .cheat-fa { font-family: var(--persian-font); font-weight: bold; color: var(--primary); font-size: 1.8rem; }
+
+        /* 결과 스크린 */
+        #certificate { background: #fff; padding: 60px; border: 12px solid var(--primary); border-radius: 16px; text-align: center; position: relative; margin-bottom: 30px; }
+        .cert-title { font-size: 2.5rem; color: var(--primary); margin-bottom: 25px; border-bottom: 3px dashed #ccc; padding-bottom: 20px; font-weight: bold; }
+        .cert-rank { font-size: 6rem; font-weight: bold; color: var(--accent); margin: 30px 0; text-shadow: 3px 3px 0px #ffe3e3; }
+        .cert-msg { font-size: 1.6rem; color: #555; margin-bottom: 40px; font-weight: bold; }
+        .cert-stamp { position: absolute; bottom: 25px; right: 30px; font-size: 1.1rem; color: #888; text-align: right; }
+        
+        .mistake-list { text-align: left; background: #f8f9fa; padding: 30px; border-radius: 12px; max-height: 300px; overflow-y: auto; direction: rtl; font-family: var(--persian-font); font-size: 1.5rem; border: 1px solid #dee2e6; }
+        .mistake-item { border-bottom: 1px dashed #ccc; padding: 20px 0; color: var(--accent); }
+        .mistake-item:last-child { border-bottom: none; }
+        .mistake-item span { color: #2b8a3e; margin-right: 20px; display: inline-block; }
+
+        .btn-share { width: 100%; padding: 20px; background: #20c997; color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-share:hover { background: #12b886; }
+    </style>
+</head>
+<body>
+
+<a href="index.html" class="portal-home-button" title="메인 페이지로 돌아가기">
+    <i class="fas fa-home"></i>
+</a>
+
+<style>
+    .portal-home-button {
+        position: fixed;
+        top: 25px;       /* 상단에서 적당히 띄움 */
+        left: 25px;      /* 왼쪽에서 적당히 띄움 */
+        width: 50px;
+        height: 50px;
+        background-color: #0b2a4a; /* 메인 페이지의 진한 푸른색 활용 */
+        color: white;
+        border-radius: 50%;        /* 동그라미 모양 */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* 입체감을 위한 그림자 */
+        z-index: 10000;            /* 다른 요소보다 항상 위에 표시 */
+        transition: all 0.3s ease; /* 부드러운 애니메이션 */
+    }
+
+    .portal-home-button:hover {
+        background-color: #1a3a5a; /* 마우스를 올렸을 때 약간 밝아짐 */
+        transform: scale(1.1);     /* 살짝 커지는 효과 */
+        box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    .portal-home-button i {
+        font-size: 20px; /* 집 모양 아이콘 크기 */
+    }
+
+    /* 모바일 기기 배려: 화면이 아주 작을 때는 버튼 크기를 살짝 조절 */
+    @media (max-width: 600px) {
+        .portal-home-button {
+            top: 15px;
+            left: 15px;
+            width: 40px;
+            height: 40px;
+        }
+        .portal-home-button i {
+            font-size: 16px;
+        }
+    }
+</style>
+
+<div class="cheat-sheet-wrapper">
+    <div class="cheat-sheet-panel" id="cheat-panel">
+        <div class="cheat-grid">
+            <div class="cheat-item"><div class="cheat-fa">۰</div><div>0</div></div>
+            <div class="cheat-item"><div class="cheat-fa">۱</div><div>1</div></div>
+            <div class="cheat-item"><div class="cheat-fa">۲</div><div>2</div></div>
+            <div class="cheat-item"><div class="cheat-fa">۳</div><div>3</div></div>
+            <div class="cheat-item"><div class="cheat-fa">۴</div><div>4</div></div>
+            <div class="cheat-item"><div class="cheat-fa">۵</div><div>5</div></div>
+            <div class="cheat-item"><div class="cheat-fa">۶</div><div>6</div></div>
+            <div class="cheat-item"><div class="cheat-fa">۷</div><div>7</div></div>
+            <div class="cheat-item"><div class="cheat-fa">۸</div><div>8</div></div>
+            <div class="cheat-item"><div class="cheat-fa">۹</div><div>9</div></div>
+        </div>
+    </div>
+    <button class="cheat-sheet-btn" onclick="toggleCheatSheet()">🔢 컨닝페이퍼</button>
+</div>
+
+<div class="container" id="main-container">
+    <div class="top-nav" id="top-nav">
+        <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
+    </div>
+
+    <header id="main-header">
+        <h2>페르시아 숫자 훈련소</h2>
+        <p>글자가 아닌 감각으로 익히는 숫자 마스터 클래스</p>
+    </header>
+
+    <div id="screen-home" class="screen active">
+        <h3 style="font-size: 1.7rem; color: var(--primary); margin-bottom: 20px; text-align: center;">훈련 모드를 선택하세요</h3>
+        <div class="home-grid">
+            <div class="mode-card" onclick="showOnboarding('math')">
+                <i class="fas fa-keyboard mode-icon"></i>
+                <h3>사칙연산 서바이벌</h3>
+                <p>쏟아지는 연산을 풀며 콤보를 쌓고 생존하세요.<br>(직접 입력 / 목숨 3개)</p>
+            </div>
+            <div class="mode-card" onclick="showOnboarding('mcq_time')">
+                <i class="fas fa-clock mode-icon"></i>
+                <h3>시계 읽기 타임어택</h3>
+                <p>'반'과 '15분 전' 등 특수 시간 표현을 정복하세요.<br>(4지 선다 / 20문제)</p>
+            </div>
+            <div class="mode-card" onclick="showOnboarding('mcq_receipt')">
+                <i class="fas fa-receipt mode-icon"></i>
+                <h3>영수증 타임어택</h3>
+                <p>화폐(토만/리얄)를 빠르게 읽어내세요.<br>(4지 선다 / 20문제)</p>
+            </div>
+            <div class="mode-card" onclick="showOnboarding('mcq_calendar')">
+                <i class="fas fa-calendar-alt mode-icon"></i>
+                <h3>이란력 타임어택</h3>
+                <p>생소한 이란력의 월 이름을 숙지하세요.<br>(4지 선다 / 20문제)</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-onboarding" class="screen">
+        <h3 id="ob-title" style="font-size: 2rem; color: var(--primary); margin-bottom: 25px;"></h3>
+        <div id="ob-desc" style="font-size: 1.3rem; line-height: 1.8; background: #f8f9fa; padding: 35px; border-radius: 12px; border-left: 6px solid var(--primary);"></div>
+        <button class="btn-start" onclick="startGame()">훈련 시작하기</button>
+    </div>
+
+    <div id="screen-math" class="screen">
+        <div class="game-header">
+            <div>
+                점수: <span id="math-score">0</span> 
+                <span id="math-combo" class="combo-text"></span>
+                <div id="bonus-anchor" style="position:relative; display:inline-block;"></div>
+            </div>
+            <div class="lives" id="math-lives">❤️❤️❤️</div>
+        </div>
+        <div class="hint-box">
+            <div class="hint-toggle" id="math-hint-btn" onclick="showMathHint()"><i class="fas fa-search"></i> 식 힌트 보기 (클릭 시 0점)</div>
+            <div class="hint-text" id="math-hint-val"></div>
+        </div>
+        <div class="math-problem" id="math-prob-text"></div>
+        <div class="math-input-wrapper">
+            <input type="text" id="math-input" class="math-input" placeholder="정답 (Enter)" autocomplete="off">
+        </div>
+    </div>
+
+    <div id="screen-mcq" class="screen">
+        <div class="game-header">
+            <div>진행도: <span id="mcq-progress">1 / 20</span></div>
+            <div>타이머: <span id="mcq-timer" style="color:var(--primary); font-weight:bold; transition: 0.3s;">00:00</span></div>
+        </div>
+        <div class="mcq-problem">
+            <span id="mcq-prob-text"></span>
+        </div>
+        <div class="mcq-grid" id="mcq-buttons">
+            <button class="mcq-btn" onclick="checkMCQ(0)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(1)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(2)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(3)"></button>
+        </div>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <div id="certificate">
+            <div class="cert-title">페르시아어 숫자 검정 인증서</div>
+            <div id="res-mode" style="font-size:1.5rem; font-weight:bold; color:#666;"></div>
+            <div class="cert-rank" id="res-rank">A+</div>
+            <div class="cert-msg" id="res-msg">완벽합니다!</div>
+            <div style="font-size: 1.6rem; margin-bottom: 10px;">기록: <strong id="res-score" style="color:var(--primary);"></strong></div>
+            <div class="cert-stamp" id="res-stamp"></div>
+        </div>
+        
+        <div id="mistake-area" style="display:none; margin-bottom:40px;">
+            <h4 style="margin:20px 0 15px 0; font-size:1.5rem; color:var(--primary);"><i class="fas fa-book-open"></i> 오답 노트</h4>
+            <div class="mistake-list" id="mistake-list"></div>
+        </div>
+
+        <button class="btn-share" onclick="copyResultImage()"><i class="fas fa-camera"></i> 인증서 복사하기 (클립보드)</button>
+    </div>
+</div>
+
+<script>
+    /* --- 유틸리티 --- */
+    const farsiDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+    const toFaDigit = (num) => String(num).split('').map(c => /[0-9]/.test(c) ? farsiDigits[parseInt(c)] : c).join('');
+    const toEnDigit = (str) => String(str).replace(/[۰-۹]/g, w => farsiDigits.indexOf(w));
+    
+    const ones = ['','یک','دو','سه','چهار','پنج','شش','هفت','هشت','نه','ده','یازده','دوازده','سیزده','چهارده','پانزده','شانزده','هفده','هجده','نوزده'];
+    const tens = ['','','بیست','سی','چهل','پنجاه','شصت','هفتاد','هشتاد','نود'];
+    const hundreds = ['','صد','دویست','سیصد','چهارصد','پانصد','ششصد','هفتصد','هشتصد','نهصد'];
+    const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+    const hoursFa = ['','یک','دو','سه','چهار','پنج','شش','هفت','هشت','نه','ده','یازده','دوازده']; // [V5 추가] 시간용 어휘
+
+    function numToFaWords(n) {
+        if (n === 0) return 'صفر';
+        function convertHundreds(num) {
+            let res = [];
+            if (num >= 100) { res.push(hundreds[Math.floor(num/100)]); num %= 100; }
+            if (num >= 20) { res.push(tens[Math.floor(num/10)]); num %= 10; }
+            if (num > 0) res.push(ones[num]);
+            return res.filter(x=>x).join(' و ');
+        }
+        let parts = [];
+        if (n >= 1000) {
+            let t = Math.floor(n/1000);
+            parts.push(t === 1 ? 'هزار' : convertHundreds(t) + ' هزار');
+            n %= 1000;
+        }
+        if (n > 0) parts.push(convertHundreds(n));
+        return parts.join(' و ');
+    }
+
+    // [V5 추가] 시계 읽기 텍스트 변환기
+    function timeToFaWords(h, m) {
+        let hFa = hoursFa[h];
+        if (m === 0) return `ساعت ${hFa}`;
+        if (m === 15) return `ساعت ${hFa} و ربع`;
+        if (m === 30) return `ساعت ${hFa} و نیم`;
+        if (m === 45) {
+            let nextH = h === 12 ? 1 : h + 1;
+            return `یه ربع به ${hoursFa[nextH]}`;
+        }
+        return `ساعت ${hFa} و ${numToFaWords(m)} دقیقه`;
+    }
+
+    function getFormattedDate() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const h = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        return `${y}.${m}.${d} ${h}:${min}`;
+    }
+
+    /* --- 전역 상태 --- */
+    let currentMode = ''; 
+    let score = 0, lives = 3, combo = 0, maxCombo = 0, startTime = 0;
+    let currentAns = 0, currentProbTxt = '';
+    let hintUsed = false;
+    let isMathDelay = false; 
+    let timerInterval = null;
+    let mcqStep = 0, mcqTotal = 20, mcqMistakes = [];
+    let mcqPenaltySec = 0, mcqClicks = 0;
+
+    /* --- 네비게이션 로직 --- */
+    function goHome() {
+        clearInterval(timerInterval);
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-home').classList.add('active');
+        document.getElementById('top-nav').style.display = 'none';
+        document.getElementById('main-header').style.display = 'block';
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('top-nav').style.display = 'block';
+        document.getElementById('main-header').style.display = 'none';
+    }
+
+    function toggleCheatSheet() {
+        const p = document.getElementById('cheat-panel');
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function showOnboarding(mode) {
+        currentMode = mode;
+        const titleEl = document.getElementById('ob-title');
+        const descEl = document.getElementById('ob-desc');
+        
+        if (mode === 'math') {
+            titleEl.innerHTML = '<i class="fas fa-keyboard"></i> 사칙연산 서바이벌';
+            descEl.innerHTML = `
+                <strong>페르시아 숫자를 익혀 봅시다!</strong><br><br>
+                - <strong>목표:</strong> 연산을 풀며 콤보를 쌓아 A+ 등급에 도전하세요.<br>
+                - <strong>규칙:</strong> 목숨 3개! 10콤보 시 목숨 회복(풀 피일 경우 +500점 보너스).<br>
+                - <strong>페널티:</strong> 오답 시 화면이 번쩍이며 정답이 1.5초간 노출된 뒤 목숨이 차감됩니다.<br>
+                - <strong>평가:</strong> 점수에 따라 A+ ~ C 등급이 부여됩니다.
+            `;
+        } else if (mode === 'mcq_time') {
+            titleEl.innerHTML = '<i class="fas fa-clock"></i> 시계 읽기 타임어택';
+            descEl.innerHTML = `
+                <strong>페르시아어로 시간을 읽어 봅시다!</strong><br><br>
+                - <strong>목표:</strong> 20문제를 빠르고 정확하게 돌파하여 A+ 등급 쟁취!<br>
+                - <strong>특징:</strong> 정각, 반(نیم), 15분(ربع), 15분 전(یه ربع به) 등의 실전 표현이 등장합니다.<br>
+                - <strong>규칙:</strong> 오답 클릭 시 타이머에 <strong>+5초 페널티</strong>가 누적됩니다.<br>
+                - <strong>평가:</strong> 소요 시간과 정확도를 종합하여 등급이 부여됩니다.
+            `;
+        } else if (mode === 'mcq_receipt') {
+            titleEl.innerHTML = '<i class="fas fa-receipt"></i> 영수증 타임어택';
+            descEl.innerHTML = `
+                <strong>자연스럽게 돈 거래를 익혀 봅시다!</strong><br><br>
+                - <strong>목표:</strong> 20문제를 빠르고 정확하게 돌파하여 A+ 등급 쟁취!<br>
+                - <strong>규칙:</strong> 오답 클릭 시 타이머에 <strong>+5초 페널티</strong>가 누적됩니다.<br>
+                - <strong>평가:</strong> 소요 시간과 정확도(클릭 수 대비 정답률)를 종합하여 학점이 부여됩니다. 광클(찍기) 시 C등급으로 강등됩니다.<br>
+                - <strong>진행:</strong> 전반부(텍스트 ➔ 숫자) / 후반부(숫자 ➔ 텍스트)
+            `;
+        } else {
+            titleEl.innerHTML = '<i class="fas fa-calendar-alt"></i> 이란력 타임어택';
+            descEl.innerHTML = `
+                <strong>이란의 특수한 달력 체계를 익혀 봅시다!</strong><br><br>
+                - <strong>목표:</strong> 20문제를 빠르고 정확하게 풀고 A+ 등급 쟁취!<br>
+                - <strong>규칙:</strong> 오답 클릭 시 타이머에 <strong>+5초 페널티</strong>가 누적됩니다.<br>
+                - <strong>평가:</strong> 소요 시간과 정확도(%)를 종합하여 등급이 부여됩니다.<br>
+                - <strong>진행:</strong> 전반부(텍스트 ➔ 숫자) / 후반부(숫자 ➔ 텍스트)
+            `;
+        }
+        showScreen('screen-onboarding');
+    }
+
+    function startGame() {
+        if (currentMode === 'math') startMath();
+        else startMCQ();
+    }
+
+    /* --- 1. 사칙연산 게임 로직 --- */
+    const mathInput = document.getElementById('math-input');
+    
+    mathInput.addEventListener('input', function(e) {
+        if (!isMathDelay) this.value = toFaDigit(this.value);
+    });
+
+    mathInput.addEventListener('keyup', function(e) {
+        if(e.key === 'Enter' && this.value.trim() !== '' && !isMathDelay) {
+            checkMath(toEnDigit(this.value));
+        }
+    });
+
+    function showMathHint() {
+        if(isMathDelay) return;
+        document.getElementById('math-hint-val').style.display = 'inline-block';
+        document.getElementById('math-hint-btn').style.display = 'none';
+        hintUsed = true;
+    }
+
+    function startMath() {
+        score = 0; lives = 3; combo = 0; maxCombo = 0; isMathDelay = false;
+        updateMathUI();
+        showScreen('screen-math');
+        nextMathProb();
+    }
+
+    function updateMathUI() {
+        document.getElementById('math-score').innerText = score;
+        document.getElementById('math-combo').innerText = combo > 1 ? `(${combo} Combo!)` : '';
+        document.getElementById('math-lives').innerText = '❤️'.repeat(lives) + '🖤'.repeat(3-lives);
+    }
+
+    function showBonusEffect() {
+        let el = document.createElement('div');
+        el.className = 'bonus-float';
+        el.innerText = '+500 보너스!';
+        document.getElementById('bonus-anchor').appendChild(el);
+        setTimeout(() => el.remove(), 1000);
+    }
+
+    function triggerDamageEffect() {
+        let container = document.getElementById('main-container');
+        container.classList.add('damage-effect');
+        setTimeout(() => container.classList.remove('damage-effect'), 500);
+    }
+
+    function nextMathProb() {
+        mathInput.value = '';
+        mathInput.style.color = '';
+        mathInput.style.fontWeight = '';
+        mathInput.focus();
+        hintUsed = false;
+        isMathDelay = false;
+        document.getElementById('math-hint-val').style.display = 'none';
+        document.getElementById('math-hint-btn').style.display = 'inline-block';
+        startTime = Date.now();
+
+        let opRand = Math.random();
+        let op = '+';
+        if (combo >= 5) {
+            if (opRand > 0.75) op = '÷';
+            else if (opRand > 0.5) op = '×';
+            else if (opRand > 0.25) op = '-';
+        }
+
+        let a, b, ans, hintStr;
+
+        if (op === '×') {
+            a = Math.floor(Math.random() * 8) + 2; 
+            b = Math.floor(Math.random() * 8) + 2;
+            ans = a * b;
+            hintStr = `${a} × ${b}`;
+        } else if (op === '÷') {
+            let divisor = Math.floor(Math.random() * 8) + 2; 
+            let quotient = Math.floor(Math.random() * 8) + 2; 
+            a = divisor * quotient;
+            b = divisor;
+            ans = quotient;
+            hintStr = `${a} ÷ ${b}`;
+        } else if (op === '-') {
+            let maxNum = Math.min(10 + Math.floor(combo / 2) * 10, 99);
+            a = Math.floor(Math.random() * maxNum) + 1;
+            b = Math.floor(Math.random() * maxNum) + 1;
+            if (a < b) [a, b] = [b, a]; 
+            ans = a - b;
+            hintStr = `${a} - ${b}`;
+        } else {
+            let maxNum = Math.min(10 + Math.floor(combo / 2) * 10, 99);
+            a = Math.floor(Math.random() * maxNum) + 1;
+            b = Math.floor(Math.random() * maxNum) + 1;
+            ans = a + b;
+            hintStr = `${a} + ${b}`;
+        }
+
+        currentAns = ans;
+        currentProbTxt = `${toFaDigit(a)} ${op} ${toFaDigit(b)}`;
+        
+        document.getElementById('math-prob-text').innerText = currentProbTxt + ' = ?';
+        document.getElementById('math-hint-val').innerText = hintStr;
+    }
+
+    function checkMath(userVal) {
+        if (parseInt(userVal) === currentAns) {
+            let timeTaken = (Date.now() - startTime) / 1000;
+            let earned = 100;
+            if (hintUsed) { 
+                earned = 0; 
+                combo = 0; 
+            } else {
+                combo++;
+                if (combo > maxCombo) maxCombo = combo; 
+                
+                if (timeTaken < 3) earned += 50;
+                else if (timeTaken < 5) earned += 20;
+                earned = Math.floor(earned * (1 + (combo*0.1)));
+                
+                // [V5 수정] 10콤보 초과 보상 로직
+                if (combo > 0 && combo % 10 === 0) {
+                    if (lives < 3) {
+                        lives++; 
+                    } else {
+                        earned += 500;
+                        showBonusEffect();
+                    }
+                }
+            }
+            score += earned;
+            updateMathUI();
+            nextMathProb();
+        } else {
+            // [V5 수정] 피격 이펙트 및 정답 노출
+            triggerDamageEffect();
+            combo = 0; 
+            isMathDelay = true; 
+            mathInput.value = toFaDigit(currentAns);
+            mathInput.style.color = 'var(--accent)';
+            mathInput.style.fontWeight = 'bold';
+            
+            setTimeout(() => {
+                lives--;
+                updateMathUI();
+                if(lives <= 0) endGame('math');
+                else nextMathProb();
+            }, 1500);
+        }
+    }
+
+    /* --- 2. 객관식 타임어택 로직 --- */
+    function startMCQ() {
+        mcqStep = 0; mcqMistakes = [];
+        mcqPenaltySec = 0; mcqClicks = 0; 
+        showScreen('screen-mcq');
+        document.getElementById('mcq-timer').style.color = 'var(--primary)';
+
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+            let sec = Math.floor((Date.now() - startTime) / 1000) + mcqPenaltySec;
+            document.getElementById('mcq-timer').innerText = `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+        }, 1000);
+        nextMCQProb();
+    }
+
+    function nextMCQProb() {
+        mcqStep++;
+        if (mcqStep > mcqTotal) return endGame(currentMode);
+        
+        document.getElementById('mcq-progress').innerText = `${mcqStep} / ${mcqTotal}`;
+        
+        let isPhase2 = mcqStep > 10;
+        let pData = generateMCQData(mcqStep);
+        
+        currentAns = pData.correctText; 
+
+        let qText = isPhase2 ? pData.correctDigit : pData.correctText;
+        document.getElementById('mcq-prob-text').innerText = qText;
+
+        let btns = document.querySelectorAll('.mcq-btn');
+        let options = isPhase2 ? pData.optionsText : pData.optionsDigit;
+        
+        btns.forEach((btn, idx) => {
+            btn.innerText = options[idx];
+            btn.dataset.correct = (options[idx] === (isPhase2 ? pData.correctText : pData.correctDigit)) ? 'true' : 'false';
+        });
+    }
+
+    function checkMCQ(btnIdx) {
+        mcqClicks++; 
+        let btn = document.querySelectorAll('.mcq-btn')[btnIdx];
+        if (btn.dataset.correct === 'true') {
+            nextMCQProb();
+        } else {
+            mcqPenaltySec += 5;
+            let timerEl = document.getElementById('mcq-timer');
+            timerEl.style.color = 'var(--accent)';
+            setTimeout(() => { timerEl.style.color = 'var(--primary)'; }, 500);
+
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 400);
+            
+            let q = document.getElementById('mcq-prob-text').innerText;
+            if(!mcqMistakes.find(m => m.q === q)) {
+                mcqMistakes.push({q: q, wrong: btn.innerText, right: currentAns});
+            }
+        }
+    }
+
+    /* --- 오답 생성 알고리즘 --- */
+    function generateMCQData(step) {
+        let isHard = step > 10;
+        
+        if (currentMode === 'mcq_time') {
+            // [V5 추가] 시계 읽기 생성기
+            let h = Math.floor(Math.random() * 12) + 1;
+            let mOpts = isHard ? [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] : [0, 15, 30, 45];
+            let m = mOpts[Math.floor(Math.random() * mOpts.length)];
+
+            let cTxt = timeToFaWords(h, m);
+            let cDig = `${toFaDigit(h)}:${String(m).padStart(2, '0').split('').map(c => farsiDigits[parseInt(c)]).join('')}`;
+
+            let optD = [cDig], optT = [cTxt];
+            while(optD.length < 4) {
+                let wH = Math.floor(Math.random() * 12) + 1;
+                let wM = mOpts[Math.floor(Math.random() * mOpts.length)];
+                if (wH === h && wM === m) continue;
+
+                let txt = timeToFaWords(wH, wM);
+                let dig = `${toFaDigit(wH)}:${String(wM).padStart(2, '0').split('').map(c => farsiDigits[parseInt(c)]).join('')}`;
+
+                if(!optD.includes(dig)) {
+                    optD.push(dig); optT.push(txt);
+                }
+            }
+            return shuffleOptions({correctDigit: cDig, correctText: cTxt, optionsDigit: optD, optionsText: optT});
+
+        } else if (currentMode === 'mcq_calendar') {
+            // 이란력 생성기
+            let day = Math.floor(Math.random() * 31) + 1;
+            let mIdx = Math.floor(Math.random() * 12);
+            let year = Math.floor(Math.random() * 100) + 1300; 
+            
+            let cTxt, cDig;
+            if (isHard) {
+                cTxt = `${numToFaWords(day)} ${months[mIdx]} ${numToFaWords(year)}`;
+                cDig = `${toFaDigit(year)}/${toFaDigit(mIdx+1)}/${toFaDigit(day)}`;
+            } else {
+                cTxt = `${numToFaWords(day)} ${months[mIdx]}`;
+                cDig = `${toFaDigit(day)} ${months[mIdx]}`;
+            }
+            
+            let optD = [cDig], optT = [cTxt];
+            while(optD.length < 4) {
+                let wD = Math.floor(Math.random() * 31) + 1;
+                let wY = year + Math.floor(Math.random()*10)-5;
+                if (wY === year && wD === day) continue; 
+                
+                let dig = isHard ? `${toFaDigit(wY)}/${toFaDigit(mIdx+1)}/${toFaDigit(wD)}` : `${toFaDigit(wD)} ${months[mIdx]}`;
+                let txt = isHard ? `${numToFaWords(wD)} ${months[mIdx]} ${numToFaWords(wY)}` : `${numToFaWords(wD)} ${months[mIdx]}`;
+                
+                if(!optD.includes(dig)) {
+                    optD.push(dig); optT.push(txt);
+                }
+            }
+            return shuffleOptions({correctDigit: cDig, correctText: cTxt, optionsDigit: optD, optionsText: optT});
+            
+        } else {
+            // 영수증 생성기
+            let n = isHard ? (Math.floor(Math.random() * 90000) + 1000) : (Math.floor(Math.random() * 900) + 10);
+            let unit = isHard ? (Math.random() > 0.5 ? ' تومان' : ' ریال') : '';
+            
+            let cTxt = numToFaWords(n) + unit;
+            let cDig = toFaDigit(n) + unit;
+            let optD = [cDig], optT = [cTxt];
+            
+            let sNum = String(n);
+            if (sNum.includes('7')) optD.push(toFaDigit(sNum.replace('7','8')) + unit);
+            if (sNum.includes('2')) optD.push(toFaDigit(sNum.replace('2','3')) + unit);
+            if (isHard && sNum.length >= 4) {
+                let swapped = sNum.slice(0,2) + sNum[3] + sNum[2] + sNum.slice(4);
+                if(swapped !== sNum) optD.push(toFaDigit(swapped) + unit);
+            }
+            
+            while(optD.length < 4) {
+                let wNum = n + (Math.floor(Math.random()*100)-50);
+                let wDig = toFaDigit(wNum) + unit;
+                if(!optD.includes(wDig)) optD.push(wDig);
+            }
+            optD = optD.slice(0,4);
+            optT = optD.map(d => numToFaWords(parseInt(toEnDigit(d))) + (isHard ? (d.includes('تومان')?' تومان':' ریال') : ''));
+            
+            return shuffleOptions({correctDigit: cDig, correctText: cTxt, optionsDigit: optD, optionsText: optT});
+        }
+    }
+
+    function shuffleOptions(data) {
+        let indices = [0,1,2,3].sort(() => Math.random() - 0.5);
+        data.optionsDigit = indices.map(i => data.optionsDigit[i]);
+        data.optionsText = indices.map(i => data.optionsText[i]);
+        return data;
+    }
+
+    /* --- 게임 종료 및 결과 --- */
+    function endGame(type) {
+        clearInterval(timerInterval);
+        showScreen('screen-result');
+        document.getElementById('top-nav').style.display = 'block';
+        
+        let rank = 'C', msg = '', finalScoreStr = '';
+        
+        if (type === 'math') {
+            document.getElementById('res-mode').innerText = '사칙연산 서바이벌';
+            finalScoreStr = `${score} 점 (최고 ${maxCombo} 콤보)`;
+            
+            if (score >= 3000) { rank = 'A+'; msg = "🎉 완벽합니다! 수학의 신이시네요."; }
+            else if (score >= 1500) { rank = 'A'; msg = "👏 훌륭합니다! 콤보 유지력이 대단해요."; }
+            else if (score >= 800) { rank = 'B'; msg = "👍 잘하셨습니다! 다음엔 더 빠르게 쳐보세요."; }
+            else { rank = 'C'; msg = "💪 괜찮습니다! 매일 훈련하면 금방 늘 거예요."; }
+            
+            document.getElementById('mistake-area').style.display = 'none';
+        } else {
+            let totalSec = Math.floor((Date.now() - startTime) / 1000) + mcqPenaltySec;
+            let accuracy = Math.floor((20 / mcqClicks) * 100);
+            
+            if (type === 'mcq_receipt') document.getElementById('res-mode').innerText = '영수증 타임어택';
+            else if (type === 'mcq_time') document.getElementById('res-mode').innerText = '시계 읽기 타임어택';
+            else document.getElementById('res-mode').innerText = '이란력 타임어택';
+            
+            finalScoreStr = `${Math.floor(totalSec/60)}분 ${String(totalSec%60).padStart(2,'0')}초 (정확도 ${accuracy}%)`;
+            
+            if (accuracy < 70) { 
+                rank = 'C'; msg = "🚨 정확도가 너무 낮습니다. 찍지 말고 천천히 풀어보세요!"; 
+            } else if (totalSec <= 180 && accuracy >= 90) { 
+                rank = 'A+'; msg = "🎉 최고입니다! 이란 현지인 반응속도네요."; 
+            } else if (totalSec <= 270 && accuracy >= 80) { 
+                rank = 'A'; msg = "👏 훌륭합니다! 조금만 다듬으면 원어민급입니다."; 
+            } else if (totalSec <= 360 && accuracy >= 70) { 
+                rank = 'B'; msg = "👍 좋습니다! 오답 노트를 한 번 더 복습해 볼까요?"; 
+            } else { 
+                rank = 'C'; msg = "💪 끝까지 완주한 것만으로도 대단합니다! 다시 도전!"; 
+            }
+
+            if(mcqMistakes.length > 0) {
+                document.getElementById('mistake-area').style.display = 'block';
+                let html = mcqMistakes.map(m => `<div class="mistake-item">문제: ${m.q}<br>❌ 선택: ${m.wrong}<br><span>✅ 정답: ${m.right}</span></div>`).join('');
+                document.getElementById('mistake-list').innerHTML = html;
+            } else {
+                document.getElementById('mistake-area').style.display = 'none';
+            }
+        }
+
+        document.getElementById('res-rank').innerText = rank;
+        document.getElementById('res-msg').innerText = msg;
+        document.getElementById('res-score').innerText = finalScoreStr;
+        document.getElementById('res-stamp').innerText = `${getFormattedDate()} 인증됨`;
+    }
+
+    /* --- 클립보드 복사 --- */
+    async function copyResultImage() {
+        const btn = document.querySelector('.btn-share');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 이미지 생성 중...';
+        
+        try {
+            const el = document.getElementById('certificate');
+            const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff' });
+            
+            canvas.toBlob(async (blob) => {
+                try {
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    await navigator.clipboard.write([item]);
+                    btn.innerHTML = '<i class="fas fa-check"></i> 클립보드에 복사되었습니다! (Ctrl+V)';
+                    btn.style.background = '#0b2a4a';
+                } catch (err) {
+                    btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 브라우저 보안 권한 필요';
+                }
+            });
+        } catch(e) {
+            btn.innerHTML = '<i class="fas fa-exclamation"></i> 오류 발생';
+        }
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-camera"></i> 인증서 복사하기 (클립보드)';
+            btn.style.background = '#20c997';
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>
