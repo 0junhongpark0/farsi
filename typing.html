@@ -999,6 +999,7 @@
                     const normalizePersian = (char) => {
                         if (!char) return char;
                         if (char === 'ي') return 'ی'; if (char === 'ك') return 'ک'; 
+                        if (char === '\\' || char === '₩') return 'پ'; // 👈 핵심 방어 코드 추가
                         const enToFa = {'0':'۰','1':'۱','2':'۲','3':'۳','4':'۴','5':'۵','6':'۶','7':'۷','8':'۸','9':'۹'};
                         const arToFa = {'٠':'۰','١':'۱','٢':'۲','٣':'۳','٤':'۴','٥':'۵','٦':'۶','٧':'۷','٨':'۸','٩':'۹'};
                         if (enToFa[char]) return enToFa[char];
@@ -1304,6 +1305,12 @@
             btn.style.background = '#20c997';
         }, 3000);
     }
+
+// [추가] 한국 키보드 'پ' (Backslash/₩) 입력 충돌 방어 로직 (산성비 용)
+        document.getElementById('acid-input').addEventListener('input', function(e) {
+            // 입력창에 \ 나 ₩ 가 들어오면 즉시 پ 로 바꿔치기함
+            this.value = this.value.replace(/[\\₩]/g, 'پ');
+        });
 
         // --- 산성비 전용 입력 처리 로직 ---
         document.getElementById('acid-input').addEventListener('keydown', function(e) {
