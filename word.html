@@ -347,12 +347,19 @@ window.onload = function() {
                             wordData.push({ 
                                 p: parsed[i][0].trim(), 
                                 k: parsed[i][1] ? parsed[i][1].trim() : '',
-                                r: parsed[i][2] ? parsed[i][2].trim() : '' // 발음 데이터(3열) 추가
+                                r: parsed[i][2] ? parsed[i][2].trim() : '' 
                             });
                         }
                     }
+                    // [수정 핵심] 데이터 로딩이 끝났을 때, 
+                    // 사용자가 이미 사전 화면을 보고 있다면 자동으로 리스트를 갱신합니다.
+                    if(document.getElementById('screen-dict').classList.contains('active')) {
+                        renderDict();
+                    }
                 }
-            }).catch(e => console.log("단어장 로딩 실패"));
+            }).catch(e => {
+                console.log("단어장 로딩 실패", e);
+            });
         }
     };
 
