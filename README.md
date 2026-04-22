@@ -1,2 +1,2 @@
 # farsi
-Farsi practice
+Farsi Practice Site for Korean
