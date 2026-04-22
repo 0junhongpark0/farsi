@@ -202,7 +202,7 @@
             <div class="vocab-controls">
                 <div class="vocab-count">단어 사전: <span id="dict-count">0</span>개</div>
                 <button class="btn-control btn-shuffle" onclick="shuffleDict()"><i class="fas fa-random"></i> 단어 섞기</button>
-                <button class="btn-control btn-download" onclick="downloadCSV()"><i class="fas fa-download"></i> 리스트 다운로드</button>
+                <button class="btn-control btn-download" onclick="downloadCSV()"><i class="fas fa-download"></i> 단어 다운로드</button>
             </div>
         </div>
         <div class="vocab-list" id="dict-list"></div>
@@ -811,13 +811,15 @@ window.onload = function() {
         document.getElementById('fcMean').classList.add('fc-content-hidden'); // 창 넘길 때마다 뜻은 다시 숨김
     }
 
-// 단어장 CSV 파일 다운로드 기능
+// 단어장 CSV 파일 다운로드 기능 (경고창 추가)
     function downloadCSV() {
         if(!WORD_CSV_URL) {
             alert("다운로드할 수 있는 시트 링크가 설정되지 않았습니다.");
             return;
         }
-        // 구글 시트 CSV 링크는 클릭 시 브라우저에서 바로 파일을 내려받게 됩니다.
+        // 다운로드 실행 전 강력한 경고 팝업 띄우기
+        alert("⚠️ [필독 주의사항]\n\n다운받은 csv 파일을 더블클릭하여 엑셀로 열면 페르시아어가 100% 깨집니다.\n\n반드시 구글 스프레드시트를 새로 열고 [파일] -> [가져오기] 메뉴를 통해 해당 파일을 여세요.");
+        
         window.open(WORD_CSV_URL, '_blank');
     }
 </script>
