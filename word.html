@@ -109,6 +109,18 @@
         .vocab-per { font-family: var(--persian-font); font-size: 1.8rem; font-weight: bold; color: var(--primary); }
         .vocab-kor { font-size: 1.1rem; color: #495057; font-weight: bold; }
 
+/* 로딩 스피너 디자인 */
+        .loading-view {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 50px; color: var(--primary); font-weight: bold; font-size: 1.2rem;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
 /* --- 모달 공통 --- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
 
@@ -205,7 +217,12 @@
                 <button class="btn-control btn-download" onclick="downloadCSV()"><i class="fas fa-download"></i> 단어 다운로드</button>
             </div>
         </div>
-        <div class="vocab-list" id="dict-list"></div>
+<div class="vocab-list" id="dict-list">
+            <div class="loading-view" id="loading-spinner">
+                <div class="spinner"></div>
+                데이터를 연동 중입니다...
+            </div>
+        </div>
     </div>
 
     <div id="screen-mcq" class="screen">
@@ -304,21 +321,8 @@
         osc.start(); osc.stop(audioCtx.currentTime + 0.15);
     }
 
-    // 데이터 변수
-    let wordData = [
-        { p: "سلام", k: "안녕" },
-        { p: "دانشگاه", k: "대학교" },
-        { p: "ایران", k: "이란" },
-        { p: "کتاب", k: "책" },
-        { p: "دوست", k: "친구" },
-        { p: "آب", k: "물" },
-        { p: "نان", k: "빵" },
-        { p: "پدر", k: "아버지" },
-        { p: "مادر", k: "어머니" },
-        { p: "خانه", k: "집" },
-        { p: "ماشین", k: "자동차" },
-        { p: "گربه", k: "고양이" }
-    ];
+// [수정] 기본 데이터를 빈 배열로 초기화하여 플리커링 원천 봉쇄
+    let wordData = [];
 
     function parseCSV(str) {
         const arr = []; let quote = false;
@@ -351,14 +355,12 @@ window.onload = function() {
                             });
                         }
                     }
-                    // [수정 핵심] 데이터 로딩이 끝났을 때, 
-                    // 사용자가 이미 사전 화면을 보고 있다면 자동으로 리스트를 갱신합니다.
-                    if(document.getElementById('screen-dict').classList.contains('active')) {
-                        renderDict();
-                    }
+                    // 데이터 로딩 완료 시점에 리스트 즉시 갱신
+                    renderDict();
                 }
             }).catch(e => {
-                console.log("단어장 로딩 실패", e);
+                // 실패 시 로딩 문구를 오류 메시지로 교체
+                document.getElementById('dict-list').innerHTML = `<div class="loading-view" style="color:var(--accent);">단어 데이터를 가져오지 못했습니다.</div>`;
             });
         }
     };
