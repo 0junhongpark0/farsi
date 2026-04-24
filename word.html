@@ -22,9 +22,15 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         
+        /* 글로벌 로딩 스크린 */
+        #global-loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+
         .container { width: 100%; max-width: 1200px; min-height: 750px; background: var(--card); border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); position: relative; overflow: hidden; display: flex; flex-direction: column; transition: 0.2s; }
         
-        /* 피격 이펙트 */
         @keyframes damageFlash {
             0% { box-shadow: inset 0 0 0px 0px rgba(250, 82, 82, 0); }
             50% { box-shadow: inset 0 0 80px 15px rgba(250, 82, 82, 0.4); }
@@ -32,9 +38,12 @@
         }
         .damage-effect { animation: damageFlash 0.5s ease-out; }
 
-        .top-nav { display: none; background: #f8f9fa; padding: 20px 30px; border-bottom: 2px solid #e9ecef; text-align: left; }
+        .top-nav { display: none; background: #f8f9fa; padding: 20px 30px; border-bottom: 2px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; }
         .btn-home { background: #ffffff; border: 2px solid #dee2e6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--primary); font-size: 1.1rem; }
         .btn-home:hover { background: #e9ecef; border-color: #adb5bd; }
+        
+        /* 음소거 버튼 스타일 */
+        #btn-mute { width: 45px; padding: 10px 0; text-align: center; }
 
         header { background: var(--primary); color: white; padding: 25px; text-align: center; }
         header h2 { font-size: 2.5rem; margin: 0; }
@@ -43,7 +52,6 @@
         .screen { display: none; padding: 40px 50px; flex-grow: 1; overflow-y: auto; max-height: calc(100vh - 150px); }
         .screen.active { display: block; }
 
-        /* --- 홈(Lobby) 화면 --- */
         .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 30px; width: 100%; }
         @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } }
         
@@ -54,17 +62,20 @@
         .mode-card p { font-size: 1.05rem; color: #666; word-break: keep-all; }
 
         .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; font-weight: bold; font-size: 1.5rem; padding-bottom: 15px; border-bottom: 2px solid #f1f3f5; }
-        .btn-start { display: block; width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 40px; }
+        
+        /* 모드 선택 버튼 분리 */
+        .btn-group { display: flex; gap: 15px; margin-top: 40px; }
+        .btn-start { flex: 1; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-start:hover { background: #081e36; transform: translateY(-2px); }
+        .btn-extreme { flex: 1; padding: 20px; background: #8b0000; color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-extreme:hover { background: #5a0000; transform: translateY(-2px); }
 
-        /* --- 1. 객관식 게임 --- */
         .mcq-problem { font-family: var(--persian-font); font-size: 3.5rem; text-align: center; margin: 40px 0; font-weight: bold; color: var(--primary); }
         .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .mcq-btn { font-family: var(--persian-font); font-size: 1.8rem; padding: 25px; background: #fff; border: 3px solid #dee2e6; border-radius: 12px; cursor: pointer; transition: 0.1s; font-weight: bold; color: #495057; }
         .mcq-btn:hover { border-color: var(--primary); background: #f8f9fa; transform: scale(1.02); color: var(--primary); }
         .mcq-btn.wrong { border-color: var(--accent); background: #fff5f5; animation: shake 0.4s; color: var(--accent); }
 
-        /* --- 2. 스피드 매치 --- */
         .match-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
         @media (max-width: 600px) { .match-grid { grid-template-columns: repeat(3, 1fr); } }
         .match-card { background: white; border: 3px solid #dee2e6; border-radius: 12px; height: 100px; display: flex; justify-content: center; align-items: center; font-size: 1.6rem; font-family: var(--persian-font); font-weight: bold; cursor: pointer; transition: 0.2s; text-align: center; padding: 10px; user-select: none; }
@@ -73,7 +84,6 @@
         .match-card.matched { visibility: hidden; opacity: 0; pointer-events: none; }
         .match-card.wrong { border-color: var(--accent); background: #ffe3e3; color: var(--accent); animation: shake 0.4s; }
 
-        /* --- 3. 스크램블 --- */
         .scramble-mean { font-size: 2.5rem; text-align: center; margin: 30px 0 10px 0; font-weight: bold; color: var(--primary); }
         .scramble-input-area { min-height: 80px; background: #f8f9fa; border: 3px dashed #ced4da; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-bottom: 30px; padding: 10px; gap: 5px; font-family: var(--persian-font); font-size: 3rem; color: var(--primary); direction: rtl; }
         .scramble-letters { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; direction: rtl; }
@@ -83,48 +93,31 @@
 
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-/* --- 단어장 헤더 및 컨트롤 레이아웃 --- */
         .vocab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 20px; }
         .vocab-controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .vocab-count { font-weight: bold; color: var(--primary); font-size: 1.05rem; white-space: nowrap; }
         
-        /* 검색창 크기 고정 */
         .search-bar { padding: 10px 18px; width: 100%; max-width: 450px; border: 2px solid #ced4da; border-radius: 8px; font-size: 1.05rem; outline: none; }
         .search-bar:focus { border-color: var(--primary); }
 
-        /* 버튼 스타일 슬림화 */
-        .btn-control { 
-            padding: 8px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; 
-            transition: 0.2s; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; white-space: nowrap;
-        }
+        .btn-control { padding: 8px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .btn-shuffle { background: #ffc107; color: #000; }
         .btn-shuffle:hover { background: #fab005; }
         .btn-download { background: #e9ecef; color: #495057; border: 1px solid #ced4da; }
         .btn-download:hover { background: #dee2e6; }
 
-/* --- 날아간 단어 리스트 디자인 복구 --- */
         .vocab-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
         .vocab-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; font-size: 1.2rem; transition: 0.2s; }
         .vocab-item:hover { background: #e3f2fd; border-color: var(--primary); transform: translateX(5px); }
         .vocab-per { font-family: var(--persian-font); font-size: 1.8rem; font-weight: bold; color: var(--primary); }
         .vocab-kor { font-size: 1.1rem; color: #495057; font-weight: bold; }
 
-/* 로딩 스피너 디자인 */
-        .loading-view {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 50px; color: var(--primary); font-weight: bold; font-size: 1.2rem;
-        }
-        .spinner {
-            width: 40px; height: 40px; border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 15px;
-        }
+        .loading-view { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px; color: var(--primary); font-weight: bold; font-size: 1.2rem; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* --- 모달 공통 --- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
 
-/* --- 플래시카드 모달 --- */
         .flashcard { width: 80%; max-width: 600px; height: 50vh; min-height: 350px; background: white; border-radius: 20px; cursor: pointer; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         .fc-top { flex: 6; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 2px dashed #e9ecef; padding: 20px; text-align: center; }
         .fc-bottom { flex: 4; display: flex; justify-content: center; align-items: center; background: #f8f9fa; border-radius: 0 0 20px 20px; padding: 20px; text-align: center; }
@@ -140,11 +133,22 @@
         .close-modal { position: absolute; top: 20px; right: 25px; font-size: 2rem; cursor: pointer; border:none; background:none; color: #adb5bd; transition: 0.2s; }
         .close-modal:hover { color: var(--accent); }
 
-        /* --- 결과 및 인증서 --- */
-        #certificate { background: #fff; padding: 40px; border: 8px solid var(--primary); border-radius: 16px; text-align: center; position: relative; margin-bottom: 30px; }
+        /* 결과 및 인증서 익스트림 디자인 추가 */
+        #certificate { background: #fff; padding: 40px; border: 8px solid var(--primary); border-radius: 16px; text-align: center; position: relative; margin-bottom: 30px; overflow: hidden;}
+        #certificate.extreme-mode { border-color: #8b0000; background: #fffdfd; }
+        #certificate.extreme-mode::before {
+            content: 'EXTREME MODE'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 6rem; color: rgba(250, 82, 82, 0.08); pointer-events: none;
+            white-space: nowrap; font-weight: bold; letter-spacing: 5px;
+        }
+
         .cert-title { font-size: 2rem; color: var(--primary); margin-bottom: 15px; border-bottom: 2px dashed #ccc; padding-bottom: 15px; font-weight: bold; }
-        .cert-rank { font-size: 5rem; font-weight: bold; color: var(--accent); margin: 20px 0; text-shadow: 2px 2px 0px #ffe3e3; }
-        .cert-msg { font-size: 1.3rem; color: #555; margin-bottom: 30px; font-weight: bold; }
+        .extreme-mode .cert-title { color: #8b0000; border-bottom-color: #eebfbf; }
+        .cert-rank { font-size: 5rem; font-weight: bold; color: var(--accent); margin: 20px 0; text-shadow: 2px 2px 0px #ffe3e3; position: relative; z-index: 1;}
+        .extreme-mode .cert-rank { color: #8b0000; text-shadow: 2px 2px 0px #ffd0d0; }
+        .cert-msg { font-size: 1.3rem; color: #555; margin-bottom: 15px; font-weight: bold; position: relative; z-index: 1;}
+        .cert-accuracy { font-size: 1.2rem; color: #087f5b; margin-bottom: 30px; font-weight: bold; position: relative; z-index: 1;}
         .cert-stamp { position: absolute; bottom: 20px; right: 25px; font-size: 1rem; color: #888; text-align: right; }
         
         .mistake-area { text-align: left; background: #f8f9fa; padding: 25px; border-radius: 12px; max-height: 250px; overflow-y: auto; border: 1px solid #dee2e6; margin-bottom: 20px; }
@@ -155,16 +159,20 @@
         .btn-share { width: 100%; padding: 18px; background: #20c997; color: white; border: none; border-radius: 8px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-share:hover { background: #12b886; }
 
-        /* 포털 복귀 버튼 */
         .portal-home-button { position: fixed; top: 25px; left: 25px; width: 50px; height: 50px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 10000; transition: all 0.3s ease; }
         .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+        
+        /* 모드 배지 스타일 */
+        .mode-badge { display: inline-block; padding: 3px 10px; border-radius: 5px; font-size: 1rem; font-weight: bold; vertical-align: middle; margin-left: 10px;}
+        .badge-normal { background: #e3f2fd; color: #0b2a4a; }
+        .badge-extreme { background: #ffe3e3; color: #8b0000; }
     </style>
 </head>
 <body>
 
-<div id="global-loader" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition:opacity 0.5s;">
+<div id="global-loading">
     <div class="spinner"></div>
-    <div style="color:var(--primary); font-weight:bold; font-size:1.5rem; margin-top:20px;">단어장 데이터를 준비 중입니다...</div>
+    <h2 style="margin-top:20px; color:var(--primary);">단어장 데이터 연동 중...</h2>
 </div>
 
 <a href="index.html" class="portal-home-button" title="메인 페이지로 돌아가기">
@@ -172,9 +180,9 @@
 </a>
 
 <div class="container" id="main-container">
-<div class="top-nav" id="top-nav">
+    <div class="top-nav" id="top-nav" style="display: none;">
         <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
-        <button class="btn-home" id="muteBtn" onclick="toggleMute()" style="float:right; border:none; background:transparent; font-size:1.5rem; padding:5px;"><i class="fas fa-volume-up"></i></button>
+        <button class="btn-home" id="btn-mute" onclick="toggleMute()" title="음소거"><i class="fas fa-volume-up"></i></button>
     </div>
 
     <header id="main-header">
@@ -187,22 +195,22 @@
             <div class="mode-card" onclick="showOnboarding('mcq')">
                 <i class="fas fa-tasks mode-icon"></i>
                 <h3>객관식 서바이벌</h3>
-                <p>양방향(FA↔KO) 뜻 맞추기<br>(20문제 / 타임어택)</p>
+                <p>양방향(FA↔KO) 뜻 맞추기</p>
             </div>
             <div class="mode-card" onclick="showOnboarding('match')">
                 <i class="fas fa-clone mode-icon"></i>
                 <h3>스피드 매치</h3>
-                <p>단어와 뜻의 짝을 빠르게 맞추기<br>(12장 세팅 / 총 3라운드)</p>
+                <p>단어와 뜻의 짝을 빠르게 맞추기</p>
             </div>
             <div class="mode-card" onclick="showOnboarding('scramble')">
                 <i class="fas fa-font mode-icon"></i>
                 <h3>단어 스크램블</h3>
-                <p>조각난 철자를 순서대로 조립하기<br>(10문제 / 정확도 집중)</p>
+                <p>조각난 철자를 순서대로 조립하기</p>
             </div>
             <div class="mode-card" onclick="showScreen('screen-dict');">
                 <i class="fas fa-book mode-icon"></i>
                 <h3>단어 목록</h3>
-                <p>전체 단어 리스트를 열람하고<br>원하는 단어를 검색합니다.</p>
+                <p>전체 단어 리스트 열람 및 검색</p>
             </div>
         </div>
     </div>
@@ -210,10 +218,13 @@
     <div id="screen-onboarding" class="screen">
         <h3 id="ob-title" style="font-size: 2rem; color: var(--primary); margin-bottom: 25px;"></h3>
         <div id="ob-desc" style="font-size: 1.2rem; line-height: 1.8; background: #f8f9fa; padding: 35px; border-radius: 12px; border-left: 6px solid var(--primary);"></div>
-        <button class="btn-start" onclick="startGame()">훈련 시작하기</button>
+        <div class="btn-group">
+            <button class="btn-start" onclick="startGame('normal')">일반 모드 시작</button>
+            <button class="btn-extreme" onclick="startGame('extreme')">익스트림 모드 시작</button>
+        </div>
     </div>
 
-<div id="screen-dict" class="screen">
+    <div id="screen-dict" class="screen">
         <div class="vocab-header">
             <input type="text" id="searchInput" class="search-bar" placeholder="단어 또는 뜻 검색" oninput="filterDict()">
             
@@ -223,12 +234,12 @@
                 <button class="btn-control btn-download" onclick="downloadCSV()"><i class="fas fa-download"></i> 단어 다운로드</button>
             </div>
         </div>
-<div class="vocab-list" id="dict-list">
+        <div class="vocab-list" id="dict-list"></div>
     </div>
 
     <div id="screen-mcq" class="screen">
         <div class="game-header">
-            <div>진행도: <span id="mcq-progress">1 / 20</span></div>
+            <div>진행도: <span id="mcq-progress"></span></div>
             <div>타이머: <span id="mcq-timer" style="color:var(--primary); transition: 0.3s;">00:00</span></div>
         </div>
         <div class="mcq-problem" id="mcq-prob-text"></div>
@@ -242,32 +253,32 @@
 
     <div id="screen-match" class="screen">
         <div class="game-header">
-            <div>라운드: <span id="match-round" style="color:var(--primary);">1 / 3</span></div>
-            <div>남은 시간: <span id="match-timer" style="color:var(--accent);">40</span>초</div>
+            <div>라운드: <span id="match-round" style="color:var(--primary);"></span></div>
+            <div>남은 시간: <span id="match-timer" style="color:var(--accent);"></span>초</div>
         </div>
         <div class="match-grid" id="match-board"></div>
     </div>
 
     <div id="screen-scramble" class="screen">
         <div class="game-header">
-            <div>진행도: <span id="scramble-progress">1 / 10</span></div>
+            <div>진행도: <span id="scramble-progress"></span></div>
             <div>콤보: <span id="scramble-combo" style="color:#f59f00;">0</span></div>
         </div>
-        <div class="scramble-mean" id="scramble-mean-text">대학교</div>
+        <div class="scramble-mean" id="scramble-mean-text"></div>
         <div class="scramble-input-area" id="scramble-input"></div>
         <div class="scramble-letters" id="scramble-board"></div>
     </div>
 
-<div id="flashcardModal" class="modal-overlay" style="z-index: 10001;">
+    <div id="flashcardModal" class="modal-overlay" style="z-index: 10001;">
         <div style="position:relative; width:100%; display:flex; justify-content:center;">
             <div class="flashcard" id="fcContainer" onclick="toggleCard()">
                 <button class="close-modal" onclick="event.stopPropagation(); closeFlashcard()"><i class="fas fa-times"></i></button>
                 <div class="fc-top">
-                    <div class="card-per" id="fcPer">سلام</div>
+                    <div class="card-per" id="fcPer"></div>
                     <div class="card-pron" id="fcPron"></div>
                 </div>
                 <div class="fc-bottom">
-                    <div class="card-mean fc-content-hidden" id="fcMean">안녕</div>
+                    <div class="card-mean fc-content-hidden" id="fcMean"></div>
                 </div>
             </div>
             <div class="card-controls">
@@ -279,10 +290,11 @@
 
     <div id="screen-result" class="screen">
         <div id="certificate">
-            <div class="cert-title">페르시아어 단어 검정 인증서</div>
-            <div id="res-mode" style="font-size:1.5rem; font-weight:bold; color:#666;"></div>
-            <div class="cert-rank" id="res-rank">A+</div>
-            <div class="cert-msg" id="res-msg">완벽합니다!</div>
+            <div class="cert-title">페르시아어 단어 검정 인증서 <span id="res-badge" class="mode-badge"></span></div>
+            <div id="res-mode" style="font-size:1.5rem; font-weight:bold; color:#666; margin-top: 10px;"></div>
+            <div class="cert-rank" id="res-rank"></div>
+            <div class="cert-msg" id="res-msg"></div>
+            <div class="cert-accuracy" id="res-acc"></div>
             <div style="font-size: 1.5rem; margin-bottom: 10px;">기록: <strong id="res-score" style="color:var(--primary);"></strong></div>
             <div class="cert-stamp" id="res-stamp"></div>
         </div>
@@ -298,31 +310,20 @@
 
 <script>
     const WORD_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kygc158HJLii5s2jwGoCPNhNRyIoK0GJVM6oZUBMyfbI0FIi7lYd0XN4N6v2PYGxtq22AsBZ6yFX/pub?gid=415354578&single=true&output=csv"; 
-
-    let wordData = [
-        { p: "دانشگاه", k: "대학교", r: "daneshgah" }, { p: "سلام", k: "안녕", r: "salam" },
-        { p: "ایران", k: "이란", r: "iran" }, { p: "کتاب", k: "책", r: "ketab" },
-        { p: "تهران", k: "테헤란", r: "tehran" }, { p: "دوست", k: "친구", r: "doost" },
-        { p: "آب", k: "물", r: "ab" }, { p: "نان", k: "빵", r: "nan" },
-        { p: "سیب", k: "사과", r: "sib" }, { p: "امروز", k: "오늘", r: "emrooz" },
-        { p: "فردا", k: "내일", r: "farda" }, { p: "دیروز", k: "어제", r: "dirooz" },
-        { p: "صبح", k: "아침", r: "sobh" }, { p: "شب", k: "밤", r: "shab" },
-        { p: "پدر", k: "아버지", r: "pedar" }, { p: "مادر", k: "어머니", r: "madar" }
-    ];
     
+    // 오디오 및 음소거 설정
     let audioCtx;
     let isMuted = false;
 
     function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    
     function toggleMute() {
         isMuted = !isMuted;
-        const icon = document.querySelector('#muteBtn i');
-        if(isMuted) { icon.className = 'fas fa-volume-mute'; document.getElementById('muteBtn').style.color = 'var(--accent)'; } 
-        else { icon.className = 'fas fa-volume-up'; document.getElementById('muteBtn').style.color = 'var(--primary)'; }
+        document.getElementById('btn-mute').innerHTML = isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
     }
 
     function playTick() {
-        if(isMuted || !audioCtx) return;
+        if(!audioCtx || isMuted) return;
         let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
         osc.connect(gain); gain.connect(audioCtx.destination);
         osc.type = 'sine'; osc.frequency.setValueAtTime(1200, audioCtx.currentTime); 
@@ -330,7 +331,7 @@
         osc.start(); osc.stop(audioCtx.currentTime + 0.05);
     }
     function playBuzz() {
-        if(isMuted || !audioCtx) return;
+        if(!audioCtx || isMuted) return;
         let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
         osc.connect(gain); gain.connect(audioCtx.destination);
         osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
@@ -338,20 +339,27 @@
         osc.start(); osc.stop(audioCtx.currentTime + 0.15);
     }
 
+    let wordData = [];
+
     function parseCSV(str) {
         const arr = []; let quote = false;
-        for (let row=0, col=0, c=0; c<str.length; c++) {
-            let cc=str[c], nc=str[c+1];
+        for (let row = 0, col = 0, c = 0; c < str.length; c++) {
+            let cc = str[c], nc = str[c+1];
             arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
-            if (cc=='"' && quote && nc=='"') { arr[row][col]+=cc; ++c; continue; }
-            if (cc=='"') { quote = !quote; continue; }
-            if (cc==',' && !quote) { ++col; continue; }
-            if (cc=='\r' && nc=='\n' && !quote) { ++row; col=0; ++c; continue; }
-            if (cc=='\n' && !quote) { ++row; col=0; continue; }
-            if (cc=='\r' && !quote) { ++row; col=0; continue; }
+            if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+            if (cc == '"') { quote = !quote; continue; }
+            if (cc == ',' && !quote) { ++col; continue; }
+            if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+            if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+            if (cc == '\r' && !quote) { ++row; col = 0; continue; }
             arr[row][col] += cc;
         }
         return arr;
+    }
+
+    // 로딩 숨기기 헬퍼 함수
+    function hideGlobalLoading() {
+        document.getElementById('global-loading').style.display = 'none';
     }
 
     window.onload = function() {
@@ -361,86 +369,107 @@
                 if(parsed.length > 1) {
                     wordData = [];
                     for(let i=1; i<parsed.length; i++) {
-                        if(parsed[i][0]) wordData.push({ p: parsed[i][0].trim(), k: parsed[i][1]?parsed[i][1].trim():'', r: parsed[i][2]?parsed[i][2].trim():'' });
+                        if(parsed[i][0]) {
+                            wordData.push({ 
+                                p: parsed[i][0].trim(), 
+                                k: parsed[i][1] ? parsed[i][1].trim() : '',
+                                r: parsed[i][2] ? parsed[i][2].trim() : '' 
+                            });
+                        }
                     }
+                    renderDict();
                 }
-                finishLoading();
             }).catch(e => {
-                document.getElementById('global-loader').innerHTML = `<div style="color:var(--accent); font-weight:bold; font-size:1.5rem;">데이터 연동 실패. 기본 단어로 시작합니다.</div>`;
-                setTimeout(finishLoading, 1500);
+                alert("단어 데이터를 가져오지 못했습니다. 링크를 확인하세요.");
+            }).finally(() => {
+                hideGlobalLoading();
             });
         } else {
-            finishLoading();
+            // URL이 비어있을 경우 무한 로딩 방지 (데모용)
+            hideGlobalLoading();
         }
     };
 
-    function finishLoading() {
-        renderDict(); 
-        let loader = document.getElementById('global-loader');
-        if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }
-    }
-
-    let currentMode = ''; let isExtreme = false; let timerInterval = null; let startTime = 0; let mistakes = []; 
+    let currentMode = '';
+    let gameDifficulty = 'normal'; // 'normal' | 'extreme'
+    let timerInterval = null;
+    let startTime = 0;
+    let mistakes = []; 
 
     function getFormattedDate() {
-        const now = new Date(); const y = now.getFullYear(); const m = String(now.getMonth() + 1).padStart(2, '0');
-        const d = String(now.getDate()).padStart(2, '0'); const h = String(now.getHours()).padStart(2, '0'); const min = String(now.getMinutes()).padStart(2, '0');
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const h = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
         return `${y}.${m}.${d} ${h}:${min}`;
     }
 
-    function toggleExtremeMode() {
-        isExtreme = document.getElementById('extremeToggle').checked;
-        if(isExtreme) {
-            document.body.classList.add('is-extreme'); document.getElementById('main-header').classList.add('extreme-mode');
-            document.getElementById('desc-mcq').innerHTML = '양방향(FA↔KO) 뜻 맞추기<br>(100문제 / 한계돌파)';
-            document.getElementById('desc-match').innerHTML = '단어와 뜻의 짝 맞추기<br>(16장 세팅 / 총 7라운드)';
-            document.getElementById('desc-scramble').innerHTML = '조각난 철자 순서 조립<br>(30문제 / 정밀 타겟팅)';
-        } else {
-            document.body.classList.remove('is-extreme'); document.getElementById('main-header').classList.remove('extreme-mode');
-            document.getElementById('desc-mcq').innerHTML = '양방향(FA↔KO) 뜻 맞추기<br>(30문제 / 타임어택)';
-            document.getElementById('desc-match').innerHTML = '단어와 뜻의 짝 맞추기<br>(16장 세팅 / 총 3라운드)';
-            document.getElementById('desc-scramble').innerHTML = '조각난 철자 순서 조립<br>(15문제 / 정확도 집중)';
-        }
-    }
-
     function goHome() {
-        clearInterval(timerInterval); document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        clearInterval(timerInterval);
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('screen-home').classList.add('active');
-        document.getElementById('top-nav').style.display = 'none'; document.getElementById('main-header').style.display = 'block';
+        document.getElementById('top-nav').style.display = 'none';
+        document.getElementById('main-header').style.display = 'block';
     }
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        document.getElementById('top-nav').style.display = 'block'; document.getElementById('main-header').style.display = 'none';
+        document.getElementById('top-nav').style.display = 'flex';
+        document.getElementById('main-header').style.display = 'none';
         initAudio();
     }
 
     function showOnboarding(mode) {
-        currentMode = mode; const titleEl = document.getElementById('ob-title'); const descEl = document.getElementById('ob-desc');
-        let hardWord = isExtreme ? "<strong style='color:#d90429;'>[EXTREME]</strong> " : "";
+        if(wordData.length < 4) {
+            alert("단어장 데이터가 너무 적거나 연동되지 않았습니다.");
+            return;
+        }
+        currentMode = mode;
+        const titleEl = document.getElementById('ob-title');
+        const descEl = document.getElementById('ob-desc');
+        
         if (mode === 'mcq') {
-            titleEl.innerHTML = `<i class="fas fa-tasks"></i> ${hardWord}객관식 서바이벌`;
-            descEl.innerHTML = `- <strong>목표:</strong> ${isExtreme?100:30}문제를 빠르게 맞추세요.<br>- <strong>규칙:</strong> 오답 시 타이머 페널티.<br>- <strong>평가:</strong> 소요 시간과 정확도(찍기 방지) 평가.`;
+            titleEl.innerHTML = '<i class="fas fa-tasks"></i> 객관식 서바이벌';
+            descEl.innerHTML = `- <strong>일반 모드:</strong> 30문제<br>- <strong>익스트림:</strong> 100문제<br>- <strong>공통 규칙:</strong> 오답 시 타이머에 <strong>+5초 페널티</strong>. 모든 클릭은 '정확도'에 산정됩니다.`;
         } else if (mode === 'match') {
-            titleEl.innerHTML = `<i class="fas fa-clone"></i> ${hardWord}스피드 매치`;
-            descEl.innerHTML = `- <strong>목표:</strong> 16장 카드의 짝을 빠르게 맞추세요.<br>- <strong>규칙:</strong> 총 ${isExtreme?7:3}라운드 점진적 시간 압박.<br>- <strong>평가:</strong> 남은 시간 누적과 광클률 제한 평가.`;
+            titleEl.innerHTML = '<i class="fas fa-clone"></i> 스피드 매치';
+            descEl.innerHTML = `- <strong>일반 모드:</strong> 3라운드 (40초 / 30초 / 20초)<br>- <strong>익스트림:</strong> 7라운드 (45➔40➔35➔30➔25➔22➔20초). 시간 초과 시 즉시 F랭크.<br>- <strong>공통 규칙:</strong> 16장 세팅. 무지성 광클은 정확도를 수직 하락시킵니다.`;
         } else if (mode === 'scramble') {
-            titleEl.innerHTML = `<i class="fas fa-font"></i> ${hardWord}단어 스크램블`;
-            descEl.innerHTML = `- <strong>목표:</strong> ${isExtreme?30:15}단어의 철자를 조립하세요.<br>- <strong>규칙:</strong> 오답 시 콤보 파괴.<br>- <strong>평가:</strong> 콤보 점수와 타겟팅 정확도.`;
+            titleEl.innerHTML = '<i class="fas fa-font"></i> 단어 스크램블';
+            descEl.innerHTML = `- <strong>일반 모드:</strong> 15문제<br>- <strong>익스트림:</strong> 30문제<br>- <strong>공통 규칙:</strong> 철자 조립. 오답 클릭 시 입력창 리셋 및 콤보 초기화. 철자 선택 하나하나가 정확도에 반영됩니다.`;
         }
         showScreen('screen-onboarding');
     }
 
-    function startGame() { mistakes = []; if(currentMode==='mcq') startMCQ(); else if(currentMode==='match') startMatch(); else if(currentMode==='scramble') startScramble(); }
-    function triggerDamageEffect() { let c = document.getElementById('main-container'); c.classList.add('damage-effect'); setTimeout(() => c.classList.remove('damage-effect'), 500); }
+    function startGame(difficulty) {
+        gameDifficulty = difficulty;
+        mistakes = [];
+        if (currentMode === 'mcq') startMCQ();
+        else if (currentMode === 'match') startMatch();
+        else if (currentMode === 'scramble') startScramble();
+    }
 
-    // === 객관식 서바이벌 ===
-    let mcqStep = 0, mcqTotal = 30, mcqPenaltySec = 0, mcqClicks = 0, mcqCurrentAnsIdx = -1, currentWordObj = null;
+    function triggerDamageEffect() {
+        let container = document.getElementById('main-container');
+        container.classList.add('damage-effect');
+        setTimeout(() => container.classList.remove('damage-effect'), 500);
+    }
+
+    // ==========================================
+    // 1. 객관식 서바이벌
+    // ==========================================
+    let mcqStep = 0, mcqTotal = 30, mcqPenaltySec = 0, mcqClicks = 0;
+    let mcqCurrentAnsIdx = -1;
+    let currentWordObj = null;
 
     function startMCQ() {
-        mcqTotal = isExtreme ? 100 : 30; mcqStep = 0; mcqPenaltySec = 0; mcqClicks = 0;
-        showScreen('screen-mcq'); document.getElementById('mcq-timer').style.color = 'var(--primary)';
+        mcqTotal = gameDifficulty === 'extreme' ? 100 : 30;
+        mcqStep = 0; mcqPenaltySec = 0; mcqClicks = 0;
+        showScreen('screen-mcq');
+        document.getElementById('mcq-timer').style.color = 'var(--primary)';
         startTime = Date.now();
         timerInterval = setInterval(() => {
             let sec = Math.floor((Date.now() - startTime) / 1000) + mcqPenaltySec;
@@ -450,15 +479,24 @@
     }
 
     function nextMCQ() {
-        mcqStep++; if (mcqStep > mcqTotal) return endMCQ();
+        mcqStep++;
+        if (mcqStep > mcqTotal) return endMCQ();
+        
         document.getElementById('mcq-progress').innerText = `${mcqStep} / ${mcqTotal}`;
         let isFaToKo = mcqStep <= (mcqTotal / 2); 
+        
         let shuffledData = [...wordData].sort(() => 0.5 - Math.random());
-        currentWordObj = shuffledData[0]; let opts = [currentWordObj];
-        for(let i=1; i<4; i++) opts.push(shuffledData[i]);
+        currentWordObj = shuffledData[0];
+        let opts = [currentWordObj];
+        for(let i=1; i<4; i++) {
+            // 풀이 적을 때를 대비한 안전장치 (중복 허용)
+            opts.push(shuffledData[i % shuffledData.length]); 
+        }
         opts.sort(() => 0.5 - Math.random());
+
         document.getElementById('mcq-prob-text').innerText = isFaToKo ? currentWordObj.p : currentWordObj.k;
         document.getElementById('mcq-prob-text').style.direction = isFaToKo ? 'rtl' : 'ltr';
+
         let btns = document.querySelectorAll('.mcq-btn');
         btns.forEach((btn, idx) => {
             btn.innerText = isFaToKo ? opts[idx].k : opts[idx].p;
@@ -469,11 +507,16 @@
 
     function checkMCQ(idx) {
         mcqClicks++;
-        if (idx === mcqCurrentAnsIdx) { playTick(); nextMCQ(); } 
-        else {
-            playBuzz(); mcqPenaltySec += 5; triggerDamageEffect();
-            let btn = document.querySelectorAll('.mcq-btn')[idx];
-            btn.classList.add('wrong'); setTimeout(() => btn.classList.remove('wrong'), 400);
+        let btn = document.querySelectorAll('.mcq-btn')[idx];
+        if (idx === mcqCurrentAnsIdx) {
+            playTick();
+            nextMCQ();
+        } else {
+            playBuzz();
+            mcqPenaltySec += 5;
+            triggerDamageEffect();
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 400);
             if(!mistakes.find(m => m.p === currentWordObj.p)) mistakes.push(currentWordObj);
         }
     }
@@ -481,209 +524,406 @@
     function endMCQ() {
         clearInterval(timerInterval);
         let totalSec = Math.floor((Date.now() - startTime) / 1000) + mcqPenaltySec;
-        let acc = mcqClicks > 0 ? Math.min(100, Math.floor((mcqTotal / mcqClicks) * 100)) : 0;
-        let rank = 'C', msg = '';
+        let accuracy = Math.floor((mcqTotal / mcqClicks) * 100);
+        if(accuracy > 100) accuracy = 100;
 
-        if(isExtreme) {
-            if (acc < 80) { rank = 'F'; msg = "한계에 부딪혔습니다. 일반 모드에서 기본기를 더 다지고 오십시오."; }
-            else if (totalSec <= 150 && acc >= 95) { rank = 'SSR'; msg = "경이로운 수준입니다. 사실상 원어민과 다를 바 없는 반응 속도입니다."; }
-            else if (totalSec <= 210 && acc >= 90) { rank = 'SR'; msg = "압도적인 실력입니다. 페르시아어 단어의 뼈대를 완벽히 꿰뚫고 있습니다."; }
-            else { rank = 'R'; msg = "익스트림의 벽을 넘으셨군요. 대단한 집중력과 끈기입니다."; }
+        let rank = '';
+        if(gameDifficulty === 'extreme') {
+            if(accuracy < 80) rank = 'F';
+            else if(accuracy >= 95 && totalSec <= 150) rank = 'SSR';
+            else if(accuracy >= 90 && totalSec <= 200) rank = 'SR';
+            else rank = 'R';
         } else {
-            if (acc < 70) rank = 'C';
-            else if (totalSec <= 80 && acc >= 95) rank = 'A+';
-            else if (totalSec <= 120 && acc >= 85) rank = 'A';
-            else if (totalSec <= 180 && acc >= 75) rank = 'B';
+            if (accuracy < 70) rank = 'C';
+            else if (totalSec <= 90 && accuracy >= 95) rank = 'A+';
+            else if (totalSec <= 120 && accuracy >= 85) rank = 'A';
+            else rank = 'B';
         }
-        showResult('객관식 서바이벌', rank, msg, `${Math.floor(totalSec/60)}분 ${String(totalSec%60).padStart(2,'0')}초 (정확도 ${acc}%)`);
+        
+        showResult('객관식 서바이벌', rank, `${Math.floor(totalSec/60)}분 ${String(totalSec%60).padStart(2,'0')}초`, accuracy);
     }
 
-    // === 스피드 매치 ===
-    let matchRound = 1, matchTimeLeft = 40, matchPairsLeft = 8, matchTotalScore = 0, matchClicks = 0, selectedMatchCard = null;
+    // ==========================================
+    // 2. 스피드 매치
+    // ==========================================
+    let matchRound = 1, matchTotalRounds = 3, matchTimeLeft = 40, matchPairsLeft = 8;
+    let matchTotalScore = 0; 
+    let selectedMatchCard = null;
+    let matchClicks = 0;
+    const extremeTimes = [45, 40, 35, 30, 25, 22, 20];
+    const normalTimes = [40, 30, 20];
 
-    function startMatch() { matchRound = 1; matchTotalScore = 0; matchClicks = 0; showScreen('screen-match'); initMatchRound(); }
+    function startMatch() {
+        matchRound = 1; matchTotalScore = 0; matchClicks = 0;
+        matchTotalRounds = gameDifficulty === 'extreme' ? 7 : 3;
+        showScreen('screen-match');
+        initMatchRound();
+    }
 
     function initMatchRound() {
-        let maxR = isExtreme ? 7 : 3;
-        const timers = isExtreme ? [45, 40, 35, 30, 25, 22, 20] : [45, 40, 35];
-        matchTimeLeft = timers[matchRound - 1]; matchPairsLeft = 8; // 16장(8쌍) 고정
+        if(gameDifficulty === 'extreme') matchTimeLeft = extremeTimes[matchRound - 1];
+        else matchTimeLeft = normalTimes[matchRound - 1];
+        
+        matchPairsLeft = 8; // 16장 셋팅
         selectedMatchCard = null;
-        document.getElementById('match-round').innerText = `${matchRound} / ${maxR}`;
+        document.getElementById('match-round').innerText = `${matchRound} / ${matchTotalRounds}`;
         document.getElementById('match-timer').innerText = matchTimeLeft;
         
-        let shuffled = [...wordData].sort(() => 0.5 - Math.random()).slice(0, 8);
+        // 풀 안전장치
+        let shuffled = [...wordData].sort(() => 0.5 - Math.random());
+        let pool = [];
+        for(let i=0; i<8; i++) pool.push(shuffled[i % shuffled.length]);
+
         let cards = [];
-        shuffled.forEach(w => { cards.push({ text: w.p, obj: w, type: 'fa' }); cards.push({ text: w.k, obj: w, type: 'ko' }); });
+        pool.forEach(w => {
+            cards.push({ text: w.p, obj: w, type: 'fa' });
+            cards.push({ text: w.k, obj: w, type: 'ko' });
+        });
         cards.sort(() => 0.5 - Math.random());
 
-        let board = document.getElementById('match-board'); board.innerHTML = "";
-        cards.forEach((c) => {
-            let el = document.createElement('div'); el.className = 'match-card'; el.innerText = c.text;
-            el.style.direction = c.type === 'fa' ? 'rtl' : 'ltr'; el.onclick = () => clickMatchCard(el, c);
+        let board = document.getElementById('match-board');
+        board.innerHTML = "";
+        cards.forEach((c, idx) => {
+            let el = document.createElement('div');
+            el.className = 'match-card';
+            el.innerText = c.text;
+            el.style.direction = c.type === 'fa' ? 'rtl' : 'ltr';
+            el.onclick = () => clickMatchCard(el, c);
             board.appendChild(el);
         });
 
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
-            matchTimeLeft--; document.getElementById('match-timer').innerText = matchTimeLeft;
-            if(matchTimeLeft <= 0) { playBuzz(); clearInterval(timerInterval); showResult('스피드 매치', isExtreme?'F':'C', isExtreme?"한계에 부딪혔습니다. 일반 모드에서 기본기를 더 다지고 오십시오.":"시간 초과 실패", `실패 (라운드 ${matchRound} 타임오버)`); }
+            matchTimeLeft--;
+            document.getElementById('match-timer').innerText = matchTimeLeft;
+            if(matchTimeLeft <= 0) {
+                playBuzz();
+                clearInterval(timerInterval);
+                let acc = calculateMatchAccuracy();
+                showResult('스피드 매치', gameDifficulty === 'extreme' ? 'F' : 'C', `실패 (라운드 ${matchRound} 타임오버)`, acc);
+            }
         }, 1000);
+    }
+
+    function calculateMatchAccuracy() {
+        let targetClicks = matchTotalRounds * 16; 
+        let accuracy = Math.floor((targetClicks / (matchClicks === 0 ? 1 : matchClicks)) * 100);
+        return accuracy > 100 ? 100 : accuracy;
     }
 
     function clickMatchCard(el, cardData) {
         if(el.classList.contains('matched') || el.classList.contains('selected')) return;
         matchClicks++;
 
-        if(!selectedMatchCard) { playTick(); el.classList.add('selected'); selectedMatchCard = { el, data: cardData }; } 
-        else {
+        if(!selectedMatchCard) {
+            playTick();
+            el.classList.add('selected');
+            selectedMatchCard = { el, data: cardData };
+        } else {
             if(selectedMatchCard.data.obj.p === cardData.obj.p && selectedMatchCard.data.type !== cardData.type) {
-                playTick(); el.classList.add('matched'); selectedMatchCard.el.classList.add('matched');
-                matchPairsLeft--; selectedMatchCard = null;
+                playTick();
+                el.classList.add('matched');
+                selectedMatchCard.el.classList.add('matched');
+                matchPairsLeft--;
+                selectedMatchCard = null;
+                
                 if(matchPairsLeft === 0) {
-                    clearInterval(timerInterval); matchTotalScore += matchTimeLeft;
-                    let targetR = isExtreme ? 7 : 3;
-                    setTimeout(() => { matchRound++; if(matchRound > targetR) endMatch(); else initMatchRound(); }, 500);
+                    clearInterval(timerInterval);
+                    matchTotalScore += matchTimeLeft;
+                    setTimeout(() => {
+                        matchRound++;
+                        if(matchRound > matchTotalRounds) endMatch();
+                        else initMatchRound();
+                    }, 500);
                 }
             } else {
-                playBuzz(); triggerDamageEffect(); el.classList.add('wrong'); selectedMatchCard.el.classList.add('wrong');
+                playBuzz();
+                triggerDamageEffect();
+                el.classList.add('wrong');
+                selectedMatchCard.el.classList.add('wrong');
                 if(!mistakes.find(m => m.p === cardData.obj.p)) mistakes.push(cardData.obj);
-                let prevEl = selectedMatchCard.el; selectedMatchCard = null;
-                setTimeout(() => { el.classList.remove('wrong'); prevEl.classList.remove('selected', 'wrong'); }, 400);
+                
+                let prevEl = selectedMatchCard.el;
+                selectedMatchCard = null;
+                setTimeout(() => {
+                    el.classList.remove('wrong');
+                    prevEl.classList.remove('selected', 'wrong');
+                }, 400);
             }
         }
     }
 
     function endMatch() {
-        let maxR = isExtreme ? 7 : 3;
-        let perfectClicks = maxR * 8 * 2; // 7라 = 112클릭, 3라 = 48클릭
-        let acc = matchClicks > 0 ? Math.min(100, Math.floor((perfectClicks / matchClicks) * 100)) : 0;
-        let rank = 'C', msg = '';
-
-        if(isExtreme) {
-            if (acc < 80) { rank = 'F'; msg = "한계에 부딪혔습니다. 일반 모드에서 기본기를 더 다지고 오십시오."; }
-            else if (matchTotalScore >= 90 && acc >= 95) { rank = 'SSR'; msg = "경이로운 수준입니다. 사실상 원어민과 다를 바 없는 반응 속도입니다."; }
-            else if (matchTotalScore >= 60 && acc >= 90) { rank = 'SR'; msg = "압도적인 실력입니다. 페르시아어 단어의 뼈대를 완벽히 꿰뚫고 있습니다."; }
-            else { rank = 'R'; msg = "익스트림의 벽을 넘으셨군요. 대단한 집중력과 끈기입니다."; }
+        let accuracy = calculateMatchAccuracy();
+        let rank = '';
+        
+        if(gameDifficulty === 'extreme') {
+            if(accuracy < 80) rank = 'F';
+            else if(accuracy >= 95 && matchTotalScore >= 80) rank = 'SSR';
+            else if(accuracy >= 90 && matchTotalScore >= 40) rank = 'SR';
+            else rank = 'R';
         } else {
-            if (acc < 70) rank = 'C';
-            else if (matchTotalScore >= 45 && acc >= 90) rank = 'A+';
-            else if (matchTotalScore >= 30 && acc >= 80) rank = 'A';
-            else if (matchTotalScore >= 15 && acc >= 70) rank = 'B';
+            if (matchTotalScore >= 45 && accuracy >= 90) rank = 'A+';
+            else if (matchTotalScore >= 20 && accuracy >= 70) rank = 'A';
+            else if (matchTotalScore >= 10) rank = 'B';
+            else rank = 'C';
         }
-        showResult('스피드 매치', rank, msg, `클리어 (누적 보너스: ${matchTotalScore}초 / 정확도 ${acc}%)`);
+        
+        showResult('스피드 매치', rank, `클리어 (누적 보너스: ${matchTotalScore}초)`, accuracy);
     }
 
-    // === 단어 스크램블 ===
-    let scrambleStep = 0, scrambleTotal = 15, scrambleScore = 0, scrambleCombo = 0, scrambleTarget = "", scrambleInput = "", scrambleTargetClicks = 0, scrambleActualClicks = 0, validScrambleData = [];
+    // ==========================================
+    // 3. 단어 스크램블
+    // ==========================================
+    let scrambleStep = 0, scrambleTotal = 15, scrambleScore = 0, scrambleCombo = 0;
+    let scrambleTarget = "", scrambleInput = "";
+    let validScrambleData = [];
+    let scrambleTargetTotalLen = 0, scrambleClicks = 0;
 
     function startScramble() {
-        scrambleTotal = isExtreme ? 30 : 15; scrambleStep = 0; scrambleScore = 0; scrambleCombo = 0; scrambleTargetClicks = 0; scrambleActualClicks = 0;
+        scrambleTotal = gameDifficulty === 'extreme' ? 30 : 15;
+        scrambleStep = 0; scrambleScore = 0; scrambleCombo = 0;
+        scrambleTargetTotalLen = 0; scrambleClicks = 0;
+        
         validScrambleData = wordData.filter(w => !w.p.includes(' ') && w.p.length <= 10);
-        if(validScrambleData.length < 10) validScrambleData = wordData; 
-        showScreen('screen-scramble'); startTime = Date.now(); nextScramble();
+        if(validScrambleData.length < 5) validScrambleData = wordData; 
+
+        showScreen('screen-scramble');
+        startTime = Date.now();
+        nextScramble();
     }
 
     function nextScramble() {
-        scrambleStep++; if(scrambleStep > scrambleTotal) return endScramble();
-        document.getElementById('scramble-progress').innerText = `${scrambleStep} / ${scrambleTotal}`; document.getElementById('scramble-combo').innerText = scrambleCombo;
+        scrambleStep++;
+        if(scrambleStep > scrambleTotal) return endScramble();
+        
+        document.getElementById('scramble-progress').innerText = `${scrambleStep} / ${scrambleTotal}`;
+        document.getElementById('scramble-combo').innerText = scrambleCombo;
+        
         let wObj = validScrambleData[Math.floor(Math.random() * validScrambleData.length)];
-        currentWordObj = wObj; scrambleTarget = wObj.p; scrambleInput = ""; scrambleTargetClicks += scrambleTarget.length;
-        document.getElementById('scramble-mean-text').innerText = wObj.k; document.getElementById('scramble-input').innerText = "";
-        let chars = Array.from(scrambleTarget).sort(() => 0.5 - Math.random());
-        let board = document.getElementById('scramble-board'); board.innerHTML = "";
-        chars.forEach(ch => { let btn = document.createElement('button'); btn.className = 'letter-btn'; btn.innerText = ch; btn.onclick = () => clickScrambleLetter(btn, ch); board.appendChild(btn); });
+        currentWordObj = wObj;
+        scrambleTarget = wObj.p;
+        scrambleTargetTotalLen += scrambleTarget.length;
+        scrambleInput = "";
+        
+        document.getElementById('scramble-mean-text').innerText = wObj.k;
+        document.getElementById('scramble-input').innerText = "";
+        
+        let chars = Array.from(scrambleTarget);
+        chars.sort(() => 0.5 - Math.random());
+        
+        let board = document.getElementById('scramble-board');
+        board.innerHTML = "";
+        chars.forEach(ch => {
+            let btn = document.createElement('button');
+            btn.className = 'letter-btn';
+            btn.innerText = ch;
+            btn.onclick = () => clickScrambleLetter(btn, ch);
+            board.appendChild(btn);
+        });
     }
 
     function clickScrambleLetter(btn, ch) {
-        scrambleActualClicks++;
-        if (ch === scrambleTarget[scrambleInput.length]) {
-            playTick(); scrambleInput += ch; btn.classList.add('used'); document.getElementById('scramble-input').innerText = scrambleInput;
-            if (scrambleInput === scrambleTarget) { scrambleCombo++; scrambleScore += 100 + (scrambleCombo * 10); setTimeout(nextScramble, 400); }
+        scrambleClicks++;
+        let expectedChar = scrambleTarget[scrambleInput.length];
+        
+        if (ch === expectedChar) {
+            playTick();
+            scrambleInput += ch;
+            btn.classList.add('used');
+            document.getElementById('scramble-input').innerText = scrambleInput;
+            
+            if (scrambleInput === scrambleTarget) {
+                scrambleCombo++;
+                scrambleScore += 100 + (scrambleCombo * 10);
+                setTimeout(nextScramble, 400);
+            }
         } else {
-            playBuzz(); triggerDamageEffect(); scrambleCombo = 0; document.getElementById('scramble-combo').innerText = "0";
+            playBuzz();
+            triggerDamageEffect();
+            scrambleCombo = 0;
+            document.getElementById('scramble-combo').innerText = "0";
             if(!mistakes.find(m => m.p === currentWordObj.p)) mistakes.push(currentWordObj);
-            scrambleInput = ""; document.getElementById('scramble-input').innerText = "";
+            
+            scrambleInput = "";
+            document.getElementById('scramble-input').innerText = "";
             document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('used'));
         }
     }
 
     function endScramble() {
         let totalSec = Math.floor((Date.now() - startTime) / 1000);
-        let acc = scrambleActualClicks > 0 ? Math.min(100, Math.floor((scrambleTargetClicks / scrambleActualClicks) * 100)) : 0;
-        let rank = 'C', msg = '';
+        let accuracy = Math.floor((scrambleTargetTotalLen / (scrambleClicks === 0 ? 1 : scrambleClicks)) * 100);
+        if(accuracy > 100) accuracy = 100;
 
-        if(isExtreme) {
-            if (acc < 85) { rank = 'F'; msg = "한계에 부딪혔습니다. 일반 모드에서 기본기를 더 다지고 오십시오."; }
-            else if (scrambleScore >= 4500 && acc >= 95) { rank = 'SSR'; msg = "경이로운 수준입니다. 사실상 원어민과 다를 바 없는 반응 속도입니다."; }
-            else if (scrambleScore >= 3000 && acc >= 90) { rank = 'SR'; msg = "압도적인 실력입니다. 페르시아어 단어의 뼈대를 완벽히 꿰뚫고 있습니다."; }
-            else { rank = 'R'; msg = "익스트림의 벽을 넘으셨군요. 대단한 집중력과 끈기입니다."; }
+        let rank = '';
+        if(gameDifficulty === 'extreme') {
+            if(accuracy < 80) rank = 'F';
+            else if(accuracy >= 95 && totalSec <= 100) rank = 'SSR';
+            else if(accuracy >= 90 && totalSec <= 150) rank = 'SR';
+            else rank = 'R';
         } else {
-            if (acc < 70) rank = 'C';
-            else if (scrambleScore >= 2000 && acc >= 90) rank = 'A+';
-            else if (scrambleScore >= 1200 && acc >= 80) rank = 'A';
-            else if (scrambleScore >= 600 && acc >= 70) rank = 'B';
+            if (accuracy >= 90 && totalSec <= 60) rank = 'A+';
+            else if (accuracy >= 80 && totalSec <= 100) rank = 'A';
+            else if (accuracy >= 70) rank = 'B';
+            else rank = 'C';
         }
-        showResult('단어 스크램블', rank, msg, `${scrambleScore} 점 (소요시간: ${totalSec}초 / 정확도 ${acc}%)`);
+        
+        showResult('단어 스크램블', rank, `${scrambleScore} 점 (소요시간: ${totalSec}초)`, accuracy);
     }
 
-    // === 결과 및 사전 공통 함수 ===
-    function showResult(modeName, rank, msg, scoreStr) {
-        document.getElementById('top-nav').style.display = 'block'; showScreen('screen-result');
-        let cert = document.getElementById('certificate');
-        if(isExtreme) cert.classList.add('cert-extreme'); else cert.classList.remove('cert-extreme');
-        document.getElementById('res-mode').innerText = modeName; document.getElementById('res-rank').innerText = rank;
+    // ==========================================
+    // 공통 결과창 및 오답노트
+    // ==========================================
+    function showResult(modeName, rank, scoreStr, accuracy) {
+        document.getElementById('top-nav').style.display = 'flex';
+        showScreen('screen-result');
+        
+        let msg = '';
+        if (gameDifficulty === 'extreme') {
+            if (rank === 'SSR') msg = "경이로운 수준입니다. 사실상 원어민과 다를 바 없는 반응 속도입니다.";
+            else if (rank === 'SR') msg = "압도적인 실력입니다. 페르시아어 단어의 뼈대를 완벽히 꿰뚫고 있습니다.";
+            else if (rank === 'R') msg = "익스트림의 벽을 넘으셨군요. 대단한 집중력과 끈기입니다.";
+            else msg = "한계에 부딪혔습니다. 일반 모드에서 기본기를 더 다지고 오십시오.";
+        } else {
+            if (rank === 'A+') msg = "🏆 완벽합니다! 원어민 수준의 암기력입니다.";
+            else if (rank === 'A') msg = "👏 훌륭합니다! 단어의 달인이네요.";
+            else if (rank === 'B') msg = "👍 준수합니다! 오답 노트만 확인해 보세요.";
+            else msg = "💪 꾸준한 훈련이 정답입니다. 다시 도전!";
+        }
+
+        let certBox = document.getElementById('certificate');
+        let badgeEl = document.getElementById('res-badge');
+        
+        if (gameDifficulty === 'extreme') {
+            certBox.classList.add('extreme-mode');
+            badgeEl.className = 'mode-badge badge-extreme';
+            badgeEl.innerText = 'Extreme';
+        } else {
+            certBox.classList.remove('extreme-mode');
+            badgeEl.className = 'mode-badge badge-normal';
+            badgeEl.innerText = 'Normal';
+        }
+
+        document.getElementById('res-mode').innerText = modeName;
+        document.getElementById('res-rank').innerText = rank;
         document.getElementById('res-msg').innerText = msg;
-        document.getElementById('res-score').innerText = scoreStr; document.getElementById('res-stamp').innerText = `${getFormattedDate()} 인증됨`;
+        document.getElementById('res-acc').innerText = `최종 정확도: ${accuracy}%`;
+        document.getElementById('res-score').innerText = scoreStr;
+        document.getElementById('res-stamp').innerText = `${getFormattedDate()} 인증됨`;
+
         let mistArea = document.getElementById('mistake-area');
         if (mistakes.length > 0) {
-            mistArea.style.display = 'block'; document.getElementById('mistake-list').innerHTML = mistakes.map(m => `<div class="mistake-item"><span>${m.p}</span> ${m.k}</div>`).join('');
-        } else { mistArea.style.display = 'none'; }
+            mistArea.style.display = 'block';
+            let html = mistakes.map(m => `<div class="mistake-item"><span>${m.p}</span> ${m.k}</div>`).join('');
+            document.getElementById('mistake-list').innerHTML = html;
+        } else {
+            mistArea.style.display = 'none';
+        }
     }
 
     async function copyResultImage() {
-        const btn = document.querySelector('.btn-share'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 생성 중...';
+        const btn = document.querySelector('.btn-share');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 이미지 생성 중...';
         try {
-            const el = document.getElementById('certificate'); const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff' });
+            const el = document.getElementById('certificate');
+            const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff' });
             canvas.toBlob(async (blob) => {
                 try {
-                    const item = new ClipboardItem({ 'image/png': blob }); await navigator.clipboard.write([item]);
-                    btn.innerHTML = '<i class="fas fa-check"></i> 복사 완료! (Ctrl+V)'; btn.style.background = '#0b2a4a';
-                } catch (err) { btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 권한 필요'; }
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    await navigator.clipboard.write([item]);
+                    btn.innerHTML = '<i class="fas fa-check"></i> 클립보드에 복사되었습니다! (Ctrl+V)';
+                    btn.style.background = '#0b2a4a';
+                } catch (err) {
+                    btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 브라우저 권한 필요';
+                }
             });
-        } catch(e) { btn.innerHTML = '<i class="fas fa-exclamation"></i> 오류 발생'; }
-        setTimeout(() => { btn.innerHTML = '<i class="fas fa-camera"></i> 인증서 복사하기'; btn.style.background = '#20c997'; }, 3000);
+        } catch(e) {
+            btn.innerHTML = '<i class="fas fa-exclamation"></i> 오류 발생';
+        }
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-camera"></i> 인증서 복사하기 (클립보드)';
+            btn.style.background = '#20c997';
+        }, 3000);
     }
 
-    let fcIndex = 0; let filteredDict = [];
+    // ==========================================
+    // 단어 사전 리스트 및 플래시카드 연동
+    // ==========================================
+    let fcIndex = 0;
+    let filteredDict = [];
+
     function renderDict() {
-        filteredDict = [...wordData]; document.getElementById('dict-count').innerText = filteredDict.length;
-        const listDiv = document.getElementById('dict-list'); listDiv.innerHTML = "";
+        filteredDict = [...wordData];
+        document.getElementById('dict-count').innerText = filteredDict.length;
+        const listDiv = document.getElementById('dict-list');
+        listDiv.innerHTML = "";
         filteredDict.forEach((w, idx) => {
-            let item = document.createElement('div'); item.className = 'vocab-item'; item.innerHTML = `<span class="vocab-per">${w.p}</span><span class="vocab-kor">${w.k}</span>`;
-            item.onclick = () => openFlashcard(idx); listDiv.appendChild(item);
+            let item = document.createElement('div');
+            item.className = 'vocab-item';
+            item.style.cursor = 'pointer'; 
+            item.innerHTML = `<span class="vocab-per">${w.p}</span><span class="vocab-kor">${w.k}</span>`;
+            item.onclick = () => openFlashcard(idx);
+            listDiv.appendChild(item);
         });
     }
+
     function filterDict() {
-        let q = document.getElementById('searchInput').value.toLowerCase(); filteredDict = wordData.filter(w => w.p.includes(q) || w.k.includes(q));
-        document.getElementById('dict-count').innerText = filteredDict.length; const listDiv = document.getElementById('dict-list'); listDiv.innerHTML = "";
+        let q = document.getElementById('searchInput').value.toLowerCase();
+        filteredDict = wordData.filter(w => w.p.includes(q) || w.k.includes(q));
+        document.getElementById('dict-count').innerText = filteredDict.length;
+        const listDiv = document.getElementById('dict-list');
+        listDiv.innerHTML = "";
         filteredDict.forEach((w, idx) => {
-            let item = document.createElement('div'); item.className = 'vocab-item'; item.innerHTML = `<span class="vocab-per">${w.p}</span><span class="vocab-kor">${w.k}</span>`;
-            item.onclick = () => openFlashcard(idx); listDiv.appendChild(item);
+            let item = document.createElement('div');
+            item.className = 'vocab-item';
+            item.style.cursor = 'pointer';
+            item.innerHTML = `<span class="vocab-per">${w.p}</span><span class="vocab-kor">${w.k}</span>`;
+            item.onclick = () => openFlashcard(idx);
+            listDiv.appendChild(item);
         });
     }
-    function shuffleDict() { for (let i = wordData.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [wordData[i], wordData[j]] = [wordData[j], wordData[i]]; } filterDict(); }
+
+    function shuffleDict() {
+        for (let i = wordData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [wordData[i], wordData[j]] = [wordData[j], wordData[i]];
+        }
+        filterDict(); 
+    }
+
+    function openFlashcard(idx) {
+        fcIndex = idx;
+        document.getElementById('flashcardModal').style.display = 'flex';
+        updateFlashcard(); 
+    }
     
-    function openFlashcard(idx) { fcIndex = idx; document.getElementById('flashcardModal').style.display = 'flex'; updateFlashcard(); }
     function closeFlashcard() { document.getElementById('flashcardModal').style.display = 'none'; }
-    function toggleCard() { const meanEl = document.getElementById('fcMean'); if (meanEl.classList.contains('fc-content-hidden')) meanEl.classList.remove('fc-content-hidden'); else meanEl.classList.add('fc-content-hidden'); }
+    
+    function toggleCard() { 
+        const meanEl = document.getElementById('fcMean');
+        if (meanEl.classList.contains('fc-content-hidden')) meanEl.classList.remove('fc-content-hidden');
+        else meanEl.classList.add('fc-content-hidden');
+    }
+    
     function nextCard() { fcIndex = (fcIndex + 1) % filteredDict.length; updateFlashcard(); }
     function prevCard() { fcIndex = (fcIndex - 1 + filteredDict.length) % filteredDict.length; updateFlashcard(); }
+    
     function updateFlashcard() {
         document.getElementById('fcPer').innerText = filteredDict[fcIndex].p;
         document.getElementById('fcPron').innerText = filteredDict[fcIndex].r ? `/${filteredDict[fcIndex].r}/` : '';
-        document.getElementById('fcMean').innerText = filteredDict[fcIndex].k; document.getElementById('fcMean').classList.add('fc-content-hidden'); 
+        document.getElementById('fcMean').innerText = filteredDict[fcIndex].k;
+        document.getElementById('fcMean').classList.add('fc-content-hidden'); 
     }
-    function downloadCSV() { if(!WORD_CSV_URL) { alert("시트 링크가 없습니다."); return; } alert("⚠️ [필독 주의사항]\n\n다운받은 csv 파일을 더블클릭하여 엑셀로 열면 페르시아어가 100% 깨집니다.\n\n반드시 구글 스프레드시트를 새로 열고 [파일] -> [가져오기] 메뉴를 통해 해당 파일을 여세요."); window.open(WORD_CSV_URL, '_blank'); }
+
+    function downloadCSV() {
+        if(!WORD_CSV_URL) {
+            alert("다운로드할 수 있는 시트 링크가 설정되지 않았습니다.");
+            return;
+        }
+        alert("⚠️ [필독 주의사항]\n\n다운받은 csv 파일을 더블클릭하여 엑셀로 열면 페르시아어가 100% 깨집니다.\n\n반드시 구글 스프레드시트를 열고 [파일] -> [가져오기] 메뉴를 통해 해당 파일을 여세요.");
+        window.open(WORD_CSV_URL, '_blank');
+    }
 </script>
 </body>
 </html>
