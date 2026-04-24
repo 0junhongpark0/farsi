@@ -182,6 +182,106 @@
     margin-left: 15px;
     transition: 0.3s;
 }
+
+/* --- 모바일 및 태블릿 반응형 대응 --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px; /* 여백 축소 */
+        align-items: flex-start; /* 모바일에서는 상단부터 정렬 */
+    }
+
+    .container {
+        min-height: auto; /* 고정 높이 해제 */
+        height: calc(100vh - 20px); /* 화면 높이에 맞춤 */
+    }
+
+    header h2 {
+        font-size: 1.8rem; /* 헤더 크기 축소 */
+    }
+
+    .screen {
+        padding: 20px; /* 내부 여백 축소 */
+        max-height: calc(100vh - 120px);
+    }
+
+    /* 객관식 게임 문제 텍스트 크기 조절 */
+    .mcq-problem {
+        font-size: 2.2rem;
+        margin: 20px 0;
+    }
+
+    /* 객관식 버튼 1열로 배치 (선택 사항) */
+    .mcq-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .mcq-btn {
+        padding: 15px;
+        font-size: 1.3rem;
+    }
+
+    /* 스피드 매치 그리드 조정 */
+    .match-grid {
+        grid-template-columns: repeat(3, 1fr); /* 모바일에서는 3열이 적당 */
+        gap: 8px;
+    }
+
+    .match-card {
+        height: 80px;
+        font-size: 1.2rem;
+    }
+
+    /* 스크램블 입력 및 버튼 크기 조절 */
+    .scramble-mean {
+        font-size: 1.8rem;
+    }
+    
+    .scramble-input-area {
+        font-size: 2rem;
+        min-height: 60px;
+    }
+
+    .letter-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.5rem;
+    }
+
+    /* 플래시카드 크기 조정 */
+    .flashcard {
+        width: 95%;
+        height: 60vh;
+    }
+
+    .card-per {
+        font-size: 3.5rem;
+    }
+    
+    .card-mean {
+        font-size: 1.8rem;
+    }
+
+    /* 결과창 인증서 텍스트 조절 */
+    .cert-rank {
+        font-size: 3.5rem;
+    }
+    
+    .cert-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* 초소형 기기 (iPhone SE 등) 대응 */
+@media (max-width: 380px) {
+    .match-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    header h2 {
+        font-size: 1.5rem;
+    }
+}
     </style>
 </head>
 <body>
