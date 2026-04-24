@@ -166,6 +166,22 @@
         .mode-badge { display: inline-block; padding: 3px 10px; border-radius: 5px; font-size: 1rem; font-weight: bold; vertical-align: middle; margin-left: 10px;}
         .badge-normal { background: #e3f2fd; color: #0b2a4a; }
         .badge-extreme { background: #ffe3e3; color: #8b0000; }
+
+/* 오답노트 발음 및 강제 체류(Lock) 관련 스타일 */
+.mistake-pron { font-size: 1.1rem; color: #868e96; margin-right: 15px; font-family: sans-serif; }
+.btn-locked {
+    pointer-events: none !important;
+    background: #f8f9fa !important;
+    color: #adb5bd !important;
+    border-color: #dee2e6 !important;
+}
+.lock-timer {
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: bold;
+    margin-left: 15px;
+    transition: 0.3s;
+}
     </style>
 </head>
 <body>
@@ -390,11 +406,10 @@
         }
     };
 
-    let currentMode = '';
-    let gameDifficulty = 'normal'; // 'normal' | 'extreme'
-    let timerInterval = null;
-    let startTime = 0;
-    let mistakes = []; 
+let currentMode = '';
+let gameDifficulty = 'normal'; // 'normal' | 'extreme'
+let isResultLocked = false; // 추가: 결과창 락 상태 확인용
+let matchCorrectClicks = 0; // 추가: 스피드매치 정확도 계산용
 
     function getFormattedDate() {
         const now = new Date();
@@ -406,13 +421,14 @@
         return `${y}.${m}.${d} ${h}:${min}`;
     }
 
-    function goHome() {
-        clearInterval(timerInterval);
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('screen-home').classList.add('active');
-        document.getElementById('top-nav').style.display = 'none';
-        document.getElementById('main-header').style.display = 'block';
-    }
+function goHome() {
+    if (isResultLocked) return; // 락 걸려있으면 동작 안 함
+    clearInterval(timerInterval);
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-home').classList.add('active');
+    document.getElementById('top-nav').style.display = 'none';
+    document.getElementById('main-header').style.display = 'block';
+}
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -527,18 +543,19 @@
         let accuracy = Math.floor((mcqTotal / mcqClicks) * 100);
         if(accuracy > 100) accuracy = 100;
 
-        let rank = '';
-        if(gameDifficulty === 'extreme') {
-            if(accuracy < 80) rank = 'F';
-            else if(accuracy >= 95 && totalSec <= 150) rank = 'SSR';
-            else if(accuracy >= 90 && totalSec <= 200) rank = 'SR';
-            else rank = 'R';
-        } else {
-            if (accuracy < 70) rank = 'C';
-            else if (totalSec <= 90 && accuracy >= 95) rank = 'A+';
-            else if (totalSec <= 120 && accuracy >= 85) rank = 'A';
-            else rank = 'B';
-        }
+let rank = '';
+    if(gameDifficulty === 'extreme') {
+        if(accuracy < 80) rank = 'F';
+        else if(accuracy >= 95 && totalSec <= 150) rank = 'SSR';
+        else if(accuracy >= 90 && totalSec <= 200) rank = 'SR';
+        else rank = 'R';
+    } else {
+        // 일반 모드 대폭 완화
+        if (accuracy < 60) rank = 'C';
+        else if (totalSec <= 120 && accuracy >= 90) rank = 'A+';
+        else if (totalSec <= 180 && accuracy >= 80) rank = 'A';
+        else rank = 'B';
+    }
         
         showResult('객관식 서바이벌', rank, `${Math.floor(totalSec/60)}분 ${String(totalSec%60).padStart(2,'0')}초`, accuracy);
     }
@@ -553,12 +570,13 @@
     const extremeTimes = [45, 40, 35, 30, 25, 22, 20];
     const normalTimes = [40, 30, 20];
 
-    function startMatch() {
-        matchRound = 1; matchTotalScore = 0; matchClicks = 0;
-        matchTotalRounds = gameDifficulty === 'extreme' ? 7 : 3;
-        showScreen('screen-match');
-        initMatchRound();
-    }
+function startMatch() {
+    matchRound = 1; matchTotalScore = 0; matchClicks = 0; 
+    matchCorrectClicks = 0; // 이 줄을 반드시 추가해
+    matchTotalRounds = gameDifficulty === 'extreme' ? 7 : 3;
+    showScreen('screen-match');
+    initMatchRound();
+}
 
     function initMatchRound() {
         if(gameDifficulty === 'extreme') matchTimeLeft = extremeTimes[matchRound - 1];
@@ -605,11 +623,12 @@
         }, 1000);
     }
 
-    function calculateMatchAccuracy() {
-        let targetClicks = matchTotalRounds * 16; 
-        let accuracy = Math.floor((targetClicks / (matchClicks === 0 ? 1 : matchClicks)) * 100);
-        return accuracy > 100 ? 100 : accuracy;
-    }
+function calculateMatchAccuracy() {
+    if (matchClicks === 0) return 0;
+    // 정확도 = (매치에 성공한 횟수*2 / 총 클릭 횟수) * 100
+    let accuracy = Math.floor((matchCorrectClicks / matchClicks) * 100);
+    return accuracy > 100 ? 100 : accuracy;
+}
 
     function clickMatchCard(el, cardData) {
         if(el.classList.contains('matched') || el.classList.contains('selected')) return;
@@ -622,6 +641,7 @@
         } else {
             if(selectedMatchCard.data.obj.p === cardData.obj.p && selectedMatchCard.data.type !== cardData.type) {
                 playTick();
+                matchCorrectClicks += 2;
                 el.classList.add('matched');
                 selectedMatchCard.el.classList.add('matched');
                 matchPairsLeft--;
@@ -655,19 +675,19 @@
 
     function endMatch() {
         let accuracy = calculateMatchAccuracy();
-        let rank = '';
-        
-        if(gameDifficulty === 'extreme') {
-            if(accuracy < 80) rank = 'F';
-            else if(accuracy >= 95 && matchTotalScore >= 80) rank = 'SSR';
-            else if(accuracy >= 90 && matchTotalScore >= 40) rank = 'SR';
-            else rank = 'R';
-        } else {
-            if (matchTotalScore >= 45 && accuracy >= 90) rank = 'A+';
-            else if (matchTotalScore >= 20 && accuracy >= 70) rank = 'A';
-            else if (matchTotalScore >= 10) rank = 'B';
-            else rank = 'C';
-        }
+let rank = '';
+    if(gameDifficulty === 'extreme') {
+        if(accuracy < 80) rank = 'F';
+        else if(accuracy >= 95 && matchTotalScore >= 80) rank = 'SSR';
+        else if(accuracy >= 90 && matchTotalScore >= 40) rank = 'SR';
+        else rank = 'R';
+    } else {
+        // 일반 모드 대폭 완화
+        if (matchTotalScore >= 30 && accuracy >= 85) rank = 'A+';
+        else if (matchTotalScore >= 15 && accuracy >= 70) rank = 'A';
+        else if (matchTotalScore >= 0 && accuracy >= 60) rank = 'B';
+        else rank = 'C';
+    }
         
         showResult('스피드 매치', rank, `클리어 (누적 보너스: ${matchTotalScore}초)`, accuracy);
     }
@@ -756,18 +776,19 @@
         let accuracy = Math.floor((scrambleTargetTotalLen / (scrambleClicks === 0 ? 1 : scrambleClicks)) * 100);
         if(accuracy > 100) accuracy = 100;
 
-        let rank = '';
-        if(gameDifficulty === 'extreme') {
-            if(accuracy < 80) rank = 'F';
-            else if(accuracy >= 95 && totalSec <= 100) rank = 'SSR';
-            else if(accuracy >= 90 && totalSec <= 150) rank = 'SR';
-            else rank = 'R';
-        } else {
-            if (accuracy >= 90 && totalSec <= 60) rank = 'A+';
-            else if (accuracy >= 80 && totalSec <= 100) rank = 'A';
-            else if (accuracy >= 70) rank = 'B';
-            else rank = 'C';
-        }
+let rank = '';
+    if(gameDifficulty === 'extreme') {
+        if(accuracy < 80) rank = 'F';
+        else if(accuracy >= 95 && totalSec <= 100) rank = 'SSR';
+        else if(accuracy >= 90 && totalSec <= 150) rank = 'SR';
+        else rank = 'R';
+    } else {
+        // 일반 모드 대폭 완화
+        if (accuracy >= 85 && totalSec <= 90) rank = 'A+';
+        else if (accuracy >= 75 && totalSec <= 120) rank = 'A';
+        else if (accuracy >= 60) rank = 'B';
+        else rank = 'C';
+    }
         
         showResult('단어 스크램블', rank, `${scrambleScore} 점 (소요시간: ${totalSec}초)`, accuracy);
     }
@@ -809,18 +830,78 @@
         document.getElementById('res-rank').innerText = rank;
         document.getElementById('res-msg').innerText = msg;
         document.getElementById('res-acc').innerText = `최종 정확도: ${accuracy}%`;
-        document.getElementById('res-score').innerText = scoreStr;
+document.getElementById('res-score').innerText = scoreStr;
         document.getElementById('res-stamp').innerText = `${getFormattedDate()} 인증됨`;
 
         let mistArea = document.getElementById('mistake-area');
         if (mistakes.length > 0) {
             mistArea.style.display = 'block';
-            let html = mistakes.map(m => `<div class="mistake-item"><span>${m.p}</span> ${m.k}</div>`).join('');
+            // 발음 기호(r)가 존재하면 span 태그로 감싸서 노출
+            let html = mistakes.map(m => {
+                let pron = m.r ? `<span class="mistake-pron">/${m.r}/</span>` : '';
+                return `<div class="mistake-item"><span>${m.p}</span> ${pron}${m.k}</div>`;
+            }).join('');
             document.getElementById('mistake-list').innerHTML = html;
         } else {
             mistArea.style.display = 'none';
         }
+
+function lockResultScreen() {
+        if (mistakes.length === 0) return; // 오답이 없으면 락을 걸지 않음
+
+        isResultLocked = true;
+        const backBtn = document.querySelector('.top-nav .btn-home:first-child');
+        const portalBtn = document.querySelector('.portal-home-button');
+        const topNav = document.getElementById('top-nav');
+
+        // 버튼 물리적/시각적 비활성화
+        backBtn.classList.add('btn-locked');
+        portalBtn.style.pointerEvents = 'none';
+        portalBtn.style.opacity = '0.4';
+
+        // 타이머 UI 생성
+        let timerSpan = document.getElementById('lock-timer-display');
+        if(!timerSpan) {
+            timerSpan = document.createElement('span');
+            timerSpan.id = 'lock-timer-display';
+            timerSpan.className = 'lock-timer';
+            topNav.insertBefore(timerSpan, backBtn.nextSibling);
+        }
+
+        let timeLeft = 5;
+        backBtn.innerHTML = `<i class="fas fa-lock"></i> 오답 확인 중...`;
+        timerSpan.innerText = `(${timeLeft}초 후 활성화)`;
+
+        let lockInterval = setInterval(() => {
+            timeLeft--;
+            timerSpan.innerText = `(${timeLeft}초 후 활성화)`;
+            
+            if(timeLeft <= 0) {
+                clearInterval(lockInterval);
+                isResultLocked = false;
+                
+                // 해금
+                backBtn.classList.remove('btn-locked');
+                portalBtn.style.pointerEvents = 'auto';
+                portalBtn.style.opacity = '1';
+                backBtn.innerHTML = `<i class="fas fa-arrow-left"></i> 뒤로가기`;
+                timerSpan.innerText = "";
+                
+                // 버튼이 풀렸다는 시각적 피드백 (잠깐 파란색으로 번쩍임)
+                backBtn.style.transition = "0.3s";
+                backBtn.style.backgroundColor = "#e3f2fd";
+                backBtn.style.borderColor = "var(--primary)";
+                setTimeout(() => {
+                    backBtn.style.backgroundColor = "#ffffff";
+                    backBtn.style.borderColor = "#dee2e6";
+                }, 500);
+            }
+        }, 1000);
     }
+
+        // 결과창 표시 직후 5초 락 로직 실행
+        lockResultScreen();
+    } // <-- showResult 함수 끝
 
     async function copyResultImage() {
         const btn = document.querySelector('.btn-share');
