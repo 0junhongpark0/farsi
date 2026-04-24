@@ -162,13 +162,19 @@
 </head>
 <body>
 
+<div id="global-loader" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition:opacity 0.5s;">
+    <div class="spinner"></div>
+    <div style="color:var(--primary); font-weight:bold; font-size:1.5rem; margin-top:20px;">단어장 데이터를 준비 중입니다...</div>
+</div>
+
 <a href="index.html" class="portal-home-button" title="메인 페이지로 돌아가기">
     <i class="fas fa-home"></i>
 </a>
 
 <div class="container" id="main-container">
-    <div class="top-nav" id="top-nav">
+<div class="top-nav" id="top-nav">
         <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
+        <button class="btn-home" id="muteBtn" onclick="toggleMute()" style="float:right; border:none; background:transparent; font-size:1.5rem; padding:5px;"><i class="fas fa-volume-up"></i></button>
     </div>
 
     <header id="main-header">
@@ -218,11 +224,6 @@
             </div>
         </div>
 <div class="vocab-list" id="dict-list">
-            <div class="loading-view" id="loading-spinner">
-                <div class="spinner"></div>
-                데이터를 연동 중입니다...
-            </div>
-        </div>
     </div>
 
     <div id="screen-mcq" class="screen">
@@ -340,7 +341,40 @@
         return arr;
     }
 
-window.onload = function() {
+// [수정] 글로벌 로딩 스크린 제어 및 음소거 기능 추가
+    let isMuted = false;
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        const icon = document.querySelector('#muteBtn i');
+        if(isMuted) {
+            icon.className = 'fas fa-volume-mute';
+            document.getElementById('muteBtn').style.color = 'var(--accent)';
+        } else {
+            icon.className = 'fas fa-volume-up';
+            document.getElementById('muteBtn').style.color = 'var(--primary)';
+        }
+    }
+
+    // 기존 오디오 재생 함수 덮어쓰기 (isMuted 검사 추가)
+    function playTick() {
+        if(isMuted || !audioCtx) return;
+        let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(1200, audioCtx.currentTime); 
+        gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+    }
+    function playBuzz() {
+        if(isMuted || !audioCtx) return;
+        let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
+        gain.gain.setValueAtTime(0.6, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+    }
+
+    window.onload = function() {
         if(WORD_CSV_URL) {
             fetch(WORD_CSV_URL).then(res => res.text()).then(csvText => {
                 const parsed = parseCSV(csvText);
@@ -348,20 +382,24 @@ window.onload = function() {
                     wordData = [];
                     for(let i=1; i<parsed.length; i++) {
                         if(parsed[i][0]) {
-                            wordData.push({ 
-                                p: parsed[i][0].trim(), 
-                                k: parsed[i][1] ? parsed[i][1].trim() : '',
-                                r: parsed[i][2] ? parsed[i][2].trim() : '' 
-                            });
+                            wordData.push({ p: parsed[i][0].trim(), k: parsed[i][1] ? parsed[i][1].trim() : '', r: parsed[i][2] ? parsed[i][2].trim() : '' });
                         }
                     }
-                    // 데이터 로딩 완료 시점에 리스트 즉시 갱신
-                    renderDict();
+                    renderDict(); // 딕셔너리 미리 세팅
+                    
+                    // 로딩 100% 완료 시 글로벌 스크린 해제
+                    setTimeout(() => {
+                        let loader = document.getElementById('global-loader');
+                        loader.style.opacity = '0';
+                        setTimeout(() => loader.style.display = 'none', 500);
+                    }, 500);
                 }
             }).catch(e => {
-                // 실패 시 로딩 문구를 오류 메시지로 교체
-                document.getElementById('dict-list').innerHTML = `<div class="loading-view" style="color:var(--accent);">단어 데이터를 가져오지 못했습니다.</div>`;
+                document.getElementById('global-loader').innerHTML = `<div style="color:var(--accent); font-weight:bold; font-size:1.5rem;">데이터 로딩에 실패했습니다. 새로고침 해주세요.</div>`;
             });
+        } else {
+            // URL이 없을 경우 무한 로딩 방지 (임시 닫기)
+            document.getElementById('global-loader').style.display = 'none';
         }
     };
 
@@ -489,12 +527,13 @@ window.onload = function() {
         }
     }
 
-    function endMCQ() {
+function endMCQ() {
         clearInterval(timerInterval);
         let totalSec = Math.floor((Date.now() - startTime) / 1000) + mcqPenaltySec;
         let acc = Math.floor((20 / mcqClicks) * 100);
         
         let rank = 'C';
+        // 정확도 기준치 미달 시 무조건 C등급 강등
         if (acc < 70) rank = 'C';
         else if (totalSec <= 60 && acc >= 95) rank = 'A+';
         else if (totalSec <= 90 && acc >= 85) rank = 'A';
@@ -600,13 +639,17 @@ window.onload = function() {
         }
     }
 
-    function endMatch() {
+function endMatch() {
+        // 총 3라운드 * 6쌍 = 18쌍. 완벽 클리어 시 최소 36클릭 필요.
+        let acc = matchClicks > 0 ? Math.floor((36 / matchClicks) * 100) : 0;
         let rank = 'C';
-        if (matchTotalScore >= 45) rank = 'A+';
-        else if (matchTotalScore >= 30) rank = 'A';
-        else if (matchTotalScore >= 15) rank = 'B';
         
-        showResult('스피드 매치', rank, `클리어 (누적 보너스: ${matchTotalScore}초)`);
+        if (acc < 70) rank = 'C';
+        else if (matchTotalScore >= 45 && acc >= 90) rank = 'A+';
+        else if (matchTotalScore >= 30 && acc >= 80) rank = 'A';
+        else if (matchTotalScore >= 15 && acc >= 70) rank = 'B';
+        
+        showResult('스피드 매치', rank, `클리어 (누적 보너스: ${matchTotalScore}초 / 정확도 ${acc}%)`);
     }
 
     // ==========================================
@@ -684,14 +727,19 @@ window.onload = function() {
         }
     }
 
-    function endScramble() {
+function endScramble() {
         let totalSec = Math.floor((Date.now() - startTime) / 1000);
-        let rank = 'C';
-        if (scrambleScore >= 1400 && totalSec <= 40) rank = 'A+';
-        else if (scrambleScore >= 1000) rank = 'A';
-        else if (scrambleScore >= 600) rank = 'B';
         
-        showResult('단어 스크램블', rank, `${scrambleScore} 점 (소요시간: ${totalSec}초)`);
+        // scrambleTargetClicks(정답 목표 클릭수)와 실제 클릭수 비교
+        let acc = scrambleActualClicks > 0 ? Math.floor((scrambleTargetClicks / scrambleActualClicks) * 100) : 0;
+        let rank = 'C';
+        
+        if (acc < 70) rank = 'C';
+        else if (scrambleScore >= 1400 && acc >= 90) rank = 'A+';
+        else if (scrambleScore >= 1000 && acc >= 80) rank = 'A';
+        else if (scrambleScore >= 600 && acc >= 70) rank = 'B';
+        
+        showResult('단어 스크램블', rank, `${scrambleScore} 점 (소요시간: ${totalSec}초 / 정확도 ${acc}%)`);
     }
 
     // ==========================================
