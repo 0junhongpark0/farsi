@@ -415,21 +415,16 @@
             <div class="cert-stamp" id="res-stamp"></div>
         </div>
         
-	<div id="mistake-area" class="mistake-area" style="display:none;">
+        <div id="mistake-area" class="mistake-area" style="display:none;">
             <h4 style="margin-bottom: 15px; font-size:1.4rem; color:var(--primary);"><i class="fas fa-book-open"></i> 오답 노트</h4>
             <div id="mistake-list"></div>
         </div>
 
         <button class="btn-share" onclick="copyResultImage()"><i class="fas fa-camera"></i> 인증서 복사하기 (클립보드)</button>
-        
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button class="btn-share" style="background:var(--primary);" onclick="retryPractice()"><i class="fas fa-redo"></i> 다시 하기</button>
-            <button class="btn-share" style="background:#868e96;" onclick="closeResultAndHome()"><i class="fas fa-home"></i> 로비로 돌아가기</button>
-        </div>
     </div>
+</div>
 
 <script>
-    // 단어장 링크
     const WORD_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kygc158HJLii5s2jwGoCPNhNRyIoK0GJVM6oZUBMyfbI0FIi7lYd0XN4N6v2PYGxtq22AsBZ6yFX/pub?gid=415354578&single=true&output=csv"; 
     
     // 오디오 및 음소거 설정
@@ -512,10 +507,9 @@
     };
 
 let currentMode = '';
-let gameDifficulty = 'normal'; 
-let isResultLocked = false; 
-let matchCorrectClicks = 0; 
-let gameTimeout = null; // [추가] 백그라운드 타이머 누수 방지용
+let gameDifficulty = 'normal'; // 'normal' | 'extreme'
+let isResultLocked = false; // 추가: 결과창 락 상태 확인용
+let matchCorrectClicks = 0; // 추가: 스피드매치 정확도 계산용
 
     function getFormattedDate() {
         const now = new Date();
@@ -530,7 +524,6 @@ let gameTimeout = null; // [추가] 백그라운드 타이머 누수 방지용
 function goHome() {
     if (isResultLocked) return; // 락 걸려있으면 동작 안 함
     clearInterval(timerInterval);
-    clearTimeout(gameTimeout); // [추가] 찰나의 대기 시간(setTimeout)까지 완벽히 멸균
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-home').classList.add('active');
     document.getElementById('top-nav').style.display = 'none';
@@ -754,15 +747,15 @@ function calculateMatchAccuracy() {
                 matchPairsLeft--;
                 selectedMatchCard = null;
                 
-		if(matchPairsLeft === 0) {
-                clearInterval(timerInterval);
-                matchTotalScore += matchTimeLeft;
-                gameTimeout = setTimeout(() => { // [수정] gameTimeout에 할당하여 추적
-                    matchRound++;
-                    if(matchRound > matchTotalRounds) endMatch();
-                    else initMatchRound();
-                }, 500);
-            }
+                if(matchPairsLeft === 0) {
+                    clearInterval(timerInterval);
+                    matchTotalScore += matchTimeLeft;
+                    setTimeout(() => {
+                        matchRound++;
+                        if(matchRound > matchTotalRounds) endMatch();
+                        else initMatchRound();
+                    }, 500);
+                }
             } else {
                 playBuzz();
                 triggerDamageEffect();
@@ -854,7 +847,7 @@ let rank = '';
         scrambleClicks++;
         let expectedChar = scrambleTarget[scrambleInput.length];
         
-	if (ch === expectedChar) {
+        if (ch === expectedChar) {
             playTick();
             scrambleInput += ch;
             btn.classList.add('used');
@@ -863,7 +856,7 @@ let rank = '';
             if (scrambleInput === scrambleTarget) {
                 scrambleCombo++;
                 scrambleScore += 100 + (scrambleCombo * 10);
-                gameTimeout = setTimeout(nextScramble, 400); // [수정] gameTimeout에 할당하여 추적
+                setTimeout(nextScramble, 400);
             }
         } else {
             playBuzz();
@@ -1112,24 +1105,6 @@ function lockResultScreen() {
         alert("⚠️ [필독 주의사항]\n\n다운받은 csv 파일을 더블클릭하여 엑셀로 열면 페르시아어가 100% 깨집니다.\n\n반드시 구글 스프레드시트를 열고 [파일] -> [가져오기] 메뉴를 통해 해당 파일을 여세요.");
         window.open(WORD_CSV_URL, '_blank');
     }
-
-    // ==========================================
-    // 결과창 전용 제어 함수
-    // ==========================================
-    function retryPractice() {
-        if (isResultLocked) return; // 5초 락 상태면 재시작도 방어
-        document.getElementById('screen-result').classList.remove('active');
-        if(currentMode === 'mcq') startMCQ();
-        else if(currentMode === 'match') startMatch();
-        else if(currentMode === 'scramble') startScramble();
-    }
-
-    function closeResultAndHome() {
-        if (isResultLocked) return;
-        document.getElementById('screen-result').classList.remove('active');
-        goHome();
-    }
-
 </script>
 </body>
 </html>
