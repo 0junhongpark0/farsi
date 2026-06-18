@@ -155,6 +155,11 @@
 
         .btn-share { width: 100%; padding: 18px; background: #20c997; color: white; border: none; border-radius: 8px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-share:hover { background: #12b886; }
+
+	/* 홈 버튼 우측 하단으로 이동 */
+        .portal-home-button { position: fixed; bottom: 25px; right: 25px; width: 55px; height: 55px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; transition: all 0.3s ease; }
+        .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .portal-home-button i { font-size: 1.5rem; }
         
         /* 모드 배지 스타일 */
         .mode-badge { display: inline-block; padding: 3px 10px; border-radius: 5px; font-size: 1rem; font-weight: bold; vertical-align: middle; margin-left: 10px;}
@@ -176,17 +181,6 @@
     margin-left: 15px;
     transition: 0.3s;
 }
-
-	/* 데스크톱(마우스) 환경에서만 hover 효과 적용 (모바일 터치 파란 잔상 제거) */
-        @media (hover: hover) and (pointer: fine) {
-            .mcq-btn:hover { border-color: var(--primary); background: #f8f9fa; transform: scale(1.02); color: var(--primary); }
-            .match-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: #adb5bd; }
-            .letter-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); }
-        }
-        /* 터치 시 즉각적인 피드백만 남김 */
-        .mcq-btn:active { background: #f8f9fa; transform: scale(0.98); }
-        .match-card:active { transform: scale(0.95); }
-        .letter-btn:active { transform: scale(0.95); }
 
 /* --- 모바일 및 태블릿 반응형 대응 --- */
 @media (max-width: 768px) {
@@ -226,46 +220,15 @@
         font-size: 1.3rem;
     }
 
-/* 스피드 매치 그리드 강제 4열 조정 (16장 완벽 핏) */
+    /* 스피드 매치 그리드 조정 */
     .match-grid {
-        grid-template-columns: repeat(4, 1fr); 
-        gap: 6px;
+        grid-template-columns: repeat(3, 1fr); /* 모바일에서는 3열이 적당 */
+        gap: 8px;
     }
 
     .match-card {
-        height: 70px;
-        font-size: 1.1rem;
-        padding: 5px;
-    }
-
-/* 단어 사전 모바일 UI 전면 개편 (검색창 확장 및 컨트롤 3단 분리) */
-    .vocab-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-    }
-    .search-bar {
-        max-width: 100%;
-        width: 100%;
-        padding: 15px; /* 터치 영역 확대 */
-        font-size: 1.15rem;
-    }
-    .vocab-controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-    .vocab-count {
-        width: 100%; /* 단독 줄 차지 */
-        text-align: left;
-        margin-bottom: 2px;
-        font-size: 1.1rem;
-    }
-    .btn-control {
-        flex: 1; /* 남은 공간을 두 버튼이 50%씩 균등 분할 */
-        justify-content: center;
-        padding: 12px;
-        font-size: 1rem;
+        height: 80px;
+        font-size: 1.2rem;
     }
 
     /* 스크램블 입력 및 버튼 크기 조절 */
@@ -318,6 +281,30 @@
         font-size: 1.5rem;
     }
 }
+
+	/* 데스크톱(마우스) 환경에서만 hover 효과 적용 (모바일 터치 파란 잔상 제거) */
+        @media (hover: hover) and (pointer: fine) {
+            .mcq-btn:hover { border-color: var(--primary); background: #f8f9fa; transform: scale(1.02); color: var(--primary); }
+            .match-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: #adb5bd; }
+            .letter-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); }
+        }
+        /* 터치 시 즉각적인 피드백만 남김 */
+        .mcq-btn:active { background: #f8f9fa; transform: scale(0.98); }
+        .match-card:active { transform: scale(0.95); }
+        .letter-btn:active { transform: scale(0.95); }
+
+	/* 모바일 전용 UI 수정 (스피드 매치 4x4, 단어장 검색창 확장) */
+        @media (max-width: 768px) {
+            .match-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 6px; }
+            .match-card { height: 70px; font-size: 1.1rem; padding: 5px; }
+            
+            .vocab-header { flex-direction: column; align-items: stretch; gap: 15px; }
+            .search-bar { max-width: 100%; width: 100%; padding: 12px; font-size: 1.1rem; }
+            .vocab-controls { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+            .vocab-count { width: 100%; text-align: left; margin-bottom: 5px; font-size: 1.1rem; }
+            .btn-control { flex: 1; justify-content: center; padding: 12px; font-size: 1rem; }
+        }
+
     </style>
 </head>
 <body>
@@ -544,10 +531,10 @@
     };
 
 let currentMode = '';
-let gameDifficulty = 'normal'; // 'normal' | 'extreme'
+let gameDifficulty = 'normal'; 
 let isResultLocked = false; 
 let matchCorrectClicks = 0; 
-let stageTimeout = null; // [추가] 라운드 간 대기 시간 추적용
+let stageTimeout = null; // 뒤로가기 시 타이머 꼬임 방지용
 
     function getFormattedDate() {
         const now = new Date();
@@ -562,7 +549,7 @@ let stageTimeout = null; // [추가] 라운드 간 대기 시간 추적용
 function goHome() {
     if (isResultLocked) return; 
     clearInterval(timerInterval);
-    clearTimeout(stageTimeout); // [추가] 로비로 나갈 때 유령 타이머 분쇄
+    clearTimeout(stageTimeout); // 추가: 대기열 타이머 분쇄
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-home').classList.add('active');
     document.getElementById('top-nav').style.display = 'none';
@@ -599,9 +586,9 @@ function goHome() {
         showScreen('screen-onboarding');
     }
 
-	function startGame(difficulty) {
-        clearInterval(timerInterval); // [추가]
-        clearTimeout(stageTimeout);   // [추가] 새 게임 시작 시 기존 타이머 완벽 파괴
+function startGame(difficulty) {
+        clearInterval(timerInterval); // 추가
+        clearTimeout(stageTimeout);   // 추가
         gameDifficulty = difficulty;
         mistakes = [];
         if (currentMode === 'mcq') startMCQ();
@@ -771,7 +758,7 @@ function calculateMatchAccuracy() {
     return accuracy > 100 ? 100 : accuracy;
 }
 
-function clickMatchCard(el, cardData) {
+    function clickMatchCard(el, cardData) {
         if(el.classList.contains('matched') || el.classList.contains('selected')) return;
         matchClicks++;
 
@@ -781,7 +768,6 @@ function clickMatchCard(el, cardData) {
             selectedMatchCard = { el, data: cardData };
         } else {
             if(selectedMatchCard.data.obj.p === cardData.obj.p && selectedMatchCard.data.type !== cardData.type) {
-                // [정답] 짝을 맞추었을 때
                 playTick();
                 matchCorrectClicks += 2;
                 el.classList.add('matched');
@@ -789,18 +775,16 @@ function clickMatchCard(el, cardData) {
                 matchPairsLeft--;
                 selectedMatchCard = null;
                 
-                if(matchPairsLeft === 0) {
+if(matchPairsLeft === 0) {
                     clearInterval(timerInterval);
                     matchTotalScore += matchTimeLeft;
-                    // 👉 유령 타이머 방지 코드가 정확히 "정답" 구역에 있어야 함
-                    stageTimeout = setTimeout(() => { 
+                    stageTimeout = setTimeout(() => { // 수정
                         matchRound++;
                         if(matchRound > matchTotalRounds) endMatch();
                         else initMatchRound();
                     }, 500);
                 }
             } else {
-                // [오답] 틀렸을 때
                 playBuzz();
                 triggerDamageEffect();
                 el.classList.add('wrong');
@@ -897,10 +881,10 @@ let rank = '';
             btn.classList.add('used');
             document.getElementById('scramble-input').innerText = scrambleInput;
             
-	if (scrambleInput === scrambleTarget) {
+if (scrambleInput === scrambleTarget) {
                 scrambleCombo++;
                 scrambleScore += 100 + (scrambleCombo * 10);
-                stageTimeout = setTimeout(nextScramble, 400); // [수정] stageTimeout으로 추적
+                stageTimeout = setTimeout(nextScramble, 400); // 수정
             }
         } else {
             playBuzz();
@@ -1143,7 +1127,7 @@ function lockResultScreen() {
 
     function downloadCSV() {
         if(!WORD_CSV_URL) {
-            alert("다운로드할 수 있는 시트 링크가 설정되지 않았습니다.");
+            alert("다운로드할 수 있는 파일이 설정되어 있지 않습니다.");
             return;
         }
         alert("⚠️ [필독 주의사항]\n\n다운받은 csv 파일을 더블클릭하여 엑셀로 열면 페르시아어가 100% 깨집니다.\n\n반드시 구글 스프레드시트를 열고 [파일] -> [가져오기] 메뉴를 통해 해당 파일을 여세요.");
