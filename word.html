@@ -330,21 +330,42 @@
     </header>
 
     <div id="screen-home" class="screen active">
-        <div class="home-grid">
-            <div class="mode-card" onclick="showOnboarding('mcq')">
-                <i class="fas fa-tasks mode-icon"></i>
-                <h3>객관식 서바이벌</h3>
-                <p>양방향(FA↔KO) 뜻 맞추기</p>
+<div class="home-grid">
+            <div class="mode-card" style="cursor: default; padding: 25px 20px;">
+                <i class="fas fa-tasks mode-icon" style="margin-bottom: 15px;"></i>
+                <h3 style="margin-bottom: 15px;">객관식 서바이벌</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
+                    🎯 <strong>분량:</strong> 일반 30문 / 익스트림 100문<br>
+                    ⚠️ <strong>규칙:</strong> 오답 +5초 페널티 및 정확도 감점
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: auto;">
+                    <button class="btn-start" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='mcq'; startGame('normal')">일반</button>
+                    <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='mcq'; startGame('extreme')">익스트림</button>
+                </div>
             </div>
-            <div class="mode-card" onclick="showOnboarding('match')">
-                <i class="fas fa-clone mode-icon"></i>
-                <h3>스피드 매치</h3>
-                <p>단어와 뜻의 짝을 빠르게 맞추기</p>
+            <div class="mode-card" style="cursor: default; padding: 25px 20px;">
+                <i class="fas fa-clone mode-icon" style="margin-bottom: 15px;"></i>
+                <h3 style="margin-bottom: 15px;">스피드 매치</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
+                    ⏱️ <strong>분량:</strong> 일반 3R / 익스트림 7R<br>
+                    ⚠️ <strong>규칙:</strong> 시간 초과 즉시 탈락, 오클릭 감점
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: auto;">
+                    <button class="btn-start" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='match'; startGame('normal')">일반</button>
+                    <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='match'; startGame('extreme')">익스트림</button>
+                </div>
             </div>
-            <div class="mode-card" onclick="showOnboarding('scramble')">
-                <i class="fas fa-font mode-icon"></i>
-                <h3>단어 스크램블</h3>
-                <p>조각난 철자를 순서대로 조립하기</p>
+            <div class="mode-card" style="cursor: default; padding: 25px 20px;">
+                <i class="fas fa-font mode-icon" style="margin-bottom: 15px;"></i>
+                <h3 style="margin-bottom: 15px;">단어 스크램블</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
+                    🧩 <strong>분량:</strong> 일반 15문 / 익스트림 30문<br>
+                    ⚠️ <strong>규칙:</strong> 오타 시 콤보 리셋 및 정확도 감점
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: auto;">
+                    <button class="btn-start" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='scramble'; startGame('normal')">일반</button>
+                    <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='scramble'; startGame('extreme')">익스트림</button>
+                </div>
             </div>
             <div class="mode-card" onclick="showScreen('screen-dict');">
                 <i class="fas fa-book mode-icon"></i>
@@ -535,9 +556,10 @@ let gameDifficulty = 'normal';
 let isResultLocked = false; 
 let matchCorrectClicks = 0; 
 let stageTimeout = null; // 뒤로가기 시 타이머 꼬임 방지용
-let timerInterval = null; // 추가: 게임 먹통 에러 방지용
-let startTime = 0;        // 추가: 게임 먹통 에러 방지용
-let mistakes = [];        // 추가: 게임 먹통 에러 방지용
+let timerInterval = null; 
+let startTime = 0;        
+let mistakes = [];        
+let gameDeck = [];        // 추가: 100% 비중복 단어 추출용 덱
 
     function getFormattedDate() {
         const now = new Date();
@@ -590,8 +612,12 @@ function goHome() {
     }
 
 function startGame(difficulty) {
-        clearInterval(timerInterval); // 추가
-        clearTimeout(stageTimeout);   // 추가
+        if(wordData.length < 8) {
+            alert("단어장 데이터가 부족합니다.");
+            return;
+        }
+        clearInterval(timerInterval); 
+        clearTimeout(stageTimeout);   
         gameDifficulty = difficulty;
         mistakes = [];
         if (currentMode === 'mcq') startMCQ();
@@ -613,8 +639,9 @@ function startGame(difficulty) {
     let currentWordObj = null;
 
     function startMCQ() {
-        mcqTotal = gameDifficulty === 'extreme' ? 100 : 30;
+mcqTotal = gameDifficulty === 'extreme' ? 100 : 30;
         mcqStep = 0; mcqPenaltySec = 0; mcqClicks = 0;
+        gameDeck = [...wordData].sort(() => 0.5 - Math.random()); // 시작 시 덱 섞기
         showScreen('screen-mcq');
         document.getElementById('mcq-timer').style.color = 'var(--primary)';
         startTime = Date.now();
@@ -630,16 +657,20 @@ function startGame(difficulty) {
         if (mcqStep > mcqTotal) return endMCQ();
         
         document.getElementById('mcq-progress').innerText = `${mcqStep} / ${mcqTotal}`;
-        let isFaToKo = mcqStep <= (mcqTotal / 2); 
+	let isFaToKo = mcqStep <= (mcqTotal / 2); 
         
-        let shuffledData = [...wordData].sort(() => 0.5 - Math.random());
-        currentWordObj = shuffledData[0];
+        // --- 비중복 덱에서 정답 단어 추출 및 리필 로직 ---
+        if (gameDeck.length === 0) gameDeck = [...wordData].sort(() => 0.5 - Math.random());
+        currentWordObj = gameDeck.pop();
+        
         let opts = [currentWordObj];
-        for(let i=1; i<4; i++) {
-            // 풀이 적을 때를 대비한 안전장치 (중복 허용)
-            opts.push(shuffledData[i % shuffledData.length]); 
+        // 오답 선지는 정답과 겹치지 않게 전체 단어장에서 무작위로 가져옴
+        let wrongOpts = [...wordData].filter(w => w.p !== currentWordObj.p).sort(() => 0.5 - Math.random());
+        for(let i=0; i<3; i++) {
+            opts.push(wrongOpts[i % wrongOpts.length]); 
         }
         opts.sort(() => 0.5 - Math.random());
+        // ------------------------------------------
 
         document.getElementById('mcq-prob-text').innerText = isFaToKo ? currentWordObj.p : currentWordObj.k;
         document.getElementById('mcq-prob-text').style.direction = isFaToKo ? 'rtl' : 'ltr';
@@ -702,9 +733,10 @@ let rank = '';
     const normalTimes = [40, 30, 20];
 
 function startMatch() {
-    matchRound = 1; matchTotalScore = 0; matchClicks = 0; 
-    matchCorrectClicks = 0; // 이 줄을 반드시 추가해
+matchRound = 1; matchTotalScore = 0; matchClicks = 0; 
+    matchCorrectClicks = 0; 
     matchTotalRounds = gameDifficulty === 'extreme' ? 7 : 3;
+    gameDeck = [...wordData].sort(() => 0.5 - Math.random()); // 시작 시 덱 섞기
     showScreen('screen-match');
     initMatchRound();
 }
@@ -716,12 +748,15 @@ function startMatch() {
         matchPairsLeft = 8; // 16장 셋팅
         selectedMatchCard = null;
         document.getElementById('match-round').innerText = `${matchRound} / ${matchTotalRounds}`;
-        document.getElementById('match-timer').innerText = matchTimeLeft;
+	document.getElementById('match-timer').innerText = matchTimeLeft;
         
-        // 풀 안전장치
-        let shuffled = [...wordData].sort(() => 0.5 - Math.random());
+        // --- 비중복 덱에서 8쌍 추출 및 리필 로직 ---
         let pool = [];
-        for(let i=0; i<8; i++) pool.push(shuffled[i % shuffled.length]);
+        for(let i=0; i<8; i++) {
+            if (gameDeck.length === 0) gameDeck = [...wordData].sort(() => 0.5 - Math.random());
+            pool.push(gameDeck.pop());
+        }
+        // ----------------------------------------
 
         let cards = [];
         pool.forEach(w => {
@@ -836,9 +871,10 @@ let rank = '';
         scrambleStep = 0; scrambleScore = 0; scrambleCombo = 0;
         scrambleTargetTotalLen = 0; scrambleClicks = 0;
         
-        validScrambleData = wordData.filter(w => !w.p.includes(' ') && w.p.length <= 10);
+	validScrambleData = wordData.filter(w => !w.p.includes(' ') && w.p.length <= 10);
         if(validScrambleData.length < 5) validScrambleData = wordData; 
-
+        
+        gameDeck = [...validScrambleData].sort(() => 0.5 - Math.random()); // 시작 시 덱 섞기
         showScreen('screen-scramble');
         startTime = Date.now();
         nextScramble();
@@ -849,9 +885,13 @@ let rank = '';
         if(scrambleStep > scrambleTotal) return endScramble();
         
         document.getElementById('scramble-progress').innerText = `${scrambleStep} / ${scrambleTotal}`;
-        document.getElementById('scramble-combo').innerText = scrambleCombo;
+	document.getElementById('scramble-combo').innerText = scrambleCombo;
         
-        let wObj = validScrambleData[Math.floor(Math.random() * validScrambleData.length)];
+        // --- 비중복 덱에서 단어 추출 및 리필 로직 ---
+        if (gameDeck.length === 0) gameDeck = [...validScrambleData].sort(() => 0.5 - Math.random());
+        let wObj = gameDeck.pop();
+        // ------------------------------------------
+
         currentWordObj = wObj;
         scrambleTarget = wObj.p;
         scrambleTargetTotalLen += scrambleTarget.length;
