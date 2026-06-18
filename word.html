@@ -156,15 +156,10 @@
         .btn-share { width: 100%; padding: 18px; background: #20c997; color: white; border: none; border-radius: 8px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-share:hover { background: #12b886; }
 
-	/* 데스크톱 상단 포털 링크 (좌상단 고정) */
-        .desktop-portal-link { position: fixed; top: 25px; left: 25px; background: var(--primary); color: white; padding: 12px 20px; border-radius: 8px; font-weight: bold; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s; z-index: 10000; display: flex; align-items: center; gap: 8px; }
-        .desktop-portal-link:hover { background: #1a3a5a; transform: translateY(-2px); }
-        
-        /* 모바일 하단 탭 바 (기본 상태는 숨김) */
-        .mobile-bottom-bar { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #ffffff; border-top: 1px solid #dee2e6; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 10000; padding-bottom: env(safe-area-inset-bottom); }
-        .tab-btn { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px 0; color: #495057; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
-        .tab-btn i { font-size: 1.4rem; margin-bottom: 4px; color: var(--primary); }
-        .tab-btn:active { background: #f8f9fa; }
+	/* 홈 버튼 우측 하단으로 이동 (충돌 원천 차단) */
+        .portal-home-button { position: fixed; top: auto !important; left: auto !important; bottom: 25px; right: 25px; width: 55px; height: 55px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; transition: all 0.3s ease; }
+        .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .portal-home-button i { font-size: 1.5rem; }
         
         /* 모드 배지 스타일 */
         .mode-badge { display: inline-block; padding: 3px 10px; border-radius: 5px; font-size: 1rem; font-weight: bold; vertical-align: middle; margin-left: 10px;}
@@ -300,10 +295,6 @@
 
 	/* 모바일 전용 UI 수정 (스피드 매치 4x4, 단어장 검색창 확장) */
         @media (max-width: 768px) {
-            .desktop-portal-link { display: none; } /* 모바일에서 좌상단 버튼 숨김 */
-            .mobile-bottom-bar { display: flex; } /* 하단 탭 바 활성화 */
-            body { padding-bottom: 80px; } /* 하단 바가 컨텐츠를 가리지 않도록 전체 여백 확보 */
-            
             .match-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 6px; }
             .match-card { height: 70px; font-size: 1.1rem; padding: 5px; }
             
@@ -323,8 +314,8 @@
     <h2 style="margin-top:20px; color:var(--primary);">단어장 데이터 연동 중...</h2>
 </div>
 
-<a href="index.html" class="desktop-portal-link" title="메인 페이지로 돌아가기">
-    <i class="fas fa-home"></i> 메인 포털
+<a href="index.html" class="portal-home-button" title="메인 페이지로 돌아가기">
+    <i class="fas fa-home"></i>
 </a>
 
 <div class="container" id="main-container">
@@ -452,19 +443,11 @@
             <div id="mistake-list"></div>
         </div>
 
-<button class="btn-share" onclick="copyResultImage()"><i class="fas fa-camera"></i> 인증서 복사하기 (클립보드)</button>
+        <button class="btn-share" onclick="copyResultImage()"><i class="fas fa-camera"></i> 인증서 복사하기 (클립보드)</button>
     </div>
 </div>
 
-<div class="mobile-bottom-bar">
-    <a href="index.html" class="tab-btn">
-        <i class="fas fa-home"></i>
-        <span>메인 포털</span>
-    </a>
-</div>
-
 <script>
-
     // 단어장 링크
     const WORD_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kygc158HJLii5s2jwGoCPNhNRyIoK0GJVM6oZUBMyfbI0FIi7lYd0XN4N6v2PYGxtq22AsBZ6yFX/pub?gid=415354578&single=true&output=csv"; 
     
