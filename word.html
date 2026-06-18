@@ -156,8 +156,8 @@
         .btn-share { width: 100%; padding: 18px; background: #20c997; color: white; border: none; border-radius: 8px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-share:hover { background: #12b886; }
 
-	/* 홈 버튼 우측 하단으로 이동 */
-        .portal-home-button { position: fixed; bottom: 25px; right: 25px; width: 55px; height: 55px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; transition: all 0.3s ease; }
+	/* 홈 버튼 우측 하단으로 이동 (충돌 원천 차단) */
+        .portal-home-button { position: fixed; top: auto !important; left: auto !important; bottom: 25px; right: 25px; width: 55px; height: 55px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; transition: all 0.3s ease; }
         .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
         .portal-home-button i { font-size: 1.5rem; }
         
@@ -535,6 +535,9 @@ let gameDifficulty = 'normal';
 let isResultLocked = false; 
 let matchCorrectClicks = 0; 
 let stageTimeout = null; // 뒤로가기 시 타이머 꼬임 방지용
+let timerInterval = null; // 추가: 게임 먹통 에러 방지용
+let startTime = 0;        // 추가: 게임 먹통 에러 방지용
+let mistakes = [];        // 추가: 게임 먹통 에러 방지용
 
     function getFormattedDate() {
         const now = new Date();
