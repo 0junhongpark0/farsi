@@ -23,31 +23,31 @@
             height: 100vh; overflow: hidden; padding: 10px 20px; 
         }
 
-        /* --- 상단 네비게이션 및 로비 UI (디자인 전면 개편) --- */
+	/* --- 상단 네비게이션 및 로비 UI --- */
         .top-header { 
             width: 100%; max-width: 1200px; 
             background: var(--primary); color: white; 
-            padding: 25px; border-radius: 15px; 
-            text-align: center; margin-bottom: 15px; 
+            padding: 25px; border-radius: 16px; 
+            text-align: center; margin-bottom: 20px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
         } 
-        .top-header h1 { font-family: 'Noto Sans KR', sans-serif; font-size: 2.2rem; letter-spacing: -1px; margin: 0; font-weight: 700; }
-        .top-header p { margin-top: 10px; opacity: 0.8; font-size: 1.1rem; }
+        .top-header h1 { font-family: 'Noto Sans KR', sans-serif; font-size: 2.5rem; letter-spacing: -1px; margin: 0; font-weight: 700; }
+        .top-header p { margin-top: 15px; opacity: 0.8; font-size: 1.2rem; }
         
-        .top-nav { display: none; width: 100%; max-width: 1200px; padding: 10px 0; margin-bottom: 10px; text-align: left; }
-        .btn-home { background: #ffffff; border: 2px solid #dee2e6; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--primary); font-size: 1.05rem; }
+        .top-nav { display: none; width: 100%; max-width: 1200px; background: #f8f9fa; padding: 15px 30px; margin-bottom: 20px; border: 2px solid #e9ecef; border-radius: 16px; align-items: center; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .btn-home { background: #ffffff; border: 2px solid #dee2e6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--primary); font-size: 1.1rem; }
         .btn-home:hover { background: #e9ecef; border-color: #adb5bd; }
-        .btn-mute { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #868e96; transition: 0.2s; float: right; margin-top: 5px; }
+        .btn-mute { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #868e96; transition: 0.2s; margin: 0; }
         .btn-mute:hover { color: var(--primary); }
 
-        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 900px; margin: 0 auto 20px auto; }
-        .mode-card { background: #fff; border: 2px solid #dee2e6; border-radius: 12px; padding: 25px 20px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; gap: 8px; }
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; width: 100%; margin: 0; }
+        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; }
         .mode-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(11, 42, 74, 0.1); }
-        .mode-icon { font-size: 3rem; color: var(--primary); margin-bottom: 5px; }
-        .mode-card h3 { font-size: 1.3rem; color: var(--primary); }
-        .mode-card p { font-size: 0.95rem; color: #666; word-break: keep-all; line-height: 1.4; }
+        .mode-icon { font-size: 3.5rem; color: var(--primary); margin-bottom: 20px; }
+        .mode-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: var(--primary); }
+        .mode-card p { font-size: 1.05rem; color: #666; word-break: keep-all; line-height: 1.4; }
 
-        @media (max-width: 600px) { .home-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } }
 
         /* --- 연습 화면 내부 통계 보드 --- */
         .inner-stats-board {
@@ -58,23 +58,24 @@
         .stat-label { font-size: 0.8rem; color: #868e96; margin-bottom: 3px; font-weight: bold; }
         .stat-value { font-size: 1.4rem; font-weight: bold; color: var(--primary); font-family: monospace; }
 
-        /* --- 메인 섹션들 (너비 확장 1200px) --- */
+	/* --- 메인 섹션들 --- */
         .section-container {
-            width: 100%; max-width: 1200px; background: white; padding: 20px 30px; 
-            border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%; max-width: 1200px; background: white; padding: 40px 50px; 
+            border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             display: none; flex-direction: column; align-items: center;
-            overflow-y: auto; max-height: calc(100vh - 130px); 
+            overflow-y: auto; max-height: calc(100vh - 130px);
         }
         .section-container.active { display: flex; }
 
         /* --- 홈 화면 --- */
-        /* [수정] overflow: visible 제거하여 내부 스크롤 허용 */
-        #homeArea { text-align: center; line-height: 1.5; justify-content: flex-start; padding-top: 20px; background: transparent; box-shadow: none; }
-        .guide-box { background: #ffffff; border: 1px solid #dee2e6; padding: 15px 20px; border-radius: 10px; margin-bottom: 10px; text-align: left; width: 100%; max-width: 900px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .guide-box h3 { color: var(--primary); margin-bottom: 8px; font-size: 1.1rem; border-bottom: 2px solid #e9ecef; padding-bottom: 8px; }
-        .guide-box p { color: #495057; margin-bottom: 3px; font-size: 0.95rem; }
+        #homeArea { text-align: center; line-height: 1.5; justify-content: flex-start; padding: 5px 0 20px 0; background: transparent; box-shadow: none; overflow-y: auto; }
+        .home-cards-wrapper { background: #ffffff; width: 100%; max-width: 1200px; border-radius: 16px; padding: 45px 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 30px; }
         
-        details { background: #f8f9fa; padding: 8px 15px; border-radius: 8px; margin-bottom: 5px; border: 1px solid #e9ecef; cursor: pointer; transition: 0.2s; }
+        .guide-box { background: #ffffff; border: 1px solid #dee2e6; padding: 25px 30px; border-radius: 15px; margin-bottom: 15px; text-align: left; width: 100%; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .guide-box h3 { color: var(--primary); margin-bottom: 12px; font-size: 1.2rem; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
+        .guide-box p { color: #495057; margin-bottom: 5px; font-size: 1.05rem; line-height: 1.6; }
+        
+        details { background: #f8f9fa; padding: 12px 20px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e9ecef; cursor: pointer; transition: 0.2s; }
         details:hover { border-color: var(--primary); }
         summary { font-weight: bold; color: var(--primary); outline: none; font-size: 0.95rem; }
         .details-content { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ced4da; font-size: 0.9rem; color: #495057; line-height: 1.6; }
@@ -244,11 +245,33 @@
 <a href="index.html" class="portal-home-button" title="메인 페이지로 돌아가기">
     <i class="fas fa-home"></i>
 </a>
+
+<div id="mobile-blocker">
+    <i class="fas fa-keyboard"></i>
+    <h2>모바일 접속 제한</h2>
+    <p>타자 연습은 <strong>물리 키보드</strong>가 있는 PC 환경에서만 지원됩니다.<br>컴퓨터에서 다시 접속해 주세요.</p>
+    <a href="index.html" style="margin-top: 30px; padding: 12px 25px; background: #0b2a4a; color: white; border-radius: 8px; text-decoration: none; font-weight: bold;"><i class="fas fa-home"></i> 메인 포털로 돌아가기</a>
+</div>
+
 <style>
-    .portal-home-button { position: fixed; top: 25px; left: 25px; width: 50px; height: 50px; background-color: #0b2a4a; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 10000; transition: all 0.3s ease; }
-    .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
-    .portal-home-button i { font-size: 20px; }
-    @media (max-width: 600px) { .portal-home-button { top: 15px; left: 15px; width: 40px; height: 40px; } .portal-home-button i { font-size: 16px; } }
+    /* 홈 버튼 좌측 하단 고정 (단어장과 동일) */
+    .portal-home-button { position: fixed; top: auto !important; left: 25px !important; bottom: 25px; right: auto !important; width: 55px; height: 55px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; transition: all 0.3s ease; }
+    .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+    .portal-home-button i { font-size: 1.5rem; }
+    
+    /* 모바일 접속 차단 CSS */
+    #mobile-blocker { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f4f6f9; z-index: 999999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px; }
+    #mobile-blocker i { font-size: 4rem; color: #fa5252; margin-bottom: 20px; }
+    #mobile-blocker h2 { color: var(--primary); margin-bottom: 15px; font-size: 1.8rem; word-break: keep-all; line-height: 1.4; }
+    #mobile-blocker p { color: #495057; font-size: 1.1rem; word-break: keep-all; line-height: 1.6; }
+    
+    /* 모바일 화면 감지 시 타자 연습 UI 강제 소멸 및 차단창 발동 */
+    @media (max-width: 768px) {
+        #mobile-blocker { display: flex !important; }
+        body { overflow: hidden; } 
+        .top-header, .top-nav, .section-container { display: none !important; } 
+        .portal-home-button { display: none !important; } 
+    }
 </style>
 
     <div class="top-header" id="top-header">
@@ -262,26 +285,55 @@
     </div>
 
     <div id="homeArea" class="section-container active">
-        <div class="home-grid">
-            <div class="mode-card" onclick="changeMode('posSelect')">
-                <i class="fas fa-hand-pointer mode-icon"></i>
-                <h3>자리 연습</h3>
-                <p>페르시아어 자판의 위치를 단계별로 확실하게 익힙니다.</p>
+<div class="home-grid">
+            <div class="mode-card" style="cursor: default; padding: 25px 20px;">
+                <i class="fas fa-hand-pointer mode-icon" style="margin-bottom: 10px;"></i>
+                <h3 style="margin-bottom: 10px; font-size: 1.4rem;">자리 연습</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all; flex-grow: 1;">
+                    🎯 <strong>목표:</strong> 표준 자판 완벽 암기<br>
+                    ⚠️ <strong>방식:</strong> 단계별 또는 전체 랜덤 타격
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: auto;">
+                    <button class="pos-btn" style="padding: 10px; font-size: 1rem; flex: 1; margin: 0; border-width: 2px;" onclick="startPosPractice('step')">단계별 학습</button>
+                    <button class="pos-btn" style="padding: 10px; font-size: 1rem; flex: 1; margin: 0; border-width: 2px;" onclick="startPosPractice('random')">랜덤 총정리</button>
+                </div>
             </div>
-            <div class="mode-card" onclick="changeMode('wordSelect')">
-                <i class="fas fa-spell-check mode-icon"></i>
-                <h3>단어 연습</h3>
-                <p>전공 필수 어휘를 타이핑하며 철자와 의미를 숙지합니다.</p>
+            
+            <div class="mode-card" style="cursor: default; padding: 25px 20px;">
+                <i class="fas fa-spell-check mode-icon" style="margin-bottom: 10px;"></i>
+                <h3 style="margin-bottom: 10px; font-size: 1.4rem;">단어 연습</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all; flex-grow: 1;">
+                    🎯 <strong>분량:</strong> 20단어 (약 2분) / 50단어 (약 5분)<br>
+                    ⚠️ <strong>규칙:</strong> 오타 즉각 피드백, 타수/정확도 측정
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: auto;">
+                    <button class="pos-btn" style="padding: 10px; font-size: 1rem; flex: 1; margin: 0; border-width: 2px;" onclick="startWordPractice(20)">20단어 시작</button>
+                    <button class="pos-btn" style="padding: 10px; font-size: 1rem; flex: 1; margin: 0; border-width: 2px;" onclick="startWordPractice(50)">50단어 시작</button>
+                </div>
             </div>
-            <div class="mode-card" onclick="changeMode('sentenceSelect')">
-                <i class="fas fa-align-left mode-icon"></i>
-                <h3>문장 연습</h3>
-                <p>실제 회화 및 예문을 치면서 띄어쓰기와 문장 감각을 높입니다.</p>
+            
+            <div class="mode-card" style="cursor: default; padding: 25px 20px;">
+                <i class="fas fa-align-left mode-icon" style="margin-bottom: 10px;"></i>
+                <h3 style="margin-bottom: 10px; font-size: 1.4rem;">문장 연습</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all; flex-grow: 1;">
+                    🎯 <strong>분량:</strong> 기초 회화 및 전공 예문<br>
+                    ⚠️ <strong>규칙:</strong> 띄어쓰기 및 기호 포함 정확도 측정
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: auto;">
+                    <button class="pos-btn" style="padding: 10px; font-size: 1.1rem; flex: 1; margin: 0; border-width: 2px; background: var(--primary); color: white;" onclick="changeMode('sentenceSelect')">주제 선택하기</button>
+                </div>
             </div>
-            <div class="mode-card" onclick="changeMode('acidRainArea')">
-                <i class="fas fa-cloud-showers-heavy mode-icon"></i>
-                <h3>산성비 게임</h3>
-                <p>비처럼 쏟아지는 단어를 맞추며 실전 타자 속도를 극대화합니다.</p>
+
+            <div class="mode-card" style="cursor: default; padding: 25px 20px;">
+                <i class="fas fa-cloud-showers-heavy mode-icon" style="margin-bottom: 10px;"></i>
+                <h3 style="margin-bottom: 10px; font-size: 1.4rem;">산성비 게임</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all; flex-grow: 1;">
+                    🎯 <strong>목표:</strong> 쏟아지는 단어 타자 방어<br>
+                    ⚠️ <strong>규칙:</strong> 충돌 및 오타 시 페널티 적용
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: auto;">
+                    <button class="pos-btn" style="padding: 10px; font-size: 1.1rem; flex: 1; margin: 0; border-width: 2px; background: #fa5252; color: white; border-color: #fa5252;" onclick="changeMode('acidRainGame')">디펜스 시작</button>
+                </div>
             </div>
         </div>
 
@@ -445,7 +497,7 @@
 
 <script>
     // ==========================================
-    // 🔴 외부 링크 설정 
+    // 단어 및 문장 데이터 링크 설정 
     // ==========================================
     const WORD_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kygc158HJLii5s2jwGoCPNhNRyIoK0GJVM6oZUBMyfbI0FIi7lYd0XN4N6v2PYGxtq22AsBZ6yFX/pub?gid=415354578&single=true&output=csv"; 
     const SENTENCE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRYQTsYanW1hpMlaA5Iq803tPA0VHRYE3bOSzHZ_EsVZmQA8i_C8G8mbS2gb8jkBM3NJQElTjnxtvfH/pub?gid=0&single=true&output=csv"; 
@@ -770,7 +822,7 @@
         }
     }
 
-    function changeMode(mode) {
+	function changeMode(mode) {
         document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
         currentMode = mode;
         
@@ -782,7 +834,7 @@
             clearInterval(acidGameLoop); clearTimeout(acidSpawnLoop);
             stopAcidBGM();
         } else {
-            document.getElementById('top-nav').style.display = 'block';
+            document.getElementById('top-nav').style.display = 'flex'; // 수정: block에서 flex로 변경
             document.getElementById('top-header').style.display = 'none';
             
             if (mode === 'posSelect') document.getElementById('posSelectArea').classList.add('active');
@@ -793,21 +845,31 @@
         }
     }
 
-    function startPosPractice(type, startLvl = 0) {
+	function startPosPractice(type, startLvl = 0) {
         currentMode = (type === 'step') ? 'posStep' : 'posRandom';
         currentStageIdx = startLvl;
         document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
         document.getElementById('typingArea').classList.add('active');
+        
+        // 추가: 상단 네비게이션(뒤로가기) 강제 활성화
+        document.getElementById('top-nav').style.display = 'flex';
+        document.getElementById('top-header').style.display = 'none';
+        
         resetStats(); loadStage();
     }
 
-    function startWordPractice(count) {
+	function startWordPractice(count) {
         currentMode = 'word';
         let shuffled = [...wordData].sort(() => 0.5 - Math.random());
         activePracticeData = shuffled.slice(0, count);
         currentStageIdx = 0;
         document.querySelectorAll('.section-container').forEach(sec => sec.classList.remove('active'));
         document.getElementById('typingArea').classList.add('active');
+        
+        // 추가: 상단 네비게이션(뒤로가기) 강제 활성화
+        document.getElementById('top-nav').style.display = 'flex';
+        document.getElementById('top-header').style.display = 'none';
+        
         resetStats(); loadStage();
     }
 
