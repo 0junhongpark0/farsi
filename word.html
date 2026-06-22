@@ -331,6 +331,12 @@
 
     <div id="screen-home" class="screen active">
 <div class="home-grid">
+            <div class="mode-card" onclick="showScreen('screen-dict');">
+                <i class="fas fa-book mode-icon"></i>
+                <h3>단어 목록</h3>
+                <p>전체 단어 리스트 열람 및 검색</p>
+            </div>
+
             <div class="mode-card" style="cursor: default; padding: 25px 20px;">
                 <i class="fas fa-tasks mode-icon" style="margin-bottom: 15px;"></i>
                 <h3 style="margin-bottom: 15px;">객관식 서바이벌</h3>
@@ -343,6 +349,7 @@
                     <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='mcq'; startGame('extreme')">익스트림</button>
                 </div>
             </div>
+            
             <div class="mode-card" style="cursor: default; padding: 25px 20px;">
                 <i class="fas fa-clone mode-icon" style="margin-bottom: 15px;"></i>
                 <h3 style="margin-bottom: 15px;">스피드 매치</h3>
@@ -355,6 +362,7 @@
                     <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='match'; startGame('extreme')">익스트림</button>
                 </div>
             </div>
+            
             <div class="mode-card" style="cursor: default; padding: 25px 20px;">
                 <i class="fas fa-font mode-icon" style="margin-bottom: 15px;"></i>
                 <h3 style="margin-bottom: 15px;">단어 스크램블</h3>
@@ -367,12 +375,8 @@
                     <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='scramble'; startGame('extreme')">익스트림</button>
                 </div>
             </div>
-            <div class="mode-card" onclick="showScreen('screen-dict');">
-                <i class="fas fa-book mode-icon"></i>
-                <h3>단어 목록</h3>
-                <p>전체 단어 리스트 열람 및 검색</p>
-            </div>
         </div>
+
     </div>
 
     <div id="screen-onboarding" class="screen">

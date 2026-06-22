@@ -140,17 +140,23 @@
         .feature-card h3 { font-size: 1.15rem; color: var(--primary-color); }
         .feature-card p { font-size: 0.9rem; color: #666; word-break: keep-all; line-height: 1.4; }
         
+	/* --- 뱃지(Badge) 공통 뼈대 --- */
         .badge {
             align-self: flex-start;
-            padding: 3px 8px;
-            border-radius: 20px;
-            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 6px; 
+            font-size: 0.75rem;
             font-weight: bold;
-            background: #e9ecef;
-            color: #495057;
+            letter-spacing: 1px;
         }
-        .badge.new { background: var(--accent-color); color: white; }
-        .badge.hot { background: #ffc107; color: #000; }
+
+        /* --- 뱃지 시맨틱 컬러 팔레트 --- */
+        .badge-hot      { background-color: #ffe3e3; color: #e03131; border: 1px solid #ffc9c9; } /* 인기, 강조 (빨강) */
+        .badge-new      { background-color: #fff3bf; color: #f08c00; border: 1px solid #ffec99; } /* 신규 (노랑) */
+        .badge-beginner { background-color: #e3fafc; color: #0c8599; border: 1px solid #99e9f2; } /* 입문, 기초 (청록) */
+        .badge-advanced { background-color: #f3f0ff; color: #845ef7; border: 1px solid #e5dbff; } /* 심화, 고급 (보라) */
+        .badge-notice   { background-color: #e9ecef; color: #495057; border: 1px solid #ced4da; } /* 공지, 일반 (회색) */
+        .badge-success  { background-color: #d3f9d8; color: #099268; border: 1px solid #b2f2bb; } /* 성공, 완료 (초록) */
 
         /* --- Footer --- */
         footer {
@@ -192,21 +198,28 @@
         <div class="feature-grid">
             <a href="word.html" class="feature-card">
                 <div class="icon-box"><i class="fas fa-book-open"></i></div>
-                <div class="badge hot">필수</div>
+                <div class="badge badge-success">기초</div>
                 <h3>단어장</h3>
                 <p>필수 어휘와 예문을 검색하고 간단한 게임을 통해 암기합니다.</p>
             </a>
 
+            <a href="alefba.html" class="feature-card">
+                <div class="icon-box"><i class="fas fa-font"></i></div>
+                <div class="badge badge-beginner">입문</div>
+                <h3>기본문자 학습</h3>
+                <p>페르시아어 문자를 반복학습합니다.</p>
+            </a>
+
             <a href="number.html" class="feature-card">
                 <div class="icon-box"><i class="fas fa-calculator"></i></div>
-                <div class="badge new">Update</div>
+                <div class="badge badge-new">보충</div>
                 <h3>숫자 및 계산 학습</h3>
                 <p>페르시아 숫자의 표기, 사칙연산, 날짜 및 시간 읽기를 훈련합니다.</p>
             </a>
 
             <a href="typing.html" class="feature-card">
                 <div class="icon-box"><i class="fas fa-keyboard"></i></div>
-                <div class="badge">기초</div>
+                <div class="badge badge-hot">심화</div>
                 <h3>타자 연습</h3>
                 <p>자판 배열을 익히고 떨어지는 단어를 맞추는 산성비 게임으로 타이핑 속도를 올립니다.</p>
             </a>
@@ -223,13 +236,13 @@
             <i class="fas fa-info-circle"></i> 안내 사항
         </div>
         <p style="color: #666; font-size: 0.9rem; background: white; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
-            본 사이트는 한국외국어대학교 페르시아어·이란학과 학생들의 학습 편의를 위해 제작된 비영리 학습 도구입니다. <br>
+            본 사이트는 페르시아어 습득 편의성 개선을 위해 제작된 비영리 학습 도구입니다. <br>
             학습 중 발견되는 오타나 기능 개선 아이디어는 우측 상단의 <strong>[건의 사항]</strong> 버튼을 통해 자유롭게 남겨주시기 바랍니다.
         </p>
     </div>
 
     <footer>
-        &copy; <span id="current-year"></span> jhp. All Rights Reserved. <br>
+        &copy; <span id="current-year"></span> JhP. All Rights Reserved. <br>
         본 사이트는 PC 환경 및 <strong>'페르시아어(표준)'</strong> 자판 사용에 최적화되어 있습니다.
     </footer>
 

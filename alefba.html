@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>페르시아어 알레프바 (문자 학습)</title>
+    
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #0b2a4a;
+            --accent: #fa5252;
+            --bg: #e9ecef;
+            --card: #ffffff;
+            --persian-font: 'Vazirmatn', 'Sahel', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; overscroll-behavior-y: none; }
+        
+        .container { width: 100%; max-width: 1200px; min-height: 750px; background: var(--card); border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); position: relative; overflow: hidden; display: flex; flex-direction: column; transition: 0.2s; }
+        
+        .top-nav { display: none; background: #f8f9fa; padding: 20px 30px; border-bottom: 2px solid #e9ecef; justify-content: space-between; align-items: center; }
+        .btn-home { background: #ffffff; border: 2px solid #dee2e6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--primary); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+        .btn-home:hover { background: #e9ecef; border-color: #adb5bd; }
+        
+        header { background: var(--primary); color: white; padding: 30px; text-align: center; }
+        header h2 { font-size: 2.5rem; margin: 0; }
+        header p { margin-top: 15px; opacity: 0.8; font-size: 1.2rem; }
+
+	.screen { display: none; padding: 20px 40px; flex-grow: 1; overflow-y: auto; max-height: calc(100vh - 120px); }
+        .screen.active { display: flex; flex-direction: column; }
+
+	/* 상하 1열 배치 (스크롤 방지 다이어트) */
+        .home-grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; max-width: 800px; margin: 0 auto; }
+        
+        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 25px 30px; text-align: center; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .mode-icon { font-size: 3rem; color: var(--primary); margin-bottom: 10px; }
+        .mode-card h3 { font-size: 1.6rem; margin-bottom: 10px; color: var(--primary); }
+        .mode-desc { font-size: 1rem; color: #555; text-align: left; margin-bottom: 15px; line-height: 1.5; word-break: keep-all; width: 100%; max-width: 500px; }
+        .btn-start { width: 100%; max-width: 350px; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-start:hover { background: #081e36; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(11, 42, 74, 0.2); }
+
+/* --- 문자 조립 시뮬레이터 UI --- */
+        .sim-display-area { background: #f8f9fa; border: 3px dashed #ced4da; border-radius: 16px; height: 260px; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; padding: 15px; position: relative; flex-shrink: 0; }
+        .sim-text { font-family: var(--persian-font); font-size: 4.5rem; color: var(--primary); direction: rtl; text-align: center; word-break: break-all; transition: 0.2s; width: 100%; max-height: 140px; overflow-y: auto; padding-right: 5px; }
+        /* 텍스트 내부 커스텀 스크롤바 */
+        .sim-text::-webkit-scrollbar { width: 6px; }
+        .sim-text::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 3px; }
+        
+        .sim-controls { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
+        .btn-action { padding: 10px 18px; font-size: 1.05rem; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-clear { background: #ffe3e3; color: var(--accent); }
+        .btn-clear:hover { background: #ffc9c9; }
+        .btn-space { background: #e9ecef; color: #495057; }
+        .btn-space:hover { background: #dee2e6; }
+        
+        .kb-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; direction: rtl; margin-bottom: 5px; }
+        @media (max-width: 600px) { .kb-grid { grid-template-columns: repeat(6, 1fr); } }
+        @media (max-width: 400px) { .kb-grid { grid-template-columns: repeat(4, 1fr); } }
+        
+        .kb-key { background: white; border: 2px solid #dee2e6; border-radius: 8px; padding: 10px 0; font-family: var(--persian-font); font-size: 1.8rem; font-weight: bold; color: var(--primary); cursor: pointer; transition: 0.1s; display: flex; justify-content: center; align-items: center; }
+        .kb-key:active { transform: scale(0.92); background: #e3f2fd; border-color: var(--primary); }
+        @media (hover: hover) and (pointer: fine) { .kb-key:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); } }
+        
+        .non-joiner { border-bottom: 4px solid var(--accent); }
+        .warning-flash { animation: flashRed 0.5s; }
+        @keyframes flashRed { 0% { color: var(--accent); transform: scale(1.1); } 100% { color: var(--primary); transform: scale(1); } }
+
+        /* --- 따라 쓰기 (Tracing) UI --- */
+        .trace-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .trace-target-info { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+        .canvas-container { position: relative; width: 100%; height: 450px; background: white; border: 3px solid #dee2e6; border-radius: 16px; overflow: hidden; touch-action: none; /* 모바일 스크롤 방지 핵심 */ box-shadow: inset 0 0 20px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        #drawCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; }
+        #watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: var(--persian-font); font-size: 15rem; color: #f1f3f5; z-index: 0; pointer-events: none; user-select: none; }
+        
+        .trace-controls { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .btn-trace-nav { padding: 15px 30px; font-size: 1.2rem; font-weight: bold; background: white; border: 2px solid var(--primary); color: var(--primary); border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .btn-trace-nav:hover { background: #e3f2fd; }
+
+        /* 공통 홈버튼 */
+        .portal-home-button { position: fixed; top: auto !important; left: 25px !important; bottom: 25px; right: auto !important; width: 55px; height: 55px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; transition: all 0.3s ease; }
+        .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .portal-home-button i { font-size: 1.5rem; }
+
+        /* 모바일 최적화 */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { min-height: auto; height: calc(100vh - 20px); }
+            header { padding: 20px; }
+            header h2 { font-size: 1.8rem; }
+            .screen { padding: 20px; max-height: calc(100vh - 100px); }
+            .mode-card { padding: 30px 20px; }
+            .sim-text { font-size: 4rem; }
+            .canvas-container { height: 350px; }
+            #watermark { font-size: 12rem; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="index.html" class="portal-home-button" title="메인 페이지로 돌아가기">
+    <i class="fas fa-home"></i>
+</a>
+
+<div class="container">
+    <div class="top-nav" id="top-nav">
+        <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
+    </div>
+
+    <header id="main-header">
+        <h2>페르시아어 알레프바</h2>
+        <p>문자의 결합 원리와 획순을 직관적으로 체화하세요</p>
+    </header>
+
+<div id="screen-home" class="screen active">
+        <div style="margin: 0 auto 20px auto; max-width: 800px; background: white; border: 2px solid #dee2e6; border-radius: 12px; padding: 25px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <h3 style="color: var(--primary); margin-bottom: 15px; font-size: 1.3rem; border-bottom: 2px dashed #e9ecef; padding-bottom: 10px;"><i class="fas fa-info-circle"></i> 페르시아어 문자 3대 절대 규칙</h3>
+            <ul style="list-style: none; padding: 0; margin: 0; color: #495057; font-size: 1.05rem; line-height: 1.7;">
+                <li style="margin-bottom: 8px;">➡️ <strong>진행 방향:</strong> 모든 글자는 오른쪽에서 왼쪽으로 씁니다.</li>
+                <li style="margin-bottom: 8px;">🚫 <strong>단절 문자:</strong> 단 7개의 글자(<span style="color:var(--accent); font-weight:bold;">ا, د, ذ, ر, ز, ژ, و</span>)는 뒤에 오는 글자와 절대 손을 잡지 않고 끊어집니다.</li>
+                <li>👻 <strong>숨은 모음:</strong> 아(a), 에(e), 오(o) 같은 짧은 모음은 표기하지 않고 투명하게 숨어 있습니다.</li>
+            </ul>
+        </div>
+
+        <div class="home-grid">
+            
+            <div class="mode-card">
+                <i class="fas fa-link mode-icon"></i>
+                <h3>문자 조립 시뮬레이터</h3>
+                <div class="mode-desc">
+                    🎯 <strong>목표:</strong> 문자가 이어질 때 변하는 형태(어두/어중/어말) 이해<br>
+                    ⚠️ <strong>규칙:</strong> 가상 키보드를 눌러 글자가 실시간으로 결합되는 원리 관찰
+                </div>
+                <button class="btn-start" onclick="changeMode('simulator')">조립기 실행</button>
+            </div>
+
+            <div class="mode-card">
+                <i class="fas fa-pen-fancy mode-icon"></i>
+                <h3>획순 따라 쓰기</h3>
+                <div class="mode-desc">
+                    🎯 <strong>목표:</strong> 32개 알파벳의 기본 형태를 손으로 직접 체화<br>
+                    ⚠️ <strong>규칙:</strong> 워터마크를 따라 부드럽게 필기 (모바일/태블릿 권장)
+                </div>
+                <button class="btn-start" onclick="startTracingCheck()">따라 쓰기 실행</button>
+            </div>
+
+        </div>
+    </div>
+
+<div id="screen-simulator" class="screen">
+        <div class="sim-controls">
+            <div id="mission-target" style="display:none; flex-grow:1; align-items:center; background:#fff3bf; color:#e67700; padding:10px 15px; border-radius:8px; font-weight:bold; font-size:1.2rem;">
+                미션: <span id="mission-word" style="font-family:var(--persian-font); font-size:1.8rem; margin: 0 10px;"></span> (<span id="mission-mean"></span>)
+            </div>
+            <button class="btn-action" onclick="toggleXrayMode()" id="btn-xray" style="background:#e3fafc; color:#0c8599; border:2px solid #99e9f2;"><i class="fas fa-search"></i> 숨은 모음</button>
+            <button class="btn-action" onclick="toggleMissionMode()" id="btn-mission" style="background:#fff3bf; color:#f08c00; border:2px solid #fcc419;"><i class="fas fa-flag"></i> 미션 모드</button>
+            <button class="btn-action btn-space" onclick="simAddSpace()"><i class="fas fa-arrows-alt-h"></i> 띄어쓰기</button>
+            <button class="btn-action btn-clear" onclick="simBackspace()"><i class="fas fa-backspace"></i> 지우기</button>
+            <button class="btn-action btn-clear" onclick="simClear()" style="background:#dee2e6; color:#495057;"><i class="fas fa-trash-alt"></i> 전체 삭제</button>
+        </div>
+        
+<div class="sim-display-area" style="flex-direction: column; justify-content: flex-start; align-items: stretch; padding: 15px;">
+            <div id="sim-hud" style="background: #ffffff; border: 2px solid #e9ecef; border-radius: 10px; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; opacity: 0; transition: 0.2s; flex-shrink: 0;">
+                <div style="display: flex; flex-direction: column; gap: 2px; text-align: left;">
+                    <div style="font-size: 1.15rem; font-weight: bold; color: var(--primary);">문자: <span id="hud-name" style="color: var(--accent);"></span></div>
+                    <div style="font-size: 1rem; color: #666; font-family: monospace; font-weight: bold;">발음: <span id="hud-pron" style="color: #0b2a4a;"></span></div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.8rem; color: #868e96; margin-bottom: 3px; font-weight: bold;">형태 변화 (독립/어두/어중/어말)</div>
+                    <div id="hud-forms" style="font-family: var(--persian-font); font-size: 1.6rem; font-weight: bold; color: var(--primary); direction: rtl; letter-spacing: 2px;"></div>
+                </div>
+            </div>
+
+            <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; height: 100%; overflow: hidden;">
+                <div id="sim-text" class="sim-text"></div>
+                <div id="sim-placeholder" style="position:absolute; color:#adb5bd; font-size:1.1rem; font-weight:bold; pointer-events:none;">아래 키보드를 눌러 문자를 조립해 보세요.</div>
+            </div>
+        </div>
+        
+        <div style="font-size: 0.95rem; color: var(--accent); margin-bottom: 10px; font-weight: bold;"><i class="fas fa-info-circle"></i> 밑줄 친 문자(ا, د, ذ, ر, ز, ژ, و)는 뒤로 이어지지 않고 끊어집니다.</div>
+        <div id="sim-keyboard" class="kb-grid"></div>
+    </div>
+
+<div id="screen-tracing" class="screen" style="padding: 20px;">
+        <div style="display:flex; gap:10px; margin-bottom:15px; justify-content:center;">
+            <button class="btn-action" id="btn-trace-alpha" onclick="setTraceMode('alpha')" style="background:var(--primary); color:white; width:150px; justify-content:center;">알파벳 개별</button>
+            <button class="btn-action" id="btn-trace-word" onclick="setTraceMode('word')" style="background:white; border:2px solid var(--primary); color:var(--primary); width:150px; justify-content:center;">기초 단어 연결</button>
+        </div>
+        <div class="trace-header">
+            <div class="trace-target-info" id="trace-info">알레프 (1/32)</div>
+        </div>
+        <div id="trace-guide" style="text-align:center; margin-bottom:15px; font-weight:bold; color:var(--accent); font-size:1.05rem; word-break:keep-all;"></div>
+        
+        <div class="canvas-container">
+            <div id="watermark">ا</div>
+            <canvas id="drawCanvas"></canvas>
+        </div>
+
+        <div class="trace-controls">
+            <button class="btn-trace-nav" onclick="prevTrace()"><i class="fas fa-chevron-left"></i> </button>
+            <button class="btn-trace-nav" onclick="clearCanvas()" style="background: #ffe3e3; color: var(--accent); border-color: #ffc9c9;"><i class="fas fa-eraser"></i> 다시쓰기</button>
+            <button class="btn-trace-nav" onclick="nextTrace()"> <i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 화면 통제 로직 ---
+    function goHome() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-home').classList.add('active');
+        document.getElementById('top-nav').style.display = 'none';
+        document.getElementById('main-header').style.display = 'block';
+    }
+
+    function changeMode(modeId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-' + modeId).classList.add('active');
+        document.getElementById('top-nav').style.display = 'flex';
+        document.getElementById('main-header').style.display = 'none';
+    }
+
+// --- 문자 조립 시뮬레이터 로직 ---
+    const persianAlphabetData = {
+        'ا': { n: '알레프 (alef)', p: '/a/, /e/, /o/ 등', f: 'ا / ا / ـا / ـا' },
+        'ب': { n: '베 (be)', p: '/b/', f: 'ب / بـ / ـبـ / ـب' },
+        'پ': { n: '페 (pe)', p: '/p/', f: 'پ / پـ / ـپـ / ـپ' },
+        'ت': { n: '테 (te)', p: '/t/', f: 'ت / تـ / ـتـ / ـت' },
+        'ث': { n: '세 (se)', p: '/s/', f: 'ث / ثـ / ـثـ / ـث' },
+        'ج': { n: '짐 (jim)', p: '/j/', f: 'ج / جـ / ـجـ / ـج' },
+        'چ': { n: '체 (che)', p: '/ch/', f: 'چ / چـ / ـچـ / ـچ' },
+        'ح': { n: '헤 (he)', p: '/h/', f: 'ح / حـ / ـحـ / ـح' },
+        'خ': { n: '헤 (xe)', p: '/x/', f: 'خ / خـ / ـخـ / ـخ' },
+        'د': { n: '덜 (dāl)', p: '/d/', f: 'د / د / ـد / ـد' },
+        'ذ': { n: '절 (zāl)', p: '/z/', f: 'ذ / ذ / ـذ / ـذ' },
+        'ر': { n: '레 (re)', p: '/r/', f: 'ر / ر / ـر / ـر' },
+        'ز': { n: '제 (ze)', p: '/z/', f: 'ز / ز / ـز / ـز' },
+        'ژ': { n: '줴 (zhe)', p: '/zh/', f: 'ژ / ژ / ـژ / ـژ' },
+        'س': { n: '신 (sin)', p: '/s/', f: 'س / سـ / ـسـ / ـس' },
+        'ش': { n: '쉰 (shin)', p: '/sh/', f: 'ش / شـ / ـشـ / ـش' },
+        'ص': { n: '서드 (sād)', p: '/s/', f: 'ص / صـ / ـصـ / ـص' },
+        'ض': { n: '저드 (zād)', p: '/z/', f: 'ض / ضـ / ـضـ / ـض' },
+        'ط': { n: '터 (tā)', p: '/t/', f: 'ط / طـ / ـطـ / ـط' },
+        'ظ': { n: '저 (zā)', p: '/z/', f: 'ظ / ظـ / ـظـ / ـظ' },
+	'ع': { n: "에인 ('eyn)", p: '/\'/ (성문파열음)', f: 'ع / عـ / ـعـ / ـع' },
+        'غ': { n: '게인 (qeyn)', p: '/q/', f: 'غ / غـ / ـغـ / ـغ' },
+        'ف': { n: '페 (fe)', p: '/f/', f: 'ف / فـ / ـفـ / ـف' },
+        'ق': { n: '거프 (qāf)', p: '/q/', f: 'ق / قـ / ـقـ / ـق' },
+        'ک': { n: '커프 (kāf)', p: '/k/', f: 'ک / کـ / ـکـ / ـک' },
+        'گ': { n: '거프 (gāf)', p: '/g/', f: 'گ / گـ / ـگـ / ـگ' },
+        'ل': { n: '럼 (lām)', p: '/l/', f: 'ل / لـ / ـلـ / ـل' },
+        'م': { n: '밈 (mim)', p: '/m/', f: 'م / مـ / ـمـ / ـم' },
+        'ن': { n: '눈 (nun)', p: '/n/', f: 'ن / نـ / ـنـ / ـن' },
+        'و': { n: '버브 (vāv)', p: '/v/, /u/, /o/', f: 'و / و / ـو / ـو' },
+        'ه': { n: '헤 (he)', p: '/h/, /e/', f: 'ه / هـ / ـهـ / ـه' },
+        'ی': { n: '예 (ye)', p: '/y/, /i/', f: 'ی / یـ / ـیـ / ـی' }
+    };
+const persianAlphabet = Object.keys(persianAlphabetData);
+    // 뒤로 이어지지 않는 단절 문자 배열
+    const nonJoiners = ['ا', 'د', 'ذ', 'ر', 'ز', 'ژ', 'و'];
+    
+    // 심화 결합 훈련을 위한 기초 단어 세트 하드코딩
+    const basicWords = [
+        { c: 'آب', n: '물 (āb)' }, { c: 'بابا', n: '아빠 (bābā)' }, { c: 'نان', n: '빵 (nān)' },
+        { c: 'سگ', n: '개 (sag)' }, { c: 'گل', n: '꽃 (gol)' }, { c: 'لب', n: '입술 (lab)' },
+        { c: 'شب', n: '밤 (shab)' }, { c: 'دست', n: '손 (dast)' }, { c: 'پا', n: '발 (pā)' },
+        { c: 'من', n: '나 (man)' }, { c: 'تو', n: '너 (to)' }
+    ];
+    
+    let currentSimText = "";
+    let isMissionMode = false;
+    let currentMissionIdx = 0;
+    
+    let isXrayMode = false;
+
+    function toggleXrayMode() {
+        isXrayMode = !isXrayMode;
+        const btn = document.getElementById('btn-xray');
+        if (isXrayMode) {
+            btn.style.background = '#0c8599';
+            btn.style.color = 'white';
+            btn.style.borderColor = '#0c8599';
+        } else {
+            btn.style.background = '#e3fafc';
+            btn.style.color = '#0c8599';
+            btn.style.borderColor = '#99e9f2';
+        }
+        updateSimDisplay(); // 화면 즉시 갱신
+    }
+
+    function toggleMissionMode() {
+        isMissionMode = !isMissionMode;
+        const btn = document.getElementById('btn-mission');
+        const targetDiv = document.getElementById('mission-target');
+        if (isMissionMode) {
+            btn.style.background = 'var(--primary)';
+            btn.style.color = 'white';
+            btn.style.borderColor = 'var(--primary)';
+            targetDiv.style.display = 'flex';
+            currentMissionIdx = Math.floor(Math.random() * basicWords.length);
+            updateMissionUI();
+            simClear();
+        } else {
+            btn.style.background = '#fff3bf';
+            btn.style.color = '#f08c00';
+            btn.style.borderColor = '#fcc419';
+            targetDiv.style.display = 'none';
+            simClear();
+        }
+    }
+
+    function updateMissionUI() {
+        if (!isMissionMode) return;
+        document.getElementById('mission-word').innerText = basicWords[currentMissionIdx].c;
+        document.getElementById('mission-mean').innerText = basicWords[currentMissionIdx].n;
+    }
+
+    function checkMissionSuccess() {
+        if (!isMissionMode) return;
+        let targetText = basicWords[currentMissionIdx].c;
+        // 아랍어/페르시아어 알레프 변형 등 보정
+        let normalizedInput = currentSimText.replace(/ا/g, 'ا').replace(/آ/g, 'آ'); 
+        
+        if (normalizedInput === targetText) {
+            setTimeout(() => {
+                alert("🎉 미션 성공! 완벽하게 분해하여 조립했습니다.");
+                currentMissionIdx = Math.floor(Math.random() * basicWords.length);
+                updateMissionUI();
+                simClear();
+            }, 300);
+        }
+    }
+
+    function initSimulator() {
+        const kb = document.getElementById('sim-keyboard');
+        kb.innerHTML = "";
+        persianAlphabet.forEach(char => {
+            let btn = document.createElement('button');
+            btn.className = 'kb-key';
+            if(nonJoiners.includes(char)) btn.classList.add('non-joiner');
+            btn.innerText = char;
+	btn.onclick = () => {
+                currentSimText += char;
+                updateSimDisplay();
+                updateSimHUD(char);
+                checkMissionSuccess();
+                
+                // 단절 문자 누를 시 시각적 경고 효과
+                if(nonJoiners.includes(char)) {
+                    const displayEl = document.getElementById('sim-text');
+                    displayEl.classList.remove('warning-flash');
+                    void displayEl.offsetWidth; // 리플로우 강제 유발
+                    displayEl.classList.add('warning-flash');
+                }
+            };
+            kb.appendChild(btn);
+        });
+    }
+
+    function updateSimHUD(char) {
+        const hud = document.getElementById('sim-hud');
+        const data = persianAlphabetData[char];
+        if (data) {
+            document.getElementById('hud-name').innerText = data.n;
+            document.getElementById('hud-pron').innerText = data.p;
+            document.getElementById('hud-forms').innerText = data.f;
+            hud.style.opacity = '1';
+        }
+    }
+
+function updateSimDisplay() {
+        const display = document.getElementById('sim-text');
+        const placeholder = document.getElementById('sim-placeholder');
+        const hud = document.getElementById('sim-hud');
+        
+        // --- 모음 투시경(X-Ray) 로직 ---
+        let displayText = currentSimText;
+        if (isXrayMode && displayText.length > 0) {
+            // 정규식을 사용해 공백 및 장모음(ا, آ, و, ی)을 제외한 '자음'의 뒤에 단모음 기호(Fatha, َ ) 강제 주입
+            displayText = displayText.replace(/([^\sاآووی])/g, '$1َ');
+            display.style.color = '#0c8599'; // 투시경 활성화 시 텍스트 청록색 변경
+        } else {
+            display.style.color = 'var(--primary)'; // 평상시 원래 색상 복구
+        }
+        
+        display.innerText = displayText;
+        // ------------------------------
+        
+        if (currentSimText.length === 0) {
+            placeholder.style.display = 'block';
+            hud.style.opacity = '0';
+        } else {
+            placeholder.style.display = 'none';
+        }
+    }
+
+	function simBackspace() {
+        if(currentSimText.length > 0) {
+            currentSimText = currentSimText.slice(0, -1);
+            updateSimDisplay();
+            checkMissionSuccess();
+        }
+    }
+    
+    function simClear() {
+        currentSimText = "";
+        updateSimDisplay();
+    }
+
+    function simAddSpace() {
+        currentSimText += " ";
+        updateSimDisplay();
+    }
+
+    // --- 따라 쓰기(Tracing) 로직 ---
+    // PC 데스크톱 접속 여부 판별 (터치 포인트가 없고 모바일 UA가 아닌 경우)
+    function isDesktop() {
+        return navigator.maxTouchPoints === 0 && !/Mobi|Android|Tablet|iPad|iPhone/i.test(navigator.userAgent);
+    }
+
+    function startTracingCheck() {
+        if (isDesktop()) {
+            alert("⚠️ 접근 제한\n\n획순 따라 쓰기는 터치펜이나 손가락을 사용하는 모바일 및 태블릿 환경에 최적화되어 있습니다.\n\n터치 스크린이 지원되는 기기(스마트폰/아이패드 등)로 접속해 주세요.\n(※ 테스트 목적이라면 브라우저의 '개발자 도구 - 모바일 뷰'를 켜고 새로고침 하세요.)");
+            return;
+        }
+        changeMode('tracing');
+        initCanvasSetup();
+        loadTraceChar();
+    }
+
+    // 32개 알파벳 + 이름 매핑
+const traceData = [
+        { c: 'ا', n: '알레프 (alef)' }, { c: 'ب', n: '베 (be)' }, { c: 'پ', n: '페 (pe)' }, { c: 'ت', n: '테 (te)' },
+        { c: 'ث', n: '세 (se)' }, { c: 'ج', n: '짐 (jim)' }, { c: 'چ', n: '체 (che)' }, { c: 'ح', n: '헤 (he)' },
+        { c: 'خ', n: '헤 (xe)' }, { c: 'د', n: '덜 (dāl)' }, { c: 'ذ', n: '절 (zāl)' }, { c: 'ر', n: '레 (re)' },
+        { c: 'ز', n: '제 (ze)' }, { c: 'ژ', n: '줴 (zhe)' }, { c: 'س', n: '신 (sin)' }, { c: 'ش', n: '쉰 (shin)' },
+        { c: 'ص', n: '서드 (sād)' }, { c: 'ض', n: '저드 (zād)' }, { c: 'ط', n: '터 (tā)' }, { c: 'ظ', n: '저 (zā)' },
+        { c: 'ع', n: "에인 ('eyn)" }, { c: 'غ', n: '게인 (qeyn)' }, { c: 'ف', n: '페 (fe)' }, { c: 'ق', n: '거프 (qāf)' },
+        { c: 'ک', n: '커프 (kāf)' }, { c: 'گ', n: '거프 (gāf)' }, { c: 'ل', n: '럼 (lām)' }, { c: 'م', n: '밈 (mim)' },
+        { c: 'ن', n: '눈 (nun)' }, { c: 'و', n: '버브 (vāv)' }, { c: 'ه', n: '헤 (he)' }, { c: 'ی', n: '예 (ye)' }
+    ];
+    
+    let traceIndex = 0;
+    let traceMode = 'alpha'; // 'alpha' or 'word'
+
+    let canvas, ctx;
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
+
+    function setTraceMode(mode) {
+        traceMode = mode;
+        traceIndex = 0;
+        document.getElementById('btn-trace-alpha').style.background = mode === 'alpha' ? 'var(--primary)' : 'white';
+        document.getElementById('btn-trace-alpha').style.color = mode === 'alpha' ? 'white' : 'var(--primary)';
+        document.getElementById('btn-trace-word').style.background = mode === 'word' ? 'var(--primary)' : 'white';
+        document.getElementById('btn-trace-word').style.color = mode === 'word' ? 'white' : 'var(--primary)';
+        loadTraceChar();
+    }
+
+    function getDotGuide(charStr) {
+        if (traceMode === 'word') return "💡 펜을 떼지 않고 이어지는 글자의 몸통을 모두 끝까지 쓴 뒤, 각 점들을 찍습니다.";
+        
+        const c = charStr;
+        if (['پ','چ','ژ','ش','ث'].includes(c)) return "💡 펜을 떼지 않고 몸통을 먼저 그린 후, 점 3개는 오른쪽에서 왼쪽으로 2개를 찍고 위(아래)에 1개를 마저 찍습니다.";
+        if (['ت','ق','ی'].includes(c)) return "💡 펜을 떼지 않고 몸통을 먼저 그린 후, 점 2개는 오른쪽에서 왼쪽으로 차례대로 찍습니다.";
+        if (['ب','ج','خ','ذ','ز','ض','ظ','غ','ف','ن'].includes(c)) return "💡 펜을 떼지 않고 몸통을 먼저 그린 후, 마지막에 점 1개를 찍습니다.";
+        if (['ک','گ'].includes(c)) return "💡 펜을 떼지 않고 몸통을 먼저 그린 후, 상단의 사선(윗선)을 마지막에 긋습니다.";
+        return "💡 오른쪽(또는 위쪽)에서 시작하여 부드럽게 긋습니다.";
+    }
+
+    function initCanvasSetup() {
+        if(canvas) return; // 이미 초기화된 경우 스킵
+        
+        canvas = document.getElementById('drawCanvas');
+        ctx = canvas.getContext('2d');
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // 캔버스 드로잉 속성
+        ctx.strokeStyle = '#0b2a4a'; // Primary Color
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 12;
+
+        // 터치 이벤트 (모바일/태블릿) - passive: false로 스크롤 완벽 차단
+        canvas.addEventListener('touchstart', startDraw, { passive: false });
+        canvas.addEventListener('touchmove', draw, { passive: false });
+        canvas.addEventListener('touchend', endDraw);
+        canvas.addEventListener('touchcancel', endDraw);
+
+        // 마우스 이벤트 (폴백용)
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', endDraw);
+        canvas.addEventListener('mouseout', endDraw);
+    }
+
+    function resizeCanvas() {
+        if(!canvas) return;
+        const rect = canvas.parentElement.getBoundingClientRect();
+        // 고해상도 모바일 화면(Retina) 선명도 대응
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        
+        // 리사이즈 시 스타일 유지
+        ctx.strokeStyle = '#0b2a4a';
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 12;
+    }
+
+	function loadTraceChar() {
+        clearCanvas();
+        const dataArr = traceMode === 'alpha' ? traceData : basicWords;
+        const data = dataArr[traceIndex];
+        
+        document.getElementById('trace-info').innerText = `${data.n} (${traceIndex + 1}/${dataArr.length})`;
+        
+        const watermarkEl = document.getElementById('watermark');
+        watermarkEl.innerText = data.c;
+        // 단어 모드일 때는 글씨 크기를 약간 줄여 캔버스에 들어가게 함
+        watermarkEl.style.fontSize = traceMode === 'word' ? '10rem' : '15rem';
+        
+        document.getElementById('trace-guide').innerText = getDotGuide(data.c);
+    }
+
+    function nextTrace() {
+        const len = traceMode === 'alpha' ? traceData.length : basicWords.length;
+        traceIndex = (traceIndex + 1) % len;
+        loadTraceChar();
+    }
+
+    function prevTrace() {
+        const len = traceMode === 'alpha' ? traceData.length : basicWords.length;
+        traceIndex = (traceIndex - 1 + len) % len;
+        loadTraceChar();
+    }
+
+    function clearCanvas() {
+        if(!ctx) return;
+        // 스케일을 고려하여 캔버스 전체 지우기
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function getPointerPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        let clientX, clientY;
+        
+        if (e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+    }
+
+    function startDraw(e) {
+        e.preventDefault(); // 스크롤 및 핀치 줌 완벽 차단
+        isDrawing = true;
+        const pos = getPointerPos(e);
+        lastX = pos.x;
+        lastY = pos.y;
+        
+        // 점만 찍었을 때도 그려지도록 처리
+        ctx.beginPath();
+        ctx.arc(lastX, lastY, ctx.lineWidth / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        e.preventDefault();
+        
+        const pos = getPointerPos(e);
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        
+        lastX = pos.x;
+        lastY = pos.y;
+    }
+
+    function endDraw(e) {
+        if(e) e.preventDefault();
+        isDrawing = false;
+        ctx.beginPath();
+    }
+
+    // 초기화 실행
+    initSimulator();
+
+</script>
+</body>
+</html>
