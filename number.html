@@ -10,6 +10,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
+/* 홈 버튼 우측(좌측) 하단으로 이동 (충돌 원천 차단) */
+        .portal-home-button { position: fixed; top: auto !important; left: 25px !important; bottom: 25px; right: auto !important; width: 55px; height: 55px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; transition: all 0.3s ease; }
+        .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .portal-home-button i { font-size: 1.5rem; }
+
+        /* 익스트림 버튼 및 결과창 스타일 추가 */
+        .btn-extreme { background: #8b0000; color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; }
+        .btn-extreme:hover { background: #5a0000; transform: translateY(-2px); }
+        
+        #certificate.extreme-mode { border-color: #8b0000; background: #fffdfd; }
+        #certificate.extreme-mode::before {
+            content: 'EXTREME MODE'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 6rem; color: rgba(250, 82, 82, 0.08); pointer-events: none;
+            white-space: nowrap; font-weight: bold; letter-spacing: 5px;
+        }
+        .extreme-mode .cert-title { color: #8b0000; border-bottom-color: #eebfbf; }
+        .extreme-mode .cert-rank { color: #8b0000; text-shadow: 2px 2px 0px #ffd0d0; }
+
         :root {
             --primary: #0b2a4a;
             --accent: #fa5252;
@@ -40,8 +59,10 @@
         header h2 { font-size: 2.5rem; margin: 0; }
         header p { margin-top: 15px; opacity: 0.8; font-size: 1.2rem; }
 
-        .screen { display: none; padding: 50px; flex-grow: 1; }
+	.screen { display: none; padding: 50px; flex-grow: 1; }
         .screen.active { display: block; }
+        /* 홈 화면이 활성화되었을 때만 flex를 적용하도록 강제 분리 */
+        #screen-home.active { display: flex; flex-direction: column; padding: 30px; }
 
         /* --- 홈(Lobby) 화면 --- */
 /* 수정된 2x2 강제 고정 그리드 */
@@ -128,49 +149,6 @@
     <i class="fas fa-home"></i>
 </a>
 
-<style>
-    .portal-home-button {
-        position: fixed;
-        top: 25px;       /* 상단에서 적당히 띄움 */
-        left: 25px;      /* 왼쪽에서 적당히 띄움 */
-        width: 50px;
-        height: 50px;
-        background-color: #0b2a4a; /* 메인 페이지의 진한 푸른색 활용 */
-        color: white;
-        border-radius: 50%;        /* 동그라미 모양 */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-decoration: none;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* 입체감을 위한 그림자 */
-        z-index: 10000;            /* 다른 요소보다 항상 위에 표시 */
-        transition: all 0.3s ease; /* 부드러운 애니메이션 */
-    }
-
-    .portal-home-button:hover {
-        background-color: #1a3a5a; /* 마우스를 올렸을 때 약간 밝아짐 */
-        transform: scale(1.1);     /* 살짝 커지는 효과 */
-        box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-    }
-
-    .portal-home-button i {
-        font-size: 20px; /* 집 모양 아이콘 크기 */
-    }
-
-    /* 모바일 기기 배려: 화면이 아주 작을 때는 버튼 크기를 살짝 조절 */
-    @media (max-width: 600px) {
-        .portal-home-button {
-            top: 15px;
-            left: 15px;
-            width: 40px;
-            height: 40px;
-        }
-        .portal-home-button i {
-            font-size: 16px;
-        }
-    }
-</style>
-
 <div class="cheat-sheet-wrapper">
     <div class="cheat-sheet-panel" id="cheat-panel">
         <div class="cheat-grid">
@@ -199,36 +177,57 @@
         <p>글자가 아닌 감각으로 익히는 숫자 마스터 클래스</p>
     </header>
 
-    <div id="screen-home" class="screen active">
-        <h3 style="font-size: 1.7rem; color: var(--primary); margin-bottom: 20px; text-align: center;">훈련 모드를 선택하세요</h3>
-        <div class="home-grid">
-            <div class="mode-card" onclick="showOnboarding('math')">
-                <i class="fas fa-keyboard mode-icon"></i>
-                <h3>사칙연산 서바이벌</h3>
-                <p>쏟아지는 연산을 풀며 콤보를 쌓고 생존하세요.<br>(직접 입력 / 목숨 3개)</p>
+<div id="screen-home" class="screen active">
+        <div class="home-grid" style="flex-grow: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%;">
+            <div class="mode-card" style="cursor: default; padding: 25px 20px; display: flex; flex-direction: column;">
+                <i class="fas fa-keyboard mode-icon" style="margin-bottom: 15px;"></i>
+                <h3 style="margin-bottom: 15px;">사칙연산 서바이벌</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
+                    🎯 <strong>분량:</strong> 무제한 생존<br>
+                    ⚠️ <strong>규칙:</strong> 오답 시 목숨 차감, 10콤보 시 보너스
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: auto;">
+                    <button class="btn-start" style="padding: 12px; font-size: 1.1rem; flex: 1; margin-top:0;" onclick="currentMode='math'; startGame('normal')">일반</button>
+                    <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='math'; startGame('extreme')">익스트림(목숨 1개)</button>
+                </div>
             </div>
-            <div class="mode-card" onclick="showOnboarding('mcq_time')">
-                <i class="fas fa-clock mode-icon"></i>
-                <h3>시계 읽기 타임어택</h3>
-                <p>'반'과 '15분 전' 등 특수 시간 표현을 정복하세요.<br>(4지 선다 / 20문제)</p>
+            <div class="mode-card" style="cursor: default; padding: 25px 20px; display: flex; flex-direction: column;">
+                <i class="fas fa-clock mode-icon" style="margin-bottom: 15px;"></i>
+                <h3 style="margin-bottom: 15px;">시계 읽기 타임어택</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
+                    ⏱️ <strong>분량:</strong> 20문항 / 익스트림 50문항<br>
+                    ⚠️ <strong>규칙:</strong> 특수 시간 표현 포함, 오답 +5초
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: auto;">
+                    <button class="btn-start" style="padding: 12px; font-size: 1.1rem; flex: 1; margin-top:0;" onclick="currentMode='mcq_time'; startGame('normal')">일반</button>
+                    <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='mcq_time'; startGame('extreme')">익스트림</button>
+                </div>
             </div>
-            <div class="mode-card" onclick="showOnboarding('mcq_receipt')">
-                <i class="fas fa-receipt mode-icon"></i>
-                <h3>영수증 타임어택</h3>
-                <p>화폐(토만/리얄)를 빠르게 읽어내세요.<br>(4지 선다 / 20문제)</p>
+            <div class="mode-card" style="cursor: default; padding: 25px 20px; display: flex; flex-direction: column;">
+                <i class="fas fa-receipt mode-icon" style="margin-bottom: 15px;"></i>
+                <h3 style="margin-bottom: 15px;">영수증 타임어택</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
+                    💵 <strong>분량:</strong> 20문항 / 익스트림 50문항<br>
+                    ⚠️ <strong>규칙:</strong> 토만/리얄 화폐 환산, 오답 +5초
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: auto;">
+                    <button class="btn-start" style="padding: 12px; font-size: 1.1rem; flex: 1; margin-top:0;" onclick="currentMode='mcq_receipt'; startGame('normal')">일반</button>
+                    <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='mcq_receipt'; startGame('extreme')">익스트림</button>
+                </div>
             </div>
-            <div class="mode-card" onclick="showOnboarding('mcq_calendar')">
-                <i class="fas fa-calendar-alt mode-icon"></i>
-                <h3>이란력 타임어택</h3>
-                <p>생소한 이란력의 월 이름을 숙지하세요.<br>(4지 선다 / 20문제)</p>
+            <div class="mode-card" style="cursor: default; padding: 25px 20px; display: flex; flex-direction: column;">
+                <i class="fas fa-calendar-alt mode-icon" style="margin-bottom: 15px;"></i>
+                <h3 style="margin-bottom: 15px;">이란력 타임어택</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
+                    📅 <strong>분량:</strong> 20문항 / 익스트림 50문항<br>
+                    ⚠️ <strong>규칙:</strong> 월 이름 및 숫자 변환, 오답 +5초
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: auto;">
+                    <button class="btn-start" style="padding: 12px; font-size: 1.1rem; flex: 1; margin-top:0;" onclick="currentMode='mcq_calendar'; startGame('normal')">일반</button>
+                    <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='mcq_calendar'; startGame('extreme')">익스트림</button>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div id="screen-onboarding" class="screen">
-        <h3 id="ob-title" style="font-size: 2rem; color: var(--primary); margin-bottom: 25px;"></h3>
-        <div id="ob-desc" style="font-size: 1.3rem; line-height: 1.8; background: #f8f9fa; padding: 35px; border-radius: 12px; border-left: 6px solid var(--primary);"></div>
-        <button class="btn-start" onclick="startGame()">훈련 시작하기</button>
     </div>
 
     <div id="screen-math" class="screen">
@@ -341,6 +340,7 @@
 
     /* --- 전역 상태 --- */
     let currentMode = ''; 
+    let gameDifficulty = 'normal'; // [추가] 일반/익스트림 난이도
     let score = 0, lives = 3, combo = 0, maxCombo = 0, startTime = 0;
     let currentAns = 0, currentProbTxt = '';
     let hintUsed = false;
@@ -370,52 +370,8 @@
         p.style.display = p.style.display === 'block' ? 'none' : 'block';
     }
 
-    function showOnboarding(mode) {
-        currentMode = mode;
-        const titleEl = document.getElementById('ob-title');
-        const descEl = document.getElementById('ob-desc');
-        
-        if (mode === 'math') {
-            titleEl.innerHTML = '<i class="fas fa-keyboard"></i> 사칙연산 서바이벌';
-            descEl.innerHTML = `
-                <strong>페르시아 숫자를 익혀 봅시다!</strong><br><br>
-                - <strong>목표:</strong> 연산을 풀며 콤보를 쌓아 A+ 등급에 도전하세요.<br>
-                - <strong>규칙:</strong> 목숨 3개! 10콤보 시 목숨 회복(풀 피일 경우 +500점 보너스).<br>
-                - <strong>페널티:</strong> 오답 시 화면이 번쩍이며 정답이 1.5초간 노출된 뒤 목숨이 차감됩니다.<br>
-                - <strong>평가:</strong> 점수에 따라 A+ ~ C 등급이 부여됩니다.
-            `;
-        } else if (mode === 'mcq_time') {
-            titleEl.innerHTML = '<i class="fas fa-clock"></i> 시계 읽기 타임어택';
-            descEl.innerHTML = `
-                <strong>페르시아어로 시간을 읽어 봅시다!</strong><br><br>
-                - <strong>목표:</strong> 20문제를 빠르고 정확하게 돌파하여 A+ 등급 쟁취!<br>
-                - <strong>특징:</strong> 정각, 반(نیم), 15분(ربع), 15분 전(یه ربع به) 등의 실전 표현이 등장합니다.<br>
-                - <strong>규칙:</strong> 오답 클릭 시 타이머에 <strong>+5초 페널티</strong>가 누적됩니다.<br>
-                - <strong>평가:</strong> 소요 시간과 정확도를 종합하여 등급이 부여됩니다.
-            `;
-        } else if (mode === 'mcq_receipt') {
-            titleEl.innerHTML = '<i class="fas fa-receipt"></i> 영수증 타임어택';
-            descEl.innerHTML = `
-                <strong>자연스럽게 돈 거래를 익혀 봅시다!</strong><br><br>
-                - <strong>목표:</strong> 20문제를 빠르고 정확하게 돌파하여 A+ 등급 쟁취!<br>
-                - <strong>규칙:</strong> 오답 클릭 시 타이머에 <strong>+5초 페널티</strong>가 누적됩니다.<br>
-                - <strong>평가:</strong> 소요 시간과 정확도(클릭 수 대비 정답률)를 종합하여 학점이 부여됩니다. 광클(찍기) 시 C등급으로 강등됩니다.<br>
-                - <strong>진행:</strong> 전반부(텍스트 ➔ 숫자) / 후반부(숫자 ➔ 텍스트)
-            `;
-        } else {
-            titleEl.innerHTML = '<i class="fas fa-calendar-alt"></i> 이란력 타임어택';
-            descEl.innerHTML = `
-                <strong>이란의 특수한 달력 체계를 익혀 봅시다!</strong><br><br>
-                - <strong>목표:</strong> 20문제를 빠르고 정확하게 풀고 A+ 등급 쟁취!<br>
-                - <strong>규칙:</strong> 오답 클릭 시 타이머에 <strong>+5초 페널티</strong>가 누적됩니다.<br>
-                - <strong>평가:</strong> 소요 시간과 정확도(%)를 종합하여 등급이 부여됩니다.<br>
-                - <strong>진행:</strong> 전반부(텍스트 ➔ 숫자) / 후반부(숫자 ➔ 텍스트)
-            `;
-        }
-        showScreen('screen-onboarding');
-    }
-
-    function startGame() {
+function startGame(difficulty) {
+        gameDifficulty = difficulty || 'normal';
         if (currentMode === 'math') startMath();
         else startMCQ();
     }
@@ -440,17 +396,20 @@
         hintUsed = true;
     }
 
-    function startMath() {
-        score = 0; lives = 3; combo = 0; maxCombo = 0; isMathDelay = false;
+function startMath() {
+        score = 0; 
+        lives = (gameDifficulty === 'extreme') ? 1 : 3; // 익스트림은 목숨 1개
+        combo = 0; maxCombo = 0; isMathDelay = false;
         updateMathUI();
         showScreen('screen-math');
         nextMathProb();
     }
 
-    function updateMathUI() {
+function updateMathUI() {
         document.getElementById('math-score').innerText = score;
         document.getElementById('math-combo').innerText = combo > 1 ? `(${combo} Combo!)` : '';
-        document.getElementById('math-lives').innerText = '❤️'.repeat(lives) + '🖤'.repeat(3-lives);
+        let maxLives = (gameDifficulty === 'extreme') ? 1 : 3;
+        document.getElementById('math-lives').innerText = '❤️'.repeat(lives) + '🖤'.repeat(maxLives - lives);
     }
 
     function showBonusEffect() {
@@ -500,15 +459,17 @@
             b = divisor;
             ans = quotient;
             hintStr = `${a} ÷ ${b}`;
-        } else if (op === '-') {
-            let maxNum = Math.min(10 + Math.floor(combo / 2) * 10, 99);
+} else if (op === '-') {
+            let comboMultiplier = (gameDifficulty === 'extreme') ? combo : Math.floor(combo / 2);
+            let maxNum = Math.min(10 + comboMultiplier * 10, 99);
             a = Math.floor(Math.random() * maxNum) + 1;
             b = Math.floor(Math.random() * maxNum) + 1;
             if (a < b) [a, b] = [b, a]; 
             ans = a - b;
             hintStr = `${a} - ${b}`;
         } else {
-            let maxNum = Math.min(10 + Math.floor(combo / 2) * 10, 99);
+            let comboMultiplier = (gameDifficulty === 'extreme') ? combo : Math.floor(combo / 2);
+            let maxNum = Math.min(10 + comboMultiplier * 10, 99);
             a = Math.floor(Math.random() * maxNum) + 1;
             b = Math.floor(Math.random() * maxNum) + 1;
             ans = a + b;
@@ -537,9 +498,10 @@
                 else if (timeTaken < 5) earned += 20;
                 earned = Math.floor(earned * (1 + (combo*0.1)));
                 
-                // [V5 수정] 10콤보 초과 보상 로직
+	// [V5 수정] 10콤보 초과 보상 로직 (익스트림 제어)
                 if (combo > 0 && combo % 10 === 0) {
-                    if (lives < 3) {
+                    let maxLives = (gameDifficulty === 'extreme') ? 1 : 3;
+                    if (lives < maxLives) {
                         lives++; 
                     } else {
                         earned += 500;
@@ -569,7 +531,8 @@
     }
 
     /* --- 2. 객관식 타임어택 로직 --- */
-    function startMCQ() {
+function startMCQ() {
+        mcqTotal = (gameDifficulty === 'extreme') ? 50 : 20; // 문항 수 대폭발
         mcqStep = 0; mcqMistakes = [];
         mcqPenaltySec = 0; mcqClicks = 0; 
         showScreen('screen-mcq');
@@ -628,8 +591,8 @@
     }
 
     /* --- 오답 생성 알고리즘 --- */
-    function generateMCQData(step) {
-        let isHard = step > 10;
+function generateMCQData(step) {
+        let isHard = (gameDifficulty === 'extreme') || (step > mcqTotal / 2);
         
         if (currentMode === 'mcq_time') {
             // [V5 추가] 시계 읽기 생성기
@@ -721,7 +684,7 @@
         return data;
     }
 
-    /* --- 게임 종료 및 결과 --- */
+/* --- 게임 종료 및 결과 --- */
     function endGame(type) {
         clearInterval(timerInterval);
         showScreen('screen-result');
@@ -729,19 +692,29 @@
         
         let rank = 'C', msg = '', finalScoreStr = '';
         
+        let certBox = document.getElementById('certificate');
+        if (gameDifficulty === 'extreme') certBox.classList.add('extreme-mode');
+        else certBox.classList.remove('extreme-mode');
+        
         if (type === 'math') {
             document.getElementById('res-mode').innerText = '사칙연산 서바이벌';
             finalScoreStr = `${score} 점 (최고 ${maxCombo} 콤보)`;
             
-            if (score >= 3000) { rank = 'A+'; msg = "🎉 완벽합니다! 수학의 신이시네요."; }
-            else if (score >= 1500) { rank = 'A'; msg = "👏 훌륭합니다! 콤보 유지력이 대단해요."; }
-            else if (score >= 800) { rank = 'B'; msg = "👍 잘하셨습니다! 다음엔 더 빠르게 쳐보세요."; }
-            else { rank = 'C'; msg = "💪 괜찮습니다! 매일 훈련하면 금방 늘 거예요."; }
-            
+            if (gameDifficulty === 'extreme') {
+                if (score >= 5000) { rank = 'SSR'; msg = "수학의 신 (Extreme Clear)"; }
+                else if (score >= 3000) { rank = 'SR'; msg = "경이로운 연산력입니다."; }
+                else if (score >= 1000) { rank = 'R'; msg = "익스트림의 맹공을 버텨냈습니다."; }
+                else { rank = 'F'; msg = "단판 승부의 압박감을 극복하세요."; }
+            } else {
+                if (score >= 3000) { rank = 'A+'; msg = "🎉 완벽합니다! 수학의 신이시네요."; }
+                else if (score >= 1500) { rank = 'A'; msg = "👏 훌륭합니다! 콤보 유지력이 대단해요."; }
+                else if (score >= 800) { rank = 'B'; msg = "👍 잘하셨습니다! 다음엔 더 빠르게 쳐보세요."; }
+                else { rank = 'C'; msg = "💪 괜찮습니다! 매일 훈련하면 금방 늘 거예요."; }
+            }
             document.getElementById('mistake-area').style.display = 'none';
         } else {
             let totalSec = Math.floor((Date.now() - startTime) / 1000) + mcqPenaltySec;
-            let accuracy = Math.floor((20 / mcqClicks) * 100);
+            let accuracy = Math.floor((mcqTotal / mcqClicks) * 100);
             
             if (type === 'mcq_receipt') document.getElementById('res-mode').innerText = '영수증 타임어택';
             else if (type === 'mcq_time') document.getElementById('res-mode').innerText = '시계 읽기 타임어택';
@@ -749,16 +722,17 @@
             
             finalScoreStr = `${Math.floor(totalSec/60)}분 ${String(totalSec%60).padStart(2,'0')}초 (정확도 ${accuracy}%)`;
             
-            if (accuracy < 70) { 
-                rank = 'C'; msg = "🚨 정확도가 너무 낮습니다. 찍지 말고 천천히 풀어보세요!"; 
-            } else if (totalSec <= 180 && accuracy >= 90) { 
-                rank = 'A+'; msg = "🎉 최고입니다! 이란 현지인 반응속도네요."; 
-            } else if (totalSec <= 270 && accuracy >= 80) { 
-                rank = 'A'; msg = "👏 훌륭합니다! 조금만 다듬으면 원어민급입니다."; 
-            } else if (totalSec <= 360 && accuracy >= 70) { 
-                rank = 'B'; msg = "👍 좋습니다! 오답 노트를 한 번 더 복습해 볼까요?"; 
-            } else { 
-                rank = 'C'; msg = "💪 끝까지 완주한 것만으로도 대단합니다! 다시 도전!"; 
+            if (gameDifficulty === 'extreme') {
+                if (accuracy < 80) { rank = 'F'; msg = "🚨 정확도가 무너졌습니다. 광클은 금물!"; }
+                else if (totalSec <= 200 && accuracy >= 95) { rank = 'SSR'; msg = "인간계 최고 속도입니다."; }
+                else if (totalSec <= 300 && accuracy >= 90) { rank = 'SR'; msg = "엄청난 지구력과 정확도입니다."; }
+                else { rank = 'R'; msg = "지옥의 50문항 마라톤 완주를 축하합니다."; }
+            } else {
+                if (accuracy < 70) { rank = 'C'; msg = "🚨 정확도가 너무 낮습니다. 찍지 말고 천천히 풀어보세요!"; } 
+                else if (totalSec <= 180 && accuracy >= 90) { rank = 'A+'; msg = "🎉 최고입니다! 이란 현지인 반응속도네요."; } 
+                else if (totalSec <= 270 && accuracy >= 80) { rank = 'A'; msg = "👏 훌륭합니다! 조금만 다듬으면 원어민급입니다."; } 
+                else if (totalSec <= 360 && accuracy >= 70) { rank = 'B'; msg = "👍 좋습니다! 오답 노트를 한 번 더 복습해 볼까요?"; } 
+                else { rank = 'C'; msg = "💪 끝까지 완주한 것만으로도 대단합니다! 다시 도전!"; }
             }
 
             if(mcqMistakes.length > 0) {
@@ -775,6 +749,7 @@
         document.getElementById('res-score').innerText = finalScoreStr;
         document.getElementById('res-stamp').innerText = `${getFormattedDate()} 인증됨`;
     }
+
 
     /* --- 클립보드 복사 --- */
     async function copyResultImage() {

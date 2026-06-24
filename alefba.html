@@ -34,14 +34,15 @@
 	.screen { display: none; padding: 20px 40px; flex-grow: 1; overflow-y: auto; max-height: calc(100vh - 120px); }
         .screen.active { display: flex; flex-direction: column; }
 
-	/* 상하 1열 배치 (스크롤 방지 다이어트) */
-        .home-grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; max-width: 800px; margin: 0 auto; }
+/* 좌우 2열 배치 (스크롤 방지 및 꽉 찬 레이아웃) */
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 1000px; margin: 0 auto; flex-grow: 1; }
+        @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } }
         
-        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 25px 30px; text-align: center; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 30px 20px; text-align: center; transition: 0.2s; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; height: 100%; }
         .mode-icon { font-size: 3rem; color: var(--primary); margin-bottom: 10px; }
         .mode-card h3 { font-size: 1.6rem; margin-bottom: 10px; color: var(--primary); }
-        .mode-desc { font-size: 1rem; color: #555; text-align: left; margin-bottom: 15px; line-height: 1.5; word-break: keep-all; width: 100%; max-width: 500px; }
-        .btn-start { width: 100%; max-width: 350px; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .mode-desc { font-size: 1.05rem; color: #555; text-align: left; margin-bottom: 25px; line-height: 1.6; word-break: keep-all; width: 100%; max-width: 500px; flex-grow: 1; }
+        .btn-start { width: 100%; max-width: 350px; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: auto; }
         .btn-start:hover { background: #081e36; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(11, 42, 74, 0.2); }
 
 /* --- 문자 조립 시뮬레이터 UI --- */
@@ -156,7 +157,7 @@
             <div id="mission-target" style="display:none; flex-grow:1; align-items:center; background:#fff3bf; color:#e67700; padding:10px 15px; border-radius:8px; font-weight:bold; font-size:1.2rem;">
                 미션: <span id="mission-word" style="font-family:var(--persian-font); font-size:1.8rem; margin: 0 10px;"></span> (<span id="mission-mean"></span>)
             </div>
-            <button class="btn-action" onclick="toggleXrayMode()" id="btn-xray" style="background:#e3fafc; color:#0c8599; border:2px solid #99e9f2;"><i class="fas fa-search"></i> 숨은 모음</button>
+            <button class="btn-action" onclick="toggleXrayMode()" id="btn-xray" style="display: none; background:#e3fafc; color:#0c8599; border:2px solid #99e9f2;"><i class="fas fa-search"></i> 숨은 모음</button>
             <button class="btn-action" onclick="toggleMissionMode()" id="btn-mission" style="background:#fff3bf; color:#f08c00; border:2px solid #fcc419;"><i class="fas fa-flag"></i> 미션 모드</button>
             <button class="btn-action btn-space" onclick="simAddSpace()"><i class="fas fa-arrows-alt-h"></i> 띄어쓰기</button>
             <button class="btn-action btn-clear" onclick="simBackspace()"><i class="fas fa-backspace"></i> 지우기</button>
@@ -202,7 +203,7 @@
 
         <div class="trace-controls">
             <button class="btn-trace-nav" onclick="prevTrace()"><i class="fas fa-chevron-left"></i> </button>
-            <button class="btn-trace-nav" onclick="clearCanvas()" style="background: #ffe3e3; color: var(--accent); border-color: #ffc9c9;"><i class="fas fa-eraser"></i> 다시쓰기</button>
+            <button class="btn-trace-nav" onclick="clearCanvas()" style="background: #ffe3e3; color: var(--accent); border-color: #ffc9c9;"><i class="fas fa-eraser"></i></button>
             <button class="btn-trace-nav" onclick="nextTrace()"> <i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
@@ -263,12 +264,12 @@ const persianAlphabet = Object.keys(persianAlphabetData);
     // 뒤로 이어지지 않는 단절 문자 배열
     const nonJoiners = ['ا', 'د', 'ذ', 'ر', 'ز', 'ژ', 'و'];
     
-    // 심화 결합 훈련을 위한 기초 단어 세트 하드코딩
+// 심화 결합 훈련을 위한 기초 단어 세트 하드코딩 (v: 투시경 전용 모음 포함 데이터 추가)
     const basicWords = [
-        { c: 'آب', n: '물 (āb)' }, { c: 'بابا', n: '아빠 (bābā)' }, { c: 'نان', n: '빵 (nān)' },
-        { c: 'سگ', n: '개 (sag)' }, { c: 'گل', n: '꽃 (gol)' }, { c: 'لب', n: '입술 (lab)' },
-        { c: 'شب', n: '밤 (shab)' }, { c: 'دست', n: '손 (dast)' }, { c: 'پا', n: '발 (pā)' },
-        { c: 'من', n: '나 (man)' }, { c: 'تو', n: '너 (to)' }
+        { c: 'آب', v: 'آب', n: '물 (āb)' }, { c: 'بابا', v: 'بابا', n: '아빠 (bābā)' }, { c: 'نان', v: 'نان', n: '빵 (nān)' },
+        { c: 'سگ', v: 'سَگ', n: '개 (sag)' }, { c: 'گل', v: 'گُل', n: '꽃 (gol)' }, { c: 'لب', v: 'لَب', n: '입술 (lab)' },
+        { c: 'شب', v: 'شَب', n: '밤 (shab)' }, { c: 'دست', v: 'دَست', n: '손 (dast)' }, { c: 'پا', v: 'پا', n: '발 (pā)' },
+        { c: 'من', v: 'مَن', n: '나 (man)' }, { c: 'تو', v: 'تُو', n: '너 (to)' }
     ];
     
     let currentSimText = "";
@@ -277,7 +278,7 @@ const persianAlphabet = Object.keys(persianAlphabetData);
     
     let isXrayMode = false;
 
-    function toggleXrayMode() {
+function toggleXrayMode() {
         isXrayMode = !isXrayMode;
         const btn = document.getElementById('btn-xray');
         if (isXrayMode) {
@@ -289,18 +290,21 @@ const persianAlphabet = Object.keys(persianAlphabetData);
             btn.style.color = '#0c8599';
             btn.style.borderColor = '#99e9f2';
         }
-        updateSimDisplay(); // 화면 즉시 갱신
+        updateMissionUI(); // 엑스레이 버튼 누를 때 미션 제시어를 즉시 갱신
     }
 
     function toggleMissionMode() {
         isMissionMode = !isMissionMode;
         const btn = document.getElementById('btn-mission');
         const targetDiv = document.getElementById('mission-target');
+        const btnXray = document.getElementById('btn-xray'); 
+
         if (isMissionMode) {
             btn.style.background = 'var(--primary)';
             btn.style.color = 'white';
             btn.style.borderColor = 'var(--primary)';
             targetDiv.style.display = 'flex';
+            btnXray.style.display = 'flex'; 
             currentMissionIdx = Math.floor(Math.random() * basicWords.length);
             updateMissionUI();
             simClear();
@@ -309,14 +313,27 @@ const persianAlphabet = Object.keys(persianAlphabetData);
             btn.style.color = '#f08c00';
             btn.style.borderColor = '#fcc419';
             targetDiv.style.display = 'none';
+            btnXray.style.display = 'none'; 
+            
+            if (isXrayMode) toggleXrayMode();
             simClear();
         }
     }
 
     function updateMissionUI() {
         if (!isMissionMode) return;
-        document.getElementById('mission-word').innerText = basicWords[currentMissionIdx].c;
-        document.getElementById('mission-mean').innerText = basicWords[currentMissionIdx].n;
+        const wordEl = document.getElementById('mission-word');
+        const data = basicWords[currentMissionIdx];
+        
+        // 투시경이 켜져 있으면 모음이 포함된 v(vowel) 값을, 아니면 기본 c 값을 출력
+        if (isXrayMode) {
+            wordEl.innerText = data.v;
+            wordEl.style.color = '#0c8599'; 
+        } else {
+            wordEl.innerText = data.c;
+            wordEl.style.color = ''; 
+        }
+        document.getElementById('mission-mean').innerText = data.n;
     }
 
     function checkMissionSuccess() {
@@ -377,15 +394,19 @@ function updateSimDisplay() {
         const placeholder = document.getElementById('sim-placeholder');
         const hud = document.getElementById('sim-hud');
         
-        // --- 모음 투시경(X-Ray) 로직 ---
-        let displayText = currentSimText;
-        if (isXrayMode && displayText.length > 0) {
-            // 정규식을 사용해 공백 및 장모음(ا, آ, و, ی)을 제외한 '자음'의 뒤에 단모음 기호(Fatha, َ ) 강제 주입
-            displayText = displayText.replace(/([^\sاآووی])/g, '$1َ');
-            display.style.color = '#0c8599'; // 투시경 활성화 시 텍스트 청록색 변경
+        // 오류투성이 모음 강제 주입 로직 제거. 순수 입력 텍스트만 출력
+        display.style.color = 'var(--primary)';
+        display.innerText = currentSimText;
+        
+        if (currentSimText.length === 0) {
+            placeholder.style.display = 'block';
+            hud.style.opacity = '0';
         } else {
-            display.style.color = 'var(--primary)'; // 평상시 원래 색상 복구
+            placeholder.style.display = 'none';
         }
+    }
+
+    function simBackspace() {
         
         display.innerText = displayText;
         // ------------------------------
