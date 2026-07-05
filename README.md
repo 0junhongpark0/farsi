@@ -1,2 +1,2 @@
 # farsi
-Farsi Practice Site for Korean
+An interactive web application for korean beginners learning Farsi
