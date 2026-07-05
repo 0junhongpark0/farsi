@@ -178,7 +178,7 @@
     </header>
 
 <div id="screen-home" class="screen active">
-        <div class="home-grid" style="flex-grow: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%;">
+	<div class="home-grid">
             <div class="mode-card" style="cursor: default; padding: 25px 20px; display: flex; flex-direction: column;">
                 <i class="fas fa-keyboard mode-icon" style="margin-bottom: 15px;"></i>
                 <h3 style="margin-bottom: 15px;">사칙연산 서바이벌</h3>
@@ -437,39 +437,21 @@ function updateMathUI() {
         document.getElementById('math-hint-btn').style.display = 'inline-block';
         startTime = Date.now();
 
-        let opRand = Math.random();
-        let op = '+';
-        if (combo >= 5) {
-            if (opRand > 0.75) op = '÷';
-            else if (opRand > 0.5) op = '×';
-            else if (opRand > 0.25) op = '-';
-        }
-
+	let opRand = Math.random();
+        let op = opRand > 0.5 ? '+' : '-';
         let a, b, ans, hintStr;
 
-        if (op === '×') {
-            a = Math.floor(Math.random() * 8) + 2; 
-            b = Math.floor(Math.random() * 8) + 2;
-            ans = a * b;
-            hintStr = `${a} × ${b}`;
-        } else if (op === '÷') {
-            let divisor = Math.floor(Math.random() * 8) + 2; 
-            let quotient = Math.floor(Math.random() * 8) + 2; 
-            a = divisor * quotient;
-            b = divisor;
-            ans = quotient;
-            hintStr = `${a} ÷ ${b}`;
-} else if (op === '-') {
-            let comboMultiplier = (gameDifficulty === 'extreme') ? combo : Math.floor(combo / 2);
-            let maxNum = Math.min(10 + comboMultiplier * 10, 99);
+        if (op === '-') {
+            // 빼기: 일반모드 1~50, 익스트림 1~99
+            let maxNum = (gameDifficulty === 'extreme') ? 99 : 50;
             a = Math.floor(Math.random() * maxNum) + 1;
             b = Math.floor(Math.random() * maxNum) + 1;
-            if (a < b) [a, b] = [b, a]; 
+            if (a < b) [a, b] = [b, a]; // 음수 방지
             ans = a - b;
             hintStr = `${a} - ${b}`;
         } else {
-            let comboMultiplier = (gameDifficulty === 'extreme') ? combo : Math.floor(combo / 2);
-            let maxNum = Math.min(10 + comboMultiplier * 10, 99);
+            // 더하기: 일반모드 1~50, 익스트림 1~99
+            let maxNum = (gameDifficulty === 'extreme') ? 99 : 50;
             a = Math.floor(Math.random() * maxNum) + 1;
             b = Math.floor(Math.random() * maxNum) + 1;
             ans = a + b;
@@ -592,7 +574,7 @@ function startMCQ() {
 
     /* --- 오답 생성 알고리즘 --- */
 function generateMCQData(step) {
-        let isHard = (gameDifficulty === 'extreme') || (step > mcqTotal / 2);
+	let isHard = (gameDifficulty === 'extreme');
         
         if (currentMode === 'mcq_time') {
             // [V5 추가] 시계 읽기 생성기
@@ -651,7 +633,7 @@ function generateMCQData(step) {
         } else {
             // 영수증 생성기
             let n = isHard ? (Math.floor(Math.random() * 90000) + 1000) : (Math.floor(Math.random() * 900) + 10);
-            let unit = isHard ? (Math.random() > 0.5 ? ' تومان' : ' ریال') : '';
+	    let unit = isHard ? (Math.random() > 0.5 ? ' تومان' : ' ریال') : ' تومان';
             
             let cTxt = numToFaWords(n) + unit;
             let cDig = toFaDigit(n) + unit;
@@ -671,7 +653,7 @@ function generateMCQData(step) {
                 if(!optD.includes(wDig)) optD.push(wDig);
             }
             optD = optD.slice(0,4);
-            optT = optD.map(d => numToFaWords(parseInt(toEnDigit(d))) + (isHard ? (d.includes('تومان')?' تومان':' ریال') : ''));
+	    optT = optD.map(d => numToFaWords(parseInt(toEnDigit(d))) + (d.includes('تومان') ? ' تومان' : ' ریال'));
             
             return shuffleOptions({correctDigit: cDig, correctText: cTxt, optionsDigit: optD, optionsText: optT});
         }

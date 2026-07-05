@@ -321,7 +321,6 @@
 <div class="container" id="main-container">
     <div class="top-nav" id="top-nav" style="display: none;">
         <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
-	<button class="btn-home" id="btn-mute" onclick="toggleMute()" title="음소거"><i class="fas fa-volume-mute"></i></button>
     </div>
 
     <header id="main-header">
@@ -476,33 +475,10 @@
     // 단어장 링크
     const WORD_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kygc158HJLii5s2jwGoCPNhNRyIoK0GJVM6oZUBMyfbI0FIi7lYd0XN4N6v2PYGxtq22AsBZ6yFX/pub?output=csv"; 
     
-    // 오디오 및 음소거 설정
-    let audioCtx;
-    let isMuted = true;
-
-    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    
-    function toggleMute() {
-        isMuted = !isMuted;
-        document.getElementById('btn-mute').innerHTML = isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
-    }
-
-    function playTick() {
-        if(!audioCtx || isMuted) return;
-        let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.type = 'sine'; osc.frequency.setValueAtTime(1200, audioCtx.currentTime); 
-        gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-    }
-    function playBuzz() {
-        if(!audioCtx || isMuted) return;
-        let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
-        gain.gain.setValueAtTime(0.6, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.15);
-    }
+    // 오디오 기능 완전 제거 (에러 방지용 더미 함수)
+    function initAudio() {}
+    function playTick() {}
+    function playBuzz() {}
 
     let wordData = [];
 

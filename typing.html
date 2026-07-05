@@ -248,8 +248,8 @@
 
 <div id="mobile-blocker">
     <i class="fas fa-keyboard"></i>
-    <h2>모바일 접속 제한</h2>
-    <p>타자 연습은 <strong>물리 키보드</strong>가 있는 PC 환경에서만 지원됩니다.<br>컴퓨터에서 다시 접속해 주세요.</p>
+    <h2>스마트폰 접속 제한</h2>
+    <p>타자 연습은 <strong>물리 키보드</strong>가 연결된 환경에서만 정상 작동합니다.<br>PC로 접속하거나, <strong>태블릿에 블루투스 키보드를 연결</strong>하여 가로 모드로 사용해 주세요.</p>
     <a href="index.html" style="margin-top: 30px; padding: 12px 25px; background: #0b2a4a; color: white; border-radius: 8px; text-decoration: none; font-weight: bold;"><i class="fas fa-home"></i> 메인 포털로 돌아가기</a>
 </div>
 
@@ -265,8 +265,8 @@
     #mobile-blocker h2 { color: var(--primary); margin-bottom: 15px; font-size: 1.8rem; word-break: keep-all; line-height: 1.4; }
     #mobile-blocker p { color: #495057; font-size: 1.1rem; word-break: keep-all; line-height: 1.6; }
     
-    /* 모바일 화면 감지 시 타자 연습 UI 강제 소멸 및 차단창 발동 */
-    @media (max-width: 768px) {
+    /* 모바일 화면 감지 시 타자 연습 UI 강제 소멸 및 차단창 발동 (480px 이하 스마트폰만 차단) */
+    @media (max-width: 480px) {
         #mobile-blocker { display: flex !important; }
         body { overflow: hidden; } 
         .top-header, .top-nav, .section-container { display: none !important; } 

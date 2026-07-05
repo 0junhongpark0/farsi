@@ -196,17 +196,17 @@
             <button class="btn-start" onclick="startTracingCheck()">따라 쓰기 실행</button>
         </div>
 
-        <div class="mode-card">
-            <i class="fas fa-eye mode-icon"></i>
-            <h3>유사 문자 감별 (점 위치)</h3>
+	<div class="mode-card">
+            <i class="fas fa-star mode-icon" style="color: #845ef7;"></i>
+            <h3 style="color: #845ef7;">특수 기호 도감</h3>
             <div class="mode-desc">
-                🎯 <strong>목표:</strong> ب, پ, ت, ث 등 점의 위치와 개수로 형태 즉각 구분<br>
-                ⚠️ <strong>규칙:</strong> 20문항 타임어택. 오답 시 5초 페널티
+                🎯 <strong>목표:</strong> 모음, 탄빈, 타슈디드, 함제 등 특수 부호 숙지<br>
+                ⚠️ <strong>참고:</strong> 실전 텍스트에서 생략되는 기호들의 원리 파악
             </div>
-            <button class="btn-start" onclick="startSpotGame()">감별 시작</button>
+            <button class="btn-start" style="background: #845ef7;" onclick="changeMode('special')">도감 열기</button>
         </div>
 
-        <div class="mode-card">
+	<div class="mode-card">
             <i class="fas fa-puzzle-piece mode-icon"></i>
             <h3>어두/어중/어말 매칭</h3>
             <div class="mode-desc">
@@ -214,6 +214,16 @@
                 ⚠️ <strong>규칙:</strong> 20문항 타임어택. 타트윌(ـ) 연결선 주의
             </div>
             <button class="btn-start" onclick="startPosGame()">매칭 시작</button>
+        </div>
+
+	<div class="mode-card" style="border-color: var(--accent); background: #fff5f5;">
+            <i class="fas fa-skull-crossbones mode-icon" style="color: var(--accent);"></i>
+            <h3 style="color: var(--accent);">종합 위기탈출 (보스전)</h3>
+            <div class="mode-desc">
+                🎯 <strong>목표:</strong> 형태, 발음, 결합 규칙의 맹점을 방어<br>
+                ⚠️ <strong>규칙:</strong> 3가지 함정 유형 무작위 출제. 오답 +5초
+            </div>
+            <button class="btn-start" style="background: var(--accent);" onclick="startSurvivalGame()">위기탈출 시작</button>
         </div>
     </div>
 </div>
@@ -295,18 +305,74 @@
     </div>
 </div>
 
-<div id="screen-spot" class="screen">
-    <div class="game-header">
-        <div>진행: <span id="spot-progress"></span></div>
-        <div>시간: <span id="spot-timer" style="color:var(--accent);">00:00</span></div>
+<div id="screen-special" class="screen">
+    <div class="grammar-content" style="max-width: 900px; margin: 0 auto; width: 100%; padding: 30px;">
+        <h3 style="text-align: center; font-size: 1.8rem; margin-bottom: 30px; color: var(--primary); border: none;"><i class="fas fa-star" style="color:#845ef7;"></i> 페르시아어 특수 기호 도감</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+            <div style="border: 2px solid #e9ecef; border-radius: 12px; padding: 15px; display: flex; gap: 15px; align-items: center;">
+                <div style="font-family: var(--persian-font); font-size: 3.5rem; color: var(--accent); min-width: 60px; text-align: center;">آ</div>
+                <div>
+                    <strong style="font-size: 1.2rem; color: var(--primary);">알레프 맛데(alef madde)</strong>
+                    <p style="margin: 5px 0; color: #555;">단어 맨 앞에서 길게 '어~' 소리를 냄</p>
+                    <span style="background: #f8f9fa; padding: 3px 8px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">예: آب (āb)</span>
+                </div>
+            </div>
+            
+            <div style="border: 2px solid #e9ecef; border-radius: 12px; padding: 15px; display: flex; gap: 15px; align-items: center;">
+                <div style="font-family: var(--persian-font); font-size: 3.5rem; color: var(--accent); min-width: 60px; text-align: center;">ـً</div>
+                <div>
+                    <strong style="font-size: 1.2rem; color: var(--primary);">탄빈(tanvin)</strong>
+                    <p style="margin: 5px 0; color: #555;">단어 끝에 붙어 '-an' 소리를 냄</p>
+                    <span style="background: #f8f9fa; padding: 3px 8px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">예: لطفاً (lotfan)</span>
+                </div>
+            </div>
+            
+            <div style="border: 2px solid #e9ecef; border-radius: 12px; padding: 15px; display: flex; gap: 15px; align-items: center;">
+                <div style="font-family: var(--persian-font); font-size: 3.5rem; color: var(--accent); min-width: 60px; text-align: center;">ـّ</div>
+                <div>
+                    <strong style="font-size: 1.2rem; color: var(--primary);">타쉬디드(tashdid)</strong>
+                    <p style="margin: 5px 0; color: #555;">해당 자음을 두 번 겹쳐서 강하게 발음</p>
+                    <span style="background: #f8f9fa; padding: 3px 8px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">예: اوّل (avval)</span>
+                </div>
+            </div>
+            
+            <div style="border: 2px solid #e9ecef; border-radius: 12px; padding: 15px; display: flex; gap: 15px; align-items: center;">
+                <div style="font-family: var(--persian-font); font-size: 3.5rem; color: var(--accent); min-width: 60px; text-align: center;">ء</div>
+                <div>
+                    <strong style="font-size: 1.2rem; color: var(--primary);">함제(hamze) 패밀리</strong>
+                    <p style="margin: 5px 0; color: #555;">أ, ؤ, ئ 등으로 쓰는 성문파열음</p>
+                    <span style="background: #f8f9fa; padding: 3px 8px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">예: سؤال (soʿāl)</span>
+                </div>
+            </div>
+            
+            <div style="border: 2px solid #e9ecef; border-radius: 12px; padding: 15px; display: flex; gap: 15px; align-items: center;">
+                <div style="font-family: var(--persian-font); font-size: 3.5rem; color: var(--accent); min-width: 60px; text-align: center;">ـَ ـِ ـُ</div>
+                <div>
+                    <strong style="font-size: 1.2rem; color: var(--primary);">단모음 3인방(a, e, o)</strong>
+                    <p style="margin: 5px 0; color: #555;">실전에선 생략. 짧은 아, 에, 오</p>
+                    <span style="background: #f8f9fa; padding: 3px 8px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">ـَ (fathe), ـِ (kasre), ـُ (zamme)</span>
+                </div>
+            </div>
+        </div>
     </div>
-    <div style="text-align:center; font-size:1.2rem; font-weight:bold; color:#666;">다음 글자는 무엇일까요?</div>
-    <div class="mega-text" id="spot-question"></div>
-    <div class="mcq-grid" id="spot-options">
-        <button class="mcq-btn" onclick="checkSpot(0)"></button>
-        <button class="mcq-btn" onclick="checkSpot(1)"></button>
-        <button class="mcq-btn" onclick="checkSpot(2)"></button>
-        <button class="mcq-btn" onclick="checkSpot(3)"></button>
+</div>
+
+<div id="screen-survival" class="screen">
+    <div class="game-header">
+        <div>진행: <span id="survival-progress"></span></div>
+        <div>시간: <span id="survival-timer" style="color:var(--accent);">00:00</span></div>
+    </div>
+    <div style="text-align:center; margin-top:10px;">
+        <span id="survival-tag" style="background:var(--primary); color:white; padding:5px 15px; border-radius:20px; font-weight:bold; font-size:1rem; letter-spacing:1px;"></span>
+    </div>
+    <div style="text-align:center; font-size:1.3rem; font-weight:bold; color:#0b2a4a; margin-top:15px; word-break:keep-all;" id="survival-question-text"></div>
+    <div class="mega-text" id="survival-target" style="font-size: 8rem; margin: 15px 0;"></div>
+    <div class="mcq-grid" id="survival-options">
+        <button class="mcq-btn" onclick="checkSurvival(0)"></button>
+        <button class="mcq-btn" onclick="checkSurvival(1)"></button>
+        <button class="mcq-btn" onclick="checkSurvival(2)"></button>
+        <button class="mcq-btn" onclick="checkSurvival(3)"></button>
     </div>
 </div>
 
@@ -348,38 +414,38 @@ function goHome() {
 
 // --- 문자 조립 시뮬레이터 로직 ---
     const persianAlphabetData = {
-        'ا': { n: '알레프 (alef)', p: '/a/, /e/, /o/ 등', f: 'ا / ا / ـا / ـا' },
-        'ب': { n: '베 (be)', p: '/b/', f: 'ب / بـ / ـبـ / ـب' },
-        'پ': { n: '페 (pe)', p: '/p/', f: 'پ / پـ / ـپـ / ـپ' },
-        'ت': { n: '테 (te)', p: '/t/', f: 'ت / تـ / ـتـ / ـت' },
-        'ث': { n: '세 (se)', p: '/s/', f: 'ث / ثـ / ـثـ / ـث' },
-        'ج': { n: '짐 (jim)', p: '/j/', f: 'ج / جـ / ـجـ / ـج' },
-        'چ': { n: '체 (che)', p: '/ch/', f: 'چ / چـ / ـچـ / ـچ' },
-        'ح': { n: '헤 (he)', p: '/h/', f: 'ح / حـ / ـحـ / ـح' },
-        'خ': { n: '헤 (xe)', p: '/x/', f: 'خ / خـ / ـخـ / ـخ' },
-        'د': { n: '덜 (dāl)', p: '/d/', f: 'د / د / ـد / ـد' },
-        'ذ': { n: '절 (zāl)', p: '/z/', f: 'ذ / ذ / ـذ / ـذ' },
-        'ر': { n: '레 (re)', p: '/r/', f: 'ر / ر / ـر / ـر' },
-        'ز': { n: '제 (ze)', p: '/z/', f: 'ز / ز / ـز / ـز' },
-        'ژ': { n: '줴 (zhe)', p: '/zh/', f: 'ژ / ژ / ـژ / ـژ' },
-        'س': { n: '신 (sin)', p: '/s/', f: 'س / سـ / ـسـ / ـس' },
-        'ش': { n: '쉰 (shin)', p: '/sh/', f: 'ش / شـ / ـشـ / ـش' },
-        'ص': { n: '서드 (sād)', p: '/s/', f: 'ص / صـ / ـصـ / ـص' },
-        'ض': { n: '저드 (zād)', p: '/z/', f: 'ض / ضـ / ـضـ / ـض' },
-        'ط': { n: '터 (tā)', p: '/t/', f: 'ط / طـ / ـطـ / ـط' },
-        'ظ': { n: '저 (zā)', p: '/z/', f: 'ظ / ظـ / ـظـ / ـظ' },
-	'ع': { n: "에인 ('eyn)", p: '/\'/ (성문파열음)', f: 'ع / عـ / ـعـ / ـع' },
-        'غ': { n: '게인 (qeyn)', p: '/q/', f: 'غ / غـ / ـغـ / ـغ' },
-        'ف': { n: '페 (fe)', p: '/f/', f: 'ف / فـ / ـفـ / ـف' },
-        'ق': { n: '거프 (qāf)', p: '/q/', f: 'ق / قـ / ـقـ / ـق' },
-        'ک': { n: '커프 (kāf)', p: '/k/', f: 'ک / کـ / ـکـ / ـک' },
-        'گ': { n: '거프 (gāf)', p: '/g/', f: 'گ / گـ / ـگـ / ـگ' },
-        'ل': { n: '럼 (lām)', p: '/l/', f: 'ل / لـ / ـلـ / ـل' },
-        'م': { n: '밈 (mim)', p: '/m/', f: 'م / مـ / ـمـ / ـم' },
-        'ن': { n: '눈 (nun)', p: '/n/', f: 'ن / نـ / ـنـ / ـن' },
-        'و': { n: '버브 (vāv)', p: '/v/, /u/, /o/', f: 'و / و / ـو / ـو' },
-        'ه': { n: '헤 (he)', p: '/h/, /e/', f: 'ه / هـ / ـهـ / ـه' },
-        'ی': { n: '예 (ye)', p: '/y/, /i/', f: 'ی / یـ / ـیـ / ـی' }
+        'ا': { n: '알레프(alef)', p: '/a/, /e/, /o/ 등', f: 'ا / ا / ـا / ـا' },
+        'ب': { n: '베(be)', p: '/b/', f: 'ب / بـ / ـبـ / ـب' },
+        'پ': { n: '페(pe)', p: '/p/', f: 'پ / پـ / ـپـ / ـپ' },
+        'ت': { n: '테(te)', p: '/t/', f: 'ت / تـ / ـتـ / ـت' },
+        'ث': { n: '세(se)', p: '/s/', f: 'ث / ثـ / ـثـ / ـث' },
+        'ج': { n: '짐(jim)', p: '/j/', f: 'ج / جـ / ـجـ / ـج' },
+        'چ': { n: '체(che)', p: '/ch/', f: 'چ / چـ / ـچـ / ـچ' },
+        'ح': { n: '헤(he)', p: '/h/', f: 'ح / حـ / ـحـ / ـح' },
+        'خ': { n: '헤(xe)', p: '/x/', f: 'خ / خـ / ـخـ / ـخ' },
+        'د': { n: '덜(dāl)', p: '/d/', f: 'د / د / ـد / ـد' },
+        'ذ': { n: '절(zāl)', p: '/z/', f: 'ذ / ذ / ـذ / ـذ' },
+        'ر': { n: '레(re)', p: '/r/', f: 'ر / ر / ـر / ـر' },
+        'ز': { n: '제(ze)', p: '/z/', f: 'ز / ز / ـز / ـز' },
+        'ژ': { n: '줴(zhe)', p: '/zh/', f: 'ژ / ژ / ـژ / ـژ' },
+        'س': { n: '신(sin)', p: '/s/', f: 'س / سـ / ـسـ / ـس' },
+        'ش': { n: '쉰(shin)', p: '/sh/', f: 'ش / شـ / ـشـ / ـش' },
+        'ص': { n: '서드(sād)', p: '/s/', f: 'ص / صـ / ـصـ / ـص' },
+        'ض': { n: '저드(zād)', p: '/z/', f: 'ض / ضـ / ـضـ / ـض' },
+        'ط': { n: '터(tā)', p: '/t/', f: 'ط / طـ / ـطـ / ـط' },
+        'ظ': { n: '저(zā)', p: '/z/', f: 'ظ / ظـ / ـظـ / ـظ' },
+	'ع': { n: "에인(ʿein)", p: '/ʿ/ (성문파열음)', f: 'ع / عـ / ـعـ / ـع' },
+        'غ': { n: '께인(qein)', p: '/q/', f: 'غ / غـ / ـغـ / ـغ' },
+        'ف': { n: '페(fe)', p: '/f/', f: 'ف / فـ / ـفـ / ـف' },
+        'ق': { n: '꺼프(qāf)', p: '/q/', f: 'ق / قـ / ـقـ / ـق' },
+        'ک': { n: '커프(kāf)', p: '/k/', f: 'ک / کـ / ـکـ / ـک' },
+        'گ': { n: '거프(gāf)', p: '/g/', f: 'گ / گـ / ـگـ / ـگ' },
+        'ل': { n: '럼(lām)', p: '/l/', f: 'ل / لـ / ـلـ / ـل' },
+        'م': { n: '밈(mim)', p: '/m/', f: 'م / مـ / ـمـ / ـم' },
+        'ن': { n: '눈(nun)', p: '/n/', f: 'ن / نـ / ـنـ / ـن' },
+        'و': { n: '버브(vāv)', p: '/v/, /u/, /o/', f: 'و / و / ـو / ـو' },
+        'ه': { n: '헤(he)', p: '/h/, /e/', f: 'ه / هـ / ـهـ / ـه' },
+        'ی': { n: '예(ye)', p: '/y/, /i/', f: 'ی / یـ / ـیـ / ـی' }
     };
 const persianAlphabet = Object.keys(persianAlphabetData);
     // 뒤로 이어지지 않는 단절 문자 배열
@@ -564,10 +630,16 @@ function updateSimDisplay() {
         return navigator.maxTouchPoints === 0 && !/Mobi|Android|Tablet|iPad|iPhone/i.test(navigator.userAgent);
     }
 
+    // --- 따라 쓰기(Tracing) 로직 ---
+    // PC 데스크톱 접속 여부 판별 (터치 포인트가 없고 모바일 UA가 아닌 경우)
+    function isDesktop() {
+        return navigator.maxTouchPoints === 0 && !/Mobi|Android|Tablet|iPad|iPhone/i.test(navigator.userAgent);
+    }
+
     function startTracingCheck() {
         if (isDesktop()) {
-            alert("⚠️ 접근 제한\n\n획순 따라 쓰기는 터치펜이나 손가락을 사용하는 모바일 및 태블릿 환경에 최적화되어 있습니다.\n\n터치 스크린이 지원되는 기기(스마트폰/아이패드 등)로 접속해 주세요.\n(※ 테스트 목적이라면 브라우저의 '개발자 도구 - 모바일 뷰'를 켜고 새로고침 하세요.)");
-            return;
+            // 접속을 차단(return)하지 않고, 권장 환경 안내 팝업만 띄운 뒤 그대로 통과시킴
+            alert("⚠️ 권장 환경 안내\n\n획순 따라 쓰기는 터치펜이나 손가락을 사용하는 태블릿 및 스마트폰 환경에 최적화되어 있습니다.\n마우스로 진행할 경우 다소 조작이 불편할 수 있으니 참고해 주세요.");
         }
         changeMode('tracing');
         initCanvasSetup();
@@ -576,14 +648,14 @@ function updateSimDisplay() {
 
     // 32개 알파벳 + 이름 매핑
 const traceData = [
-        { c: 'ا', n: '알레프 (alef)' }, { c: 'ب', n: '베 (be)' }, { c: 'پ', n: '페 (pe)' }, { c: 'ت', n: '테 (te)' },
-        { c: 'ث', n: '세 (se)' }, { c: 'ج', n: '짐 (jim)' }, { c: 'چ', n: '체 (che)' }, { c: 'ح', n: '헤 (he)' },
-        { c: 'خ', n: '헤 (xe)' }, { c: 'د', n: '덜 (dāl)' }, { c: 'ذ', n: '절 (zāl)' }, { c: 'ر', n: '레 (re)' },
-        { c: 'ز', n: '제 (ze)' }, { c: 'ژ', n: '줴 (zhe)' }, { c: 'س', n: '신 (sin)' }, { c: 'ش', n: '쉰 (shin)' },
-        { c: 'ص', n: '서드 (sād)' }, { c: 'ض', n: '저드 (zād)' }, { c: 'ط', n: '터 (tā)' }, { c: 'ظ', n: '저 (zā)' },
-        { c: 'ع', n: "에인 ('eyn)" }, { c: 'غ', n: '게인 (qeyn)' }, { c: 'ف', n: '페 (fe)' }, { c: 'ق', n: '거프 (qāf)' },
-        { c: 'ک', n: '커프 (kāf)' }, { c: 'گ', n: '거프 (gāf)' }, { c: 'ل', n: '럼 (lām)' }, { c: 'م', n: '밈 (mim)' },
-        { c: 'ن', n: '눈 (nun)' }, { c: 'و', n: '버브 (vāv)' }, { c: 'ه', n: '헤 (he)' }, { c: 'ی', n: '예 (ye)' }
+        { c: 'ا', n: '알레프(alef)' }, { c: 'ب', n: '베(be)' }, { c: 'پ', n: '페(pe)' }, { c: 'ت', n: '테(te)' },
+        { c: 'ث', n: '세(se)' }, { c: 'ج', n: '짐(jim)' }, { c: 'چ', n: '체(che)' }, { c: 'ح', n: '헤(he)' },
+        { c: 'خ', n: '헤(xe)' }, { c: 'د', n: '덜(dāl)' }, { c: 'ذ', n: '절(zāl)' }, { c: 'ر', n: '레(re)' },
+        { c: 'ز', n: '제(ze)' }, { c: 'ژ', n: '줴(zhe)' }, { c: 'س', n: '신(sin)' }, { c: 'ش', n: '쉰(shin)' },
+        { c: 'ص', n: '서드(sād)' }, { c: 'ض', n: '저드(zād)' }, { c: 'ط', n: '터(tā)' }, { c: 'ظ', n: '저(zā)' },
+        { c: 'ع', n: "에인(ʿein)" }, { c: 'غ', n: '께인(qein)' }, { c: 'ف', n: '페(fe)' }, { c: 'ق', n: '꺼프(qāf)' },
+        { c: 'ک', n: '커프(kāf)' }, { c: 'گ', n: '거프(gāf)' }, { c: 'ل', n: '럼(lām)' }, { c: 'م', n: '밈(mim)' },
+        { c: 'ن', n: '눈(nun)' }, { c: 'و', n: '버브(vāv)' }, { c: 'ه', n: '헤(he)' }, { c: 'ی', n: '예(ye)' }
     ];
     
     let traceIndex = 0;
@@ -744,18 +816,11 @@ const traceData = [
         ctx.beginPath();
     }
 
-// --- 신규 게임 엔진 ---
     let gameTimer = null;
     let gameStartTime = 0;
     let gamePenalty = 0;
     let gameStep = 0;
     let gameTotal = 20;
-    let currentCorrectIdx = 0;
-
-    const spotGroups = [
-        ['ب','پ','ت','ث'], ['ج','چ','ح','خ'], ['د','ذ'], ['ر','ز','ژ'],
-        ['س','ش'], ['ص','ض'], ['ط','ظ'], ['ع','غ'], ['ف','ق'], ['ک','گ']
-    ];
 
     function startTimer(elementId) {
         clearInterval(gameTimer);
@@ -767,69 +832,9 @@ const traceData = [
         }, 1000);
     }
 
-    // 1. 점 위치 감별 (Spot the Dot) 로직
-    function startSpotGame() {
-        gameStep = 0;
-        changeMode('spot');
-        startTimer('spot-timer');
-        nextSpot();
-    }
-
-    function nextSpot() {
-        gameStep++;
-        if (gameStep > gameTotal) {
-            clearInterval(gameTimer);
-            let finalSec = Math.floor((Date.now() - gameStartTime) / 1000) + gamePenalty;
-            alert(`🎉 훈련 종료!\n기록: ${Math.floor(finalSec/60)}분 ${finalSec%60}초`);
-            return goHome();
-        }
-        document.getElementById('spot-progress').innerText = `${gameStep} / ${gameTotal}`;
-
-        let group = spotGroups[Math.floor(Math.random() * spotGroups.length)];
-        let shuffledGroup = [...group].sort(() => 0.5 - Math.random());
-        
-        let targetChar = shuffledGroup[0];
-        let targetName = persianAlphabetData[targetChar].n;
-        
-        // 정답은 문자(Mega text)로 띄우고, 선지는 발음/이름(한국어)으로 4지선다 제시
-        document.getElementById('spot-question').innerText = targetChar;
-        
-        let btns = document.querySelectorAll('#spot-options .mcq-btn');
-        let options = [];
-        
-        // 정답 삽입
-        options.push({ text: targetName, isCorrect: true });
-        
-        // 오답 3개 무작위 추출 (같은 그룹 우선, 부족하면 전체에서)
-        let wrongPool = persianAlphabet.filter(c => c !== targetChar).sort(() => 0.5 - Math.random());
-        for(let i=0; i<3; i++) {
-            options.push({ text: persianAlphabetData[wrongPool[i]].n, isCorrect: false });
-        }
-        
-        options.sort(() => 0.5 - Math.random());
-        
-        btns.forEach((btn, i) => {
-            btn.innerText = options[i].text;
-            btn.style.fontSize = '1.3rem'; // 한국어 이름이므로 폰트 크기 축소
-            btn.dataset.correct = options[i].isCorrect;
-        });
-    }
-
-    function checkSpot(idx) {
-        let btn = document.querySelectorAll('#spot-options .mcq-btn')[idx];
-        if (btn.dataset.correct === 'true') {
-            nextSpot();
-        } else {
-            gamePenalty += 5;
-            let timerEl = document.getElementById('spot-timer');
-            timerEl.style.color = '#0b2a4a';
-            setTimeout(() => timerEl.style.color = 'var(--accent)', 300);
-            btn.classList.add('wrong');
-            setTimeout(() => btn.classList.remove('wrong'), 400);
-        }
-    }
-
-    // 2. 어두/어중/어말 매칭 (Position Match) 로직
+    // ==========================================
+    // 1. 어두/어중/어말 매칭 (심화 난이도)
+    // ==========================================
     const posNames = ['독립', '어두', '어중', '어말'];
     
     function startPosGame() {
@@ -850,30 +855,36 @@ const traceData = [
         document.getElementById('pos-progress').innerText = `${gameStep} / ${gameTotal}`;
 
         let targetChar = persianAlphabet[Math.floor(Math.random() * persianAlphabet.length)];
-        // f: 'ع / عـ / ـعـ / ـع' 분리
         let forms = persianAlphabetData[targetChar].f.split(' / ');
-        let targetPosIdx = Math.floor(Math.random() * 4); // 0~3 무작위 위치
+        let uniqueForms = [...new Set(forms)]; 
+        
+        let targetPosIdx = Math.floor(Math.random() * 4);
         let correctAnswer = forms[targetPosIdx];
         
         document.getElementById('pos-char').innerText = targetChar;
         document.getElementById('pos-target').innerText = `[${posNames[targetPosIdx]}]`;
 
-        let btns = document.querySelectorAll('#pos-options .mcq-btn');
         let options = [];
-        options.push({ text: correctAnswer, isCorrect: true });
-
-        // 오답 3개 추출 (다른 글자의 같은 위치 형태를 추출하여 타트윌(ـ) 일관성 유지)
-        let wrongPool = persianAlphabet.filter(c => c !== targetChar).sort(() => 0.5 - Math.random());
-        for(let i=0; i<3; i++) {
-            let wrongForm = persianAlphabetData[wrongPool[i]].f.split(' / ')[targetPosIdx];
-            options.push({ text: wrongForm, isCorrect: false });
+        if (uniqueForms.length === 4) {
+            options = uniqueForms.map(text => ({ text: text, isCorrect: text === correctAnswer }));
+        } else {
+            // 단절 문자(2가지 형태)의 경우 모양이 비슷한 문자의 2가지 형태를 오답으로 끌어옴
+            let similarCharMap = {'ا':'د', 'د':'ذ', 'ذ':'د', 'ر':'ز', 'ز':'ژ', 'ژ':'ز', 'و':'ر'};
+            let similarChar = similarCharMap[targetChar] || 'د';
+            let simForms = [...new Set(persianAlphabetData[similarChar].f.split(' / '))];
+            
+            options.push({ text: uniqueForms[0], isCorrect: uniqueForms[0] === correctAnswer });
+            options.push({ text: uniqueForms[1], isCorrect: uniqueForms[1] === correctAnswer });
+            options.push({ text: simForms[0], isCorrect: false });
+            options.push({ text: simForms[1], isCorrect: false });
         }
 
         options.sort(() => 0.5 - Math.random());
 
+        let btns = document.querySelectorAll('#pos-options .mcq-btn');
         btns.forEach((btn, i) => {
             btn.innerText = options[i].text;
-            btn.style.fontSize = '3rem';
+            btn.style.fontSize = '3.5rem';
             btn.dataset.correct = options[i].isCorrect;
         });
     }
@@ -885,6 +896,133 @@ const traceData = [
         } else {
             gamePenalty += 5;
             let timerEl = document.getElementById('pos-timer');
+            timerEl.style.color = '#0b2a4a';
+            setTimeout(() => timerEl.style.color = 'var(--accent)', 300);
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 400);
+        }
+    }
+
+    // ==========================================
+    // 2. 종합 위기탈출 (보스전 - 4개 카테고리 각 5문제)
+    // ==========================================
+    let askedQuestions = []; 
+    let survivalTypes = [];
+
+    function startSurvivalGame() {
+        gameStep = 0;
+        askedQuestions = []; 
+        // 0:형태, 1:발음, 2:규칙, 3:특수기호 (각 5문제씩 총 20문제 세팅 후 무작위 셔플)
+        survivalTypes = [0,0,0,0,0, 1,1,1,1,1, 2,2,2,2,2, 3,3,3,3,3].sort(() => 0.5 - Math.random());
+        changeMode('survival');
+        startTimer('survival-timer');
+        nextSurvival();
+    }
+
+    function nextSurvival() {
+        gameStep++;
+        if (gameStep > gameTotal) {
+            clearInterval(gameTimer);
+            let finalSec = Math.floor((Date.now() - gameStartTime) / 1000) + gamePenalty;
+            alert(`🎉 보스전 클리어!\n최종 기록: ${Math.floor(finalSec/60)}분 ${finalSec%60}초\n이제 형태와 발음, 규칙에 대한 완벽한 방어력이 생겼습니다.`);
+            return goHome();
+        }
+        document.getElementById('survival-progress').innerText = `${gameStep} / ${gameTotal}`;
+
+        // 미리 섞어둔 배열에서 이번 턴의 문제 유형을 확정
+        let type = survivalTypes[gameStep - 1]; 
+        let targetKey, group, targetChar, spTarget;
+        let attempts = 0;
+
+        do {
+            if (type === 0) {
+                let spotGroups = [['ب','پ','ت','ث'], ['ج','چ','ح','خ'], ['د','ذ'], ['ر','ز','ژ'], ['س','ش'], ['ص','ض'], ['ط','ظ'], ['ع','غ'], ['ف','ق'], ['ک','گ']];
+                group = spotGroups[Math.floor(Math.random() * spotGroups.length)];
+                targetChar = group[Math.floor(Math.random() * group.length)];
+                targetKey = `0-${targetChar}`;
+            } else if (type === 1) {
+                let pronGroups = [
+                    { name: 'Z', chars: ['ز','ذ','ض','ظ'] }, { name: 'S', chars: ['س','ص','ث'] },
+                    { name: 'T', chars: ['ت','ط'] }, { name: 'H', chars: ['ح','ه'] }, { name: 'Q', chars: ['غ','ق'] }
+                ];
+                group = pronGroups[Math.floor(Math.random() * pronGroups.length)];
+                targetKey = `1-${group.name}`;
+            } else if (type === 2) {
+                targetChar = nonJoiners[Math.floor(Math.random() * nonJoiners.length)];
+                targetKey = `2-${targetChar}`;
+            } else {
+                let spPool = [
+                    { c: 'آ', d: "긴 '어~' 소리" }, { c: 'ـً', d: "'-an' 소리" }, { c: 'ـّ', d: '자음을 두 번 겹쳐 발음' },
+                    { c: 'ء', d: '성문파열음 (끊어 읽기)' }, { c: 'ـَ', d: "짧은 '아' 소리" }, { c: 'ـِ', d: "짧은 '에' 소리" }, { c: 'ـُ', d: "짧은 '오' 소리" }
+                ];
+                spTarget = spPool[Math.floor(Math.random() * spPool.length)];
+                targetKey = `3-${spTarget.c}`;
+            }
+            attempts++;
+        } while (askedQuestions.includes(targetKey) && attempts < 50);
+
+        askedQuestions.push(targetKey);
+
+        let tagEl = document.getElementById('survival-tag');
+        let qTextEl = document.getElementById('survival-question-text');
+        let targetEl = document.getElementById('survival-target');
+        let options = [];
+
+        if (type === 0) {
+            tagEl.innerText = "[형태 감별]"; tagEl.style.background = "#20c997";
+            qTextEl.innerText = "다음 글자의 이름은 무엇일까요?";
+            targetEl.innerText = targetChar; targetEl.style.display = 'block';
+
+            options.push({ text: persianAlphabetData[targetChar].n, isCorrect: true, isFa: false });
+            let wrongPool = persianAlphabet.filter(c => c !== targetChar).sort(() => 0.5 - Math.random());
+            for(let i=0; i<3; i++) options.push({ text: persianAlphabetData[wrongPool[i]].n, isCorrect: false, isFa: false });
+
+        } else if (type === 1) {
+            tagEl.innerText = "[발음 감별]"; tagEl.style.background = "#339af0";
+            qTextEl.innerHTML = `다음 중 <span style="color:var(--accent); font-size:1.6rem;">'${group.name}'</span> 발음이 나는 글자는?`;
+            targetEl.style.display = 'none';
+
+            let correctChar = group.chars[Math.floor(Math.random() * group.chars.length)];
+            options.push({ text: correctChar, isCorrect: true, isFa: true });
+            let outsideChars = persianAlphabet.filter(c => !group.chars.includes(c)).sort(() => 0.5 - Math.random());
+            for(let i=0; i<3; i++) options.push({ text: outsideChars[i], isCorrect: false, isFa: true });
+
+        } else if (type === 2) {
+            tagEl.innerText = "[결합 규칙]"; tagEl.style.background = "#fcc419";
+            qTextEl.innerHTML = '다음 중 왼쪽 글자와 <strong style="color:var(--accent); text-decoration:underline;">이어지지 않는(단절)</strong> 문자는?';
+            targetEl.style.display = 'none';
+            
+            options.push({ text: targetChar, isCorrect: true, isFa: true });
+            let joiners = persianAlphabet.filter(c => !nonJoiners.includes(c)).sort(() => 0.5 - Math.random());
+            for(let i=0; i<3; i++) options.push({ text: joiners[i], isCorrect: false, isFa: true });
+
+        } else if (type === 3) {
+            tagEl.innerText = "[특수 기호]"; tagEl.style.background = "#845ef7";
+            qTextEl.innerHTML = `다음 중 <strong style="color:var(--accent); text-decoration:underline;">${spTarget.d}</strong> 역할을 하는 기호는?`;
+            targetEl.style.display = 'none';
+
+            options.push({ text: spTarget.c, isCorrect: true, isFa: true });
+            let wrongPool = [{c:'آ'},{c:'ـً'},{c:'ـّ'},{c:'ء'},{c:'ـَ'},{c:'ـِ'},{c:'ـُ'}].filter(item => item.c !== spTarget.c).sort(() => 0.5 - Math.random());
+            for(let i=0; i<3; i++) options.push({ text: wrongPool[i].c, isCorrect: false, isFa: true });
+        }
+
+        options.sort(() => 0.5 - Math.random());
+
+        let btns = document.querySelectorAll('#survival-options .mcq-btn');
+        btns.forEach((btn, i) => {
+            btn.innerText = options[i].text;
+            btn.style.fontSize = options[i].isFa ? '3.5rem' : '1.3rem';
+            btn.dataset.correct = options[i].isCorrect;
+        });
+    }
+
+    function checkSurvival(idx) {
+        let btn = document.querySelectorAll('#survival-options .mcq-btn')[idx];
+        if (btn.dataset.correct === 'true') {
+            nextSurvival();
+        } else {
+            gamePenalty += 5;
+            let timerEl = document.getElementById('survival-timer');
             timerEl.style.color = '#0b2a4a';
             setTimeout(() => timerEl.style.color = 'var(--accent)', 300);
             btn.classList.add('wrong');
