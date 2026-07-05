@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <!-- 👇 구글 애널리틱스 추적 코드 삽입 👇 -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DE1L2C451H"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DE1L2C451H');
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>페르시아어 알레프바 (문자 학습)</title>
@@ -107,7 +118,7 @@
         .trace-target-info { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
         .canvas-container { position: relative; width: 100%; height: 450px; background: white; border: 3px solid #dee2e6; border-radius: 16px; overflow: hidden; touch-action: none; /* 모바일 스크롤 방지 핵심 */ box-shadow: inset 0 0 20px rgba(0,0,0,0.03); margin-bottom: 20px; }
         #drawCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; }
-        #watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: var(--persian-font); font-size: 15rem; color: #f1f3f5; z-index: 0; pointer-events: none; user-select: none; }
+	#watermark-img { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 80%; object-fit: contain; opacity: 0.4; z-index: 0; pointer-events: none; user-select: none; }
         
         .trace-controls { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
         .btn-trace-nav { padding: 15px 30px; font-size: 1.2rem; font-weight: bold; background: white; border: 2px solid var(--primary); color: var(--primary); border-radius: 8px; cursor: pointer; transition: 0.2s; }
@@ -157,7 +168,10 @@
 
 <div class="container">
     <div class="top-nav" id="top-nav">
-        <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
+            <button class="btn-home" id="voice-toggle-btn" onclick="toggleVoice()" style="background: #e3f2fd; color: var(--primary);"><i class="fas fa-male"></i> 남성 음성</button>
+        </div>
     </div>
 
     <header id="main-header">
@@ -200,7 +214,7 @@
             <i class="fas fa-star mode-icon" style="color: #845ef7;"></i>
             <h3 style="color: #845ef7;">특수 기호 도감</h3>
             <div class="mode-desc">
-                🎯 <strong>목표:</strong> 모음, 탄빈, 타슈디드, 함제 등 특수 부호 숙지<br>
+                🎯 <strong>목표:</strong> 모음, 탄빈, 타쉬디드, 함제 등 특수 부호 숙지<br>
                 ⚠️ <strong>참고:</strong> 실전 텍스트에서 생략되는 기호들의 원리 파악
             </div>
             <button class="btn-start" style="background: #845ef7;" onclick="changeMode('special')">도감 열기</button>
@@ -258,8 +272,9 @@
             </div>
         </div>
         
-        <div style="font-size: 0.95rem; color: var(--accent); margin-bottom: 10px; font-weight: bold;"><i class="fas fa-info-circle"></i> 밑줄 친 문자(ا, د, ذ, ر, ز, ژ, و)는 뒤로 이어지지 않고 끊어집니다.</div>
+    <div style="font-size: 0.95rem; color: var(--accent); margin-bottom: 10px; font-weight: bold;"><i class="fas fa-info-circle"></i> 밑줄 친 문자(ا, د, ذ, ر, ز, ژ, و)는 뒤로 이어지지 않고 끊어집니다.</div>
         <div id="sim-keyboard" class="kb-grid"></div>
+        <div style="font-size: 0.85rem; color: #868e96; margin-top: 15px; text-align: center; word-break: keep-all;">💡 안내: 본 음성은 AI(TTS)로 합성되어, 실제 원어민의 발성 뉘앙스와 미세한 차이가 있을 수 있습니다.</div>
     </div>
 
 <div id="screen-tracing" class="screen" style="padding: 20px;">
@@ -269,11 +284,13 @@
     </div>
     <div class="trace-header">
         <div class="trace-target-info" id="trace-info">알레프 (1/32)</div>
+        <button class="btn-action" onclick="playTraceAudio()" style="background: #e3f2fd; color: var(--primary); border: 2px solid #90caf9;"><i class="fas fa-volume-up"></i> 발음 듣기</button>
     </div>
     <div id="trace-guide" style="text-align:center; margin-bottom:15px; font-weight:bold; color:var(--accent); font-size:1.05rem; word-break:keep-all;"></div>
     
     <div class="canvas-container">
         <div id="watermark">ا</div>
+        <img id="watermark-img" src="" alt="획순 가이드 이미지" style="display: none;">
         <canvas id="drawCanvas"></canvas>
     </div>
 
@@ -282,6 +299,7 @@
         <button class="btn-trace-nav" onclick="clearCanvas()" style="background: #ffe3e3; color: var(--accent); border-color: #ffc9c9;"><i class="fas fa-eraser"></i></button>
         <button class="btn-trace-nav" onclick="nextTrace()"> <i class="fas fa-chevron-right"></i></button>
     </div>
+    <div style="font-size: 0.85rem; color: #868e96; margin-top: 15px; text-align: center; word-break: keep-all;">💡 안내: 본 음성은 AI(TTS)로 합성되어, 실제 원어민의 발성 뉘앙스와 미세한 차이가 있을 수 있습니다.</div>
 </div>
 
 <div id="screen-grammar" class="screen">
@@ -412,41 +430,73 @@ function goHome() {
         document.getElementById('main-header').style.display = 'none';
     }
 
+// --- 오디오 통제 로직 ---
+    let currentVoice = 'm'; // 초기값 남성('m')
+    const globalAudio = new Audio(); // 단일 오디오 객체 (소음 겹침 완벽 방어)
+
+    function toggleVoice() {
+        currentVoice = currentVoice === 'm' ? 'f' : 'm';
+        const btn = document.getElementById('voice-toggle-btn');
+        btn.innerHTML = currentVoice === 'm' ? '<i class="fas fa-male"></i> 남성 음성' : '<i class="fas fa-female"></i> 여성 음성';
+        btn.style.background = currentVoice === 'm' ? '#e3f2fd' : '#fce4ec';
+        btn.style.color = currentVoice === 'm' ? 'var(--primary)' : '#c2185b';
+    }
+
+    function playAudio(char) {
+        const data = persianAlphabetData[char];
+        if (!data || !data.a) return;
+        // alefba_audio 폴더 내부의 01_alef_audio_m.m4a 형태로 조합
+        globalAudio.src = `alefba_audio/${data.a}_${currentVoice}.m4a`;
+        globalAudio.playbackRate = 0.85; // 재생 속도 0.85배속 강제
+        globalAudio.play().catch(e => console.log("Audio play blocked:", e));
+    }
+
+    function playTraceAudio() {
+        const dataArr = traceMode === 'alpha' ? traceData : basicWords;
+        const data = dataArr[traceIndex];
+        if (traceMode === 'alpha') {
+            playAudio(data.c); // 알파벳 모드일 때만 소리 출력
+        } else {
+            alert("⚠️ 기초 단어 모드의 음성은 아직 준비되지 않았습니다.");
+        }
+    }
+
 // --- 문자 조립 시뮬레이터 로직 ---
-    const persianAlphabetData = {
-        'ا': { n: '알레프(alef)', p: '/a/, /e/, /o/ 등', f: 'ا / ا / ـا / ـا' },
-        'ب': { n: '베(be)', p: '/b/', f: 'ب / بـ / ـبـ / ـب' },
-        'پ': { n: '페(pe)', p: '/p/', f: 'پ / پـ / ـپـ / ـپ' },
-        'ت': { n: '테(te)', p: '/t/', f: 'ت / تـ / ـتـ / ـت' },
-        'ث': { n: '세(se)', p: '/s/', f: 'ث / ثـ / ـثـ / ـث' },
-        'ج': { n: '짐(jim)', p: '/j/', f: 'ج / جـ / ـجـ / ـج' },
-        'چ': { n: '체(che)', p: '/ch/', f: 'چ / چـ / ـچـ / ـچ' },
-        'ح': { n: '헤(he)', p: '/h/', f: 'ح / حـ / ـحـ / ـح' },
-        'خ': { n: '헤(xe)', p: '/x/', f: 'خ / خـ / ـخـ / ـخ' },
-        'د': { n: '덜(dāl)', p: '/d/', f: 'د / د / ـد / ـد' },
-        'ذ': { n: '절(zāl)', p: '/z/', f: 'ذ / ذ / ـذ / ـذ' },
-        'ر': { n: '레(re)', p: '/r/', f: 'ر / ر / ـر / ـر' },
-        'ز': { n: '제(ze)', p: '/z/', f: 'ز / ز / ـز / ـز' },
-        'ژ': { n: '줴(zhe)', p: '/zh/', f: 'ژ / ژ / ـژ / ـژ' },
-        'س': { n: '신(sin)', p: '/s/', f: 'س / سـ / ـسـ / ـس' },
-        'ش': { n: '쉰(shin)', p: '/sh/', f: 'ش / شـ / ـشـ / ـش' },
-        'ص': { n: '서드(sād)', p: '/s/', f: 'ص / صـ / ـصـ / ـص' },
-        'ض': { n: '저드(zād)', p: '/z/', f: 'ض / ضـ / ـضـ / ـض' },
-        'ط': { n: '터(tā)', p: '/t/', f: 'ط / طـ / ـطـ / ـط' },
-        'ظ': { n: '저(zā)', p: '/z/', f: 'ظ / ظـ / ـظـ / ـظ' },
-	'ع': { n: "에인(ʿein)", p: '/ʿ/ (성문파열음)', f: 'ع / عـ / ـعـ / ـع' },
-        'غ': { n: '께인(qein)', p: '/q/', f: 'غ / غـ / ـغـ / ـغ' },
-        'ف': { n: '페(fe)', p: '/f/', f: 'ف / فـ / ـفـ / ـف' },
-        'ق': { n: '꺼프(qāf)', p: '/q/', f: 'ق / قـ / ـقـ / ـق' },
-        'ک': { n: '커프(kāf)', p: '/k/', f: 'ک / کـ / ـکـ / ـک' },
-        'گ': { n: '거프(gāf)', p: '/g/', f: 'گ / گـ / ـگـ / ـگ' },
-        'ل': { n: '럼(lām)', p: '/l/', f: 'ل / لـ / ـلـ / ـل' },
-        'م': { n: '밈(mim)', p: '/m/', f: 'م / مـ / ـمـ / ـم' },
-        'ن': { n: '눈(nun)', p: '/n/', f: 'ن / نـ / ـنـ / ـن' },
-        'و': { n: '버브(vāv)', p: '/v/, /u/, /o/', f: 'و / و / ـو / ـو' },
-        'ه': { n: '헤(he)', p: '/h/, /e/', f: 'ه / هـ / ـهـ / ـه' },
-        'ی': { n: '예(ye)', p: '/y/, /i/', f: 'ی / یـ / ـیـ / ـی' }
+const persianAlphabetData = {
+        'ا': { n: '알레프(alef)', p: '/a/, /e/, /o/ 등', f: 'ا / ا / ـا / ـا', a: '01_alef_audio' },
+        'ب': { n: '베(be)', p: '/b/', f: 'ب / بـ / ـبـ / ـب', a: '02_be_audio' },
+        'پ': { n: '페(pe)', p: '/p/', f: 'پ / پـ / ـپـ / ـپ', a: '03_pe_audio' },
+        'ت': { n: '테(te)', p: '/t/', f: 'ت / تـ / ـتـ / ـت', a: '04_te_audio' },
+        'ث': { n: '세(se)', p: '/s/', f: 'ث / ثـ / ـثـ / ـث', a: '05_se_audio' },
+        'ج': { n: '짐(jim)', p: '/j/', f: 'ج / جـ / ـجـ / ـج', a: '06_jim_audio' },
+        'چ': { n: '체(che)', p: '/ch/', f: 'چ / چـ / ـچـ / ـچ', a: '07_che_audio' },
+        'ح': { n: '헤(he)', p: '/h/', f: 'ح / حـ / ـحـ / ـح', a: '08_he_audio' },
+        'خ': { n: '헤(xe)', p: '/x/', f: 'خ / خـ / ـخـ / ـخ', a: '09_xe_audio' },
+        'د': { n: '덜(dāl)', p: '/d/', f: 'د / د / ـد / ـد', a: '10_dal_audio' },
+        'ذ': { n: '절(zāl)', p: '/z/', f: 'ذ / ذ / ـذ / ـذ', a: '11_zal_audio' },
+        'ر': { n: '레(re)', p: '/r/', f: 'ر / ر / ـر / ـر', a: '12_re_audio' },
+        'ز': { n: '제(ze)', p: '/z/', f: 'ز / ز / ـز / ـز', a: '13_ze_audio' },
+        'ژ': { n: '줴(zhe)', p: '/zh/', f: 'ژ / ژ / ـژ / ـژ', a: '14_zhe_audio' },
+        'س': { n: '신(sin)', p: '/s/', f: 'س / سـ / ـسـ / ـس', a: '15_sin_audio' },
+        'ش': { n: '쉰(shin)', p: '/sh/', f: 'ش / شـ / ـشـ / ـش', a: '16_shin_audio' },
+        'ص': { n: '서드(sād)', p: '/s/', f: 'ص / صـ / ـصـ / ـص', a: '17_sad_audio' },
+        'ض': { n: '저드(zād)', p: '/z/', f: 'ض / ضـ / ـضـ / ـض', a: '18_zad_audio' },
+        'ط': { n: '터(tā)', p: '/t/', f: 'ط / طـ / ـطـ / ـط', a: '19_ta_audio' },
+        'ظ': { n: '저(zā)', p: '/z/', f: 'ظ / ظـ / ـظـ / ـظ', a: '20_za_audio' },
+        'ع': { n: "에인(ʿein)", p: '/ʿ/ (성문파열음)', f: 'ع / عـ / ـعـ / ـع', a: '21_ein_audio' },
+        'غ': { n: '께인(qein)', p: '/q/', f: 'غ / غـ / ـغـ / ـغ', a: '22_qein_audio' },
+        'ف': { n: '페(fe)', p: '/f/', f: 'ف / فـ / ـفـ / ـف', a: '23_fe_audio' },
+        'ق': { n: '꺼프(qāf)', p: '/q/', f: 'ق / قـ / ـقـ / ـق', a: '24_qaf_audio' },
+        'ک': { n: '커프(kāf)', p: '/k/', f: 'ک / کـ / ـکـ / ـک', a: '25_kaf_audio' },
+        'گ': { n: '거프(gāf)', p: '/g/', f: 'گ / گـ / ـگـ / ـگ', a: '26_gaf_audio' },
+        'ل': { n: '럼(lām)', p: '/l/', f: 'ل / لـ / ـلـ / ـل', a: '27_lam_audio' },
+        'م': { n: '밈(mim)', p: '/m/', f: 'م / مـ / ـمـ / ـم', a: '28_mim_audio' },
+        'ن': { n: '눈(nun)', p: '/n/', f: 'ن / نـ / ـنـ / ـن', a: '29_nun_audio' },
+        'و': { n: '버브(vāv)', p: '/v/, /u/, /o/', f: 'و / و / ـو / ـو', a: '30_vav_audio' },
+        'ه': { n: '헤(he)', p: '/h/, /e/', f: 'ه / هـ / ـهـ / ـه', a: '31_he_audio' },
+        'ی': { n: '예(ye)', p: '/y/, /i/', f: 'ی / یـ / ـیـ / ـی', a: '32_ye_audio' }
     };
+
 const persianAlphabet = Object.keys(persianAlphabetData);
     // 뒤로 이어지지 않는 단절 문자 배열
     const nonJoiners = ['ا', 'د', 'ذ', 'ر', 'ز', 'ژ', 'و'];
@@ -552,6 +602,7 @@ function toggleXrayMode() {
                 updateSimDisplay();
                 updateSimHUD(char);
                 checkMissionSuccess();
+                playAudio(char); // 🔊 타이핑 시 즉각 오디오 재생
                 
                 // 단절 문자 누를 시 시각적 경고 효과
                 if(nonJoiners.includes(char)) {
@@ -646,16 +697,40 @@ function updateSimDisplay() {
         loadTraceChar();
     }
 
-    // 32개 알파벳 + 이름 매핑
-const traceData = [
-        { c: 'ا', n: '알레프(alef)' }, { c: 'ب', n: '베(be)' }, { c: 'پ', n: '페(pe)' }, { c: 'ت', n: '테(te)' },
-        { c: 'ث', n: '세(se)' }, { c: 'ج', n: '짐(jim)' }, { c: 'چ', n: '체(che)' }, { c: 'ح', n: '헤(he)' },
-        { c: 'خ', n: '헤(xe)' }, { c: 'د', n: '덜(dāl)' }, { c: 'ذ', n: '절(zāl)' }, { c: 'ر', n: '레(re)' },
-        { c: 'ز', n: '제(ze)' }, { c: 'ژ', n: '줴(zhe)' }, { c: 'س', n: '신(sin)' }, { c: 'ش', n: '쉰(shin)' },
-        { c: 'ص', n: '서드(sād)' }, { c: 'ض', n: '저드(zād)' }, { c: 'ط', n: '터(tā)' }, { c: 'ظ', n: '저(zā)' },
-        { c: 'ع', n: "에인(ʿein)" }, { c: 'غ', n: '께인(qein)' }, { c: 'ف', n: '페(fe)' }, { c: 'ق', n: '꺼프(qāf)' },
-        { c: 'ک', n: '커프(kāf)' }, { c: 'گ', n: '거프(gāf)' }, { c: 'ل', n: '럼(lām)' }, { c: 'م', n: '밈(mim)' },
-        { c: 'ن', n: '눈(nun)' }, { c: 'و', n: '버브(vāv)' }, { c: 'ه', n: '헤(he)' }, { c: 'ی', n: '예(ye)' }
+// 32개 알파벳 + 이름 + 이미지 파일명 매핑
+    const traceData = [
+        { c: 'ا', n: '알레프(alef)', img: '01_alef_image.png' },
+        { c: 'ب', n: '베(be)', img: '02_be_image.png' },
+        { c: 'پ', n: '페(pe)', img: '03_pe_image.png' },
+        { c: 'ت', n: '테(te)', img: '04_te_image.png' },
+        { c: 'ث', n: '세(se)', img: '05_se_image.png' },
+        { c: 'ج', n: '짐(jim)', img: '06_jim_image.png' },
+        { c: 'چ', n: '체(che)', img: '07_che_image.png' },
+        { c: 'ح', n: '헤(he)', img: '08_he_image.png' },
+        { c: 'خ', n: '헤(xe)', img: '09_xe_image.png' },
+        { c: 'د', n: '덜(dāl)', img: '10_dal_image.png' },
+        { c: 'ذ', n: '절(zāl)', img: '11_zal_image.png' },
+        { c: 'ر', n: '레(re)', img: '12_re_image.png' },
+        { c: 'ز', n: '제(ze)', img: '13_ze_image.png' },
+        { c: 'ژ', n: '줴(zhe)', img: '14_zhe_image.png' },
+        { c: 'س', n: '신(sin)', img: '15_sin_image.png' },
+        { c: 'ش', n: '쉰(shin)', img: '16_shin_image.png' },
+        { c: 'ص', n: '서드(sād)', img: '17_sad_image.png' },
+        { c: 'ض', n: '저드(zād)', img: '18_zad_image.png' },
+        { c: 'ط', n: '터(tā)', img: '19_ta_image.png' },
+        { c: 'ظ', n: '저(zā)', img: '20_za_image.png' },
+        { c: 'ع', n: "에인(ʿein)", img: '21_ein_image.png' },
+        { c: 'غ', n: '께인(qein)', img: '22_qein_image.png' },
+        { c: 'ف', n: '페(fe)', img: '23_fe_image.png' },
+        { c: 'ق', n: '꺼프(qāf)', img: '24_qaf_image.png' },
+        { c: 'ک', n: '커프(kāf)', img: '25_kaf_image.png' },
+        { c: 'گ', n: '거프(gāf)', img: '26_gaf_image.png' },
+        { c: 'ل', n: '럼(lām)', img: '27_lam_image.png' },
+        { c: 'م', n: '밈(mim)', img: '28_mim_image.png' },
+        { c: 'ن', n: '눈(nun)', img: '29_nun_image.png' },
+        { c: 'و', n: '버브(vāv)', img: '30_vav_image.png' },
+        { c: 'ه', n: '헤(he)', img: '31_he_image.png' },
+        { c: 'ی', n: '예(ye)', img: '32_ye_image.png' }
     ];
     
     let traceIndex = 0;
@@ -730,17 +805,28 @@ const traceData = [
         ctx.lineWidth = 12;
     }
 
-	function loadTraceChar() {
+    function loadTraceChar() {
         clearCanvas();
         const dataArr = traceMode === 'alpha' ? traceData : basicWords;
         const data = dataArr[traceIndex];
         
         document.getElementById('trace-info').innerText = `${data.n} (${traceIndex + 1}/${dataArr.length})`;
         
-        const watermarkEl = document.getElementById('watermark');
-        watermarkEl.innerText = data.c;
-        // 단어 모드일 때는 글씨 크기를 약간 줄여 캔버스에 들어가게 함
-        watermarkEl.style.fontSize = traceMode === 'word' ? '10rem' : '15rem';
+        const watermarkDiv = document.getElementById('watermark');
+        const watermarkImg = document.getElementById('watermark-img');
+        
+        // 알파벳 모드: 이미지 출력, 단어 모드: 텍스트 출력
+        if (traceMode === 'alpha') {
+            watermarkDiv.style.display = 'none';
+            watermarkImg.style.display = 'block';
+            // alefba_images 폴더 안의 이미지 파일 호출
+            watermarkImg.src = 'alefba_images/' + data.img; 
+        } else {
+            watermarkImg.style.display = 'none';
+            watermarkDiv.style.display = 'block';
+            watermarkDiv.innerText = data.c;
+            watermarkDiv.style.fontSize = '10rem';
+        }
         
         document.getElementById('trace-guide').innerText = getDotGuide(data.c);
     }
