@@ -340,7 +340,7 @@
 
     /* --- 전역 상태 --- */
     let currentMode = ''; 
-    let gameDifficulty = 'normal'; // [추가] 일반/익스트림 난이도
+    let gameDifficulty = 'normal'; 
     let score = 0, lives = 3, combo = 0, maxCombo = 0, startTime = 0;
     let currentAns = 0, currentProbTxt = '';
     let hintUsed = false;
@@ -348,6 +348,7 @@
     let timerInterval = null;
     let mcqStep = 0, mcqTotal = 20, mcqMistakes = [];
     let mcqPenaltySec = 0, mcqClicks = 0;
+    let mathProbCount = 0; // 신설: 사칙연산 문제 진행 수 카운터
 
     /* --- 네비게이션 로직 --- */
     function goHome() {
@@ -396,10 +397,11 @@ function startGame(difficulty) {
         hintUsed = true;
     }
 
-function startMath() {
+    function startMath() {
         score = 0; 
-        lives = (gameDifficulty === 'extreme') ? 1 : 3; // 익스트림은 목숨 1개
+        lives = (gameDifficulty === 'extreme') ? 1 : 3; 
         combo = 0; maxCombo = 0; isMathDelay = false;
+        mathProbCount = 0; // 게임 시작 시 카운터 초기화
         updateMathUI();
         showScreen('screen-math');
         nextMathProb();
@@ -436,24 +438,31 @@ function updateMathUI() {
         document.getElementById('math-hint-val').style.display = 'none';
         document.getElementById('math-hint-btn').style.display = 'inline-block';
         startTime = Date.now();
+        
+        mathProbCount++; // 문제 출제 시 카운트 1 증가
 
-	let opRand = Math.random();
+        let opRand = Math.random();
         let op = opRand > 0.5 ? '+' : '-';
         let a, b, ans, hintStr;
+        
+        // 기준 난이도 셋팅
+        let currentMax = (gameDifficulty === 'extreme') ? 99 : 50;
+        // [난이도 하향] 일반 모드이고 5번째 문제 이하라면 한 자릿수(1~9) 강제
+        if (gameDifficulty === 'normal' && mathProbCount <= 5) {
+            currentMax = 9;
+        }
 
         if (op === '-') {
-            // 빼기: 일반모드 1~50, 익스트림 1~99
-            let maxNum = (gameDifficulty === 'extreme') ? 99 : 50;
-            a = Math.floor(Math.random() * maxNum) + 1;
-            b = Math.floor(Math.random() * maxNum) + 1;
+            // 빼기 (내부 재선언 로직 삭제, currentMax 적용)
+            a = Math.floor(Math.random() * currentMax) + 1;
+            b = Math.floor(Math.random() * currentMax) + 1;
             if (a < b) [a, b] = [b, a]; // 음수 방지
             ans = a - b;
             hintStr = `${a} - ${b}`;
         } else {
-            // 더하기: 일반모드 1~50, 익스트림 1~99
-            let maxNum = (gameDifficulty === 'extreme') ? 99 : 50;
-            a = Math.floor(Math.random() * maxNum) + 1;
-            b = Math.floor(Math.random() * maxNum) + 1;
+            // 더하기 (내부 재선언 로직 삭제, currentMax 적용)
+            a = Math.floor(Math.random() * currentMax) + 1;
+            b = Math.floor(Math.random() * currentMax) + 1;
             ans = a + b;
             hintStr = `${a} + ${b}`;
         }
@@ -513,12 +522,13 @@ function updateMathUI() {
     }
 
     /* --- 2. 객관식 타임어택 로직 --- */
-function startMCQ() {
-        mcqTotal = (gameDifficulty === 'extreme') ? 50 : 20; // 문항 수 대폭발
+    function startMCQ() {
+        mcqTotal = (gameDifficulty === 'extreme') ? 50 : 20; 
         mcqStep = 0; mcqMistakes = [];
         mcqPenaltySec = 0; mcqClicks = 0; 
         showScreen('screen-mcq');
         document.getElementById('mcq-timer').style.color = 'var(--primary)';
+        document.getElementById('mcq-timer').innerText = "00:00"; // 즉각 초기화 (글리치 방어)
 
         startTime = Date.now();
         timerInterval = setInterval(() => {
@@ -576,10 +586,14 @@ function startMCQ() {
 function generateMCQData(step) {
 	let isHard = (gameDifficulty === 'extreme');
         
-        if (currentMode === 'mcq_time') {
+	if (currentMode === 'mcq_time') {
             // [V5 추가] 시계 읽기 생성기
             let h = Math.floor(Math.random() * 12) + 1;
             let mOpts = isHard ? [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] : [0, 15, 30, 45];
+            
+            // [난이도 하향] 일반 모드 5문제 이하는 정각(0)과 반(30)만 출제
+            if (!isHard && step <= 5) mOpts = [0, 30];
+            
             let m = mOpts[Math.floor(Math.random() * mOpts.length)];
 
             let cTxt = timeToFaWords(h, m);
@@ -630,10 +644,20 @@ function generateMCQData(step) {
             }
             return shuffleOptions({correctDigit: cDig, correctText: cTxt, optionsDigit: optD, optionsText: optT});
             
-        } else {
+	} else {
             // 영수증 생성기
-            let n = isHard ? (Math.floor(Math.random() * 90000) + 1000) : (Math.floor(Math.random() * 900) + 10);
-	    let unit = isHard ? (Math.random() > 0.5 ? ' تومان' : ' ریال') : ' تومان';
+            let n;
+            if (isHard) {
+                n = Math.floor(Math.random() * 90000) + 1000;
+            } else {
+                if (step <= 5) {
+                    // [난이도 하향] 100 ~ 900 까지 100단위로 딱 떨어지게 생성
+                    n = (Math.floor(Math.random() * 9) + 1) * 100;
+                } else {
+                    n = Math.floor(Math.random() * 900) + 10;
+                }
+            }
+            let unit = isHard ? (Math.random() > 0.5 ? ' تومان' : ' ریال') : ' تومان';
             
             let cTxt = numToFaWords(n) + unit;
             let cDig = toFaDigit(n) + unit;
@@ -648,7 +672,15 @@ function generateMCQData(step) {
             }
             
             while(optD.length < 4) {
-                let wNum = n + (Math.floor(Math.random()*100)-50);
+                let wNum;
+                if (!isHard && step <= 5) {
+                    // [난이도 하향] 오답(보기)도 100단위로 통일
+                    wNum = (Math.floor(Math.random() * 9) + 1) * 100;
+                } else {
+                    wNum = n + (Math.floor(Math.random()*100)-50);
+                    if (wNum <= 0) wNum = 10; // 방어 로직: 음수/0 원천 차단
+                }
+                
                 let wDig = toFaDigit(wNum) + unit;
                 if(!optD.includes(wDig)) optD.push(wDig);
             }
