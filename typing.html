@@ -348,11 +348,12 @@
             </div>
         </div>
 
-        <div class="guide-box">
+	<div class="guide-box">
             <h3>⚠️ 필독 주의사항</h3>
             <p>1. 학습 기록은 사이트를 종료하거나 새로고침하면 <strong>초기화</strong>됩니다.</p>
-            <p>2. 오타를 방지하기 위해 반드시 윈도우/맥 설정에서 <strong>'페르시아어(표준)'</strong> 자판을 설치하고 연습하세요.</p>
-            <p style="font-size:0.85rem; color:#fa5252; margin-top:5px; font-weight:bold;">(※ 일반 페르시아어, 혹은 Mac의 'QWERTY' 자판을 쓰면 기호 배열이 맞지 않습니다! 꼭 '표준'으로 설치하세요.)</p>
+            <p>2. 반드시 운영체제 설정에서 <strong>'페르시아어(표준)'</strong> 자판을 설치하고 연습하세요.</p>
+            <p>3. <strong>안내:</strong> Mac OS 환경의 경우, ZWNJ(반각 띄어쓰기) 등 일부 특수 단축키가 화면의 윈도우 기반 가상 키보드와 다르게 작동할 수 있습니다.</p>
+            <p style="font-size:0.85rem; color:#fa5252; margin-top:5px; font-weight:bold;">(※ 일반 페르시아어 자판을 쓰면 기호 배열이 맞지 않습니다. 꼭 '표준'을 선택하세요.)</p>
         </div>
 
         <div class="guide-box" style="padding:0; border:none; background:none; box-shadow:none;">
@@ -616,12 +617,12 @@
         osc.start(); osc.stop(audioCtx.currentTime + 0.4);
     }
 
-    // === 페르시아어 표준 자판(ISIRI 9147) 배열 완벽 매핑 (백슬래시 정상화) ===
+    // === 페르시아어 표준 자판(ISIRI 9147) 배열 완벽 매핑 (아랍어 잔재 제거) ===
     const kbLayout = [
-        [ {id:'Backquote', p:'÷', s:'~', e:'`', z:'l-pinky'}, {id:'Digit1', p:'۱', s:'!', e:'1', z:'l-pinky'}, {id:'Digit2', p:'۲', s:'@', e:'2', z:'l-ring'}, {id:'Digit3', p:'۳', s:'#', e:'3', z:'l-mid'}, {id:'Digit4', p:'۴', s:'$', e:'4', z:'l-index'}, {id:'Digit5', p:'۵', s:'%', e:'5', z:'l-index'}, {id:'Digit6', p:'۶', s:'^', e:'6', z:'r-index'}, {id:'Digit7', p:'۷', s:'،', e:'7', z:'r-index'}, {id:'Digit8', p:'۸', s:'*', e:'8', z:'r-mid'}, {id:'Digit9', p:'۹', s:')', e:'9', z:'r-ring'}, {id:'Digit0', p:'۰', s:'(', e:'0', z:'r-pinky'}, {id:'Minus', p:'-', s:'ـ', e:'-', z:'r-pinky'}, {id:'Equal', p:'=', s:'+', e:'=', z:'r-pinky'}, {id:'Backspace', p:'Back', e:'', z:'special', cls:'backspace-key'} ],
-        [ {id:'Tab', p:'Tab', e:'', z:'special', cls:'tab-key'}, {id:'KeyQ', p:'ض', s:'ٌ', e:'ㅂ', z:'l-pinky'}, {id:'KeyW', p:'ص', s:'ٍ', e:'ㅈ', z:'l-ring'}, {id:'KeyE', p:'ث', s:'ً', e:'ㄷ', z:'l-mid'}, {id:'KeyR', p:'ق', s:'ُ', e:'ㄱ', z:'l-index'}, {id:'KeyT', p:'ف', s:'ِ', e:'ㅅ', z:'l-index'}, {id:'KeyY', p:'غ', s:'َ', e:'ㅛ', z:'r-index'}, {id:'KeyU', p:'ع', s:'ّ', e:'ㅕ', z:'r-index'}, {id:'KeyI', p:'ه', s:']', e:'ㅑ', z:'r-mid'}, {id:'KeyO', p:'خ', s:'[', e:'ㅐ', z:'r-ring'}, {id:'KeyP', p:'ح', s:'\\', e:'ㅔ', z:'r-pinky'}, {id:'BracketLeft', p:'ج', s:'}', e:'[', z:'r-pinky'}, {id:'BracketRight', p:'چ', s:'{', e:']', z:'r-pinky'}, {id:'Backslash', p:'\\', s:'|', e:'₩', z:'r-pinky'} ],
-        [ {id:'CapsLock', p:'Caps', e:'', z:'special', cls:'caps-key'}, {id:'KeyA', p:'ش', s:'ؤ', e:'ㅁ', z:'l-pinky'}, {id:'KeyS', p:'س', s:'ئ', e:'ㄴ', z:'l-ring'}, {id:'KeyD', p:'ی', s:'ي', e:'ㅇ', z:'l-mid'}, {id:'KeyF', p:'ب', s:'إ', e:'ㄹ', z:'l-index'}, {id:'KeyG', p:'ل', s:'أ', e:'ㅎ', z:'l-index'}, {id:'KeyH', p:'ا', s:'آ', e:'ㅗ', z:'r-index'}, {id:'KeyJ', p:'ت', s:'ة', e:'ㅓ', z:'r-index'}, {id:'KeyK', p:'ن', s:'»', e:'ㅏ', z:'r-mid'}, {id:'KeyL', p:'م', s:'«', e:'ㅣ', z:'r-ring'}, {id:'Semicolon', p:'ک', s:':', e:';', z:'r-pinky'}, {id:'Quote', p:'گ', s:'"', e:'\'', z:'r-pinky'}, {id:'Enter', p:'Enter', e:'', z:'special', cls:'enter-key'} ],
-        [ {id:'ShiftLeft', p:'Shift', e:'', z:'special', cls:'shift-l-key'}, {id:'KeyZ', p:'ظ', s:'ك', e:'ㅋ', z:'l-pinky'}, {id:'KeyX', p:'ط', s:'ٓ', e:'ㅌ', z:'l-ring'}, {id:'KeyC', p:'ز', s:'ژ', e:'ㅊ', z:'l-mid'}, {id:'KeyV', p:'ر', s:'ٰ', e:'ㅍ', z:'l-index'}, {id:'KeyB', p:'ذ', s:'‌', e:'ㅠ', z:'l-index'}, {id:'KeyN', p:'د', s:'ٔ', e:'ㅜ', z:'r-index'}, {id:'KeyM', p:'پ', s:'ء', e:'ㅡ', z:'r-index'}, {id:'Comma', p:'و', s:'<', e:',', z:'r-mid'}, {id:'Period', p:'.', s:'>', e:'.', z:'r-ring'}, {id:'Slash', p:'/', s:'؟', e:'/', z:'r-pinky'}, {id:'ShiftRight', p:'Shift', e:'', z:'special', cls:'shift-r-key'} ]
+        [ {id:'Backquote', p:'÷', s:'~', e:'`', z:'l-pinky'}, {id:'Digit1', p:'۱', s:'!', e:'1', z:'l-pinky'}, {id:'Digit2', p:'۲', s:'@', e:'2', z:'l-ring'}, {id:'Digit3', p:'۳', s:'#', e:'3', z:'l-mid'}, {id:'Digit4', p:'۴', s:'$', e:'4', z:'l-index'}, {id:'Digit5', p:'۵', s:'%', e:'5', z:'l-index'}, {id:'Digit6', p:'۶', s:'^', e:'6', z:'r-index'}, {id:'Digit7', p:'۷', s:'&', e:'7', z:'r-index'}, {id:'Digit8', p:'۸', s:'*', e:'8', z:'r-mid'}, {id:'Digit9', p:'۹', s:')', e:'9', z:'r-ring'}, {id:'Digit0', p:'۰', s:'(', e:'0', z:'r-pinky'}, {id:'Minus', p:'-', s:'ـ', e:'-', z:'r-pinky'}, {id:'Equal', p:'=', s:'+', e:'=', z:'r-pinky'}, {id:'Backspace', p:'Back', e:'', z:'special', cls:'backspace-key'} ],
+        [ {id:'Tab', p:'Tab', e:'', z:'special', cls:'tab-key'}, {id:'KeyQ', p:'ض', s:'ْ', e:'ㅂ', z:'l-pinky'}, {id:'KeyW', p:'ص', s:'ٌ', e:'ㅈ', z:'l-ring'}, {id:'KeyE', p:'ث', s:'ٍ', e:'ㄷ', z:'l-mid'}, {id:'KeyR', p:'ق', s:'ً', e:'ㄱ', z:'l-index'}, {id:'KeyT', p:'ف', s:'ُ', e:'ㅅ', z:'l-index'}, {id:'KeyY', p:'غ', s:'ِ', e:'ㅛ', z:'r-index'}, {id:'KeyU', p:'ع', s:'َ', e:'ㅕ', z:'r-index'}, {id:'KeyI', p:'ه', s:'ّ', e:'ㅑ', z:'r-mid'}, {id:'KeyO', p:'خ', s:']', e:'ㅐ', z:'r-ring'}, {id:'KeyP', p:'ح', s:'[', e:'ㅔ', z:'r-pinky'}, {id:'BracketLeft', p:'ج', s:'}', e:'[', z:'r-pinky'}, {id:'BracketRight', p:'چ', s:'{', e:']', z:'r-pinky'}, {id:'Backslash', p:'\\', s:'|', e:'₩', z:'r-pinky'} ],
+        [ {id:'CapsLock', p:'Caps', e:'', z:'special', cls:'caps-key'}, {id:'KeyA', p:'ش', s:'ؤ', e:'ㅁ', z:'l-pinky'}, {id:'KeyS', p:'س', s:'ئ', e:'ㄴ', z:'l-ring'}, {id:'KeyD', p:'ی', e:'ㅇ', z:'l-mid'}, {id:'KeyF', p:'ب', s:'إ', e:'ㄹ', z:'l-index'}, {id:'KeyG', p:'ل', s:'أ', e:'ㅎ', z:'l-index'}, {id:'KeyH', p:'ا', s:'آ', e:'ㅗ', z:'r-index'}, {id:'KeyJ', p:'ت', s:'ة', e:'ㅓ', z:'r-index'}, {id:'KeyK', p:'ن', s:'»', e:'ㅏ', z:'r-mid'}, {id:'KeyL', p:'م', s:'«', e:'ㅣ', z:'r-ring'}, {id:'Semicolon', p:'ک', s:':', e:';', z:'r-pinky'}, {id:'Quote', p:'گ', s:'"', e:'\'', z:'r-pinky'}, {id:'Enter', p:'Enter', e:'', z:'special', cls:'enter-key'} ],
+        [ {id:'ShiftLeft', p:'Shift', e:'', z:'special', cls:'shift-l-key'}, {id:'KeyZ', p:'ظ', e:'ㅋ', z:'l-pinky'}, {id:'KeyX', p:'ط', s:'ٓ', e:'ㅌ', z:'l-ring'}, {id:'KeyC', p:'ز', s:'ژ', e:'ㅊ', z:'l-mid'}, {id:'KeyV', p:'ر', s:'ٰ', e:'ㅍ', z:'l-index'}, {id:'KeyB', p:'ذ', s:'‌', e:'ㅠ', z:'l-index'}, {id:'KeyN', p:'د', s:'ٔ', e:'ㅜ', z:'r-index'}, {id:'KeyM', p:'پ', s:'ء', e:'ㅡ', z:'r-index'}, {id:'Comma', p:'و', s:'<', e:',', z:'r-mid'}, {id:'Period', p:'.', s:'>', e:'.', z:'r-ring'}, {id:'Slash', p:'/', s:'؟', e:'/', z:'r-pinky'}, {id:'ShiftRight', p:'Shift', e:'', z:'special', cls:'shift-r-key'} ]
     ];
 
     const charToKeyId = {};
@@ -630,7 +631,7 @@
     // 자리 연습 단계별 목표 배열 (특수기호 \ 제거, ژ는 3단계로 원상복구)
     const lvl1Chars = ['ش','س','ی','ب','ل','ا','ت','ن','م','ک','گ']; 
     const lvl2Chars = ['ض','ص','ث','ق','ف','غ','ع','ه','خ','ح','ج','چ','ظ','ط','ز','ر','ذ','د','پ','و']; 
-    const lvl3Chars = ['۱','۲','۳','۴','۵','۶','۷','۸','۹','۰','،','ؤ','ئ','ي','إ','أ','آ','ة','»','«','ك','ژ','ٔ','ء','؟']; 
+    const lvl3Chars = ['۱','۲','۳','۴','۵','۶','۷','۸','۹','۰','،','ؤ','ئ','إ','أ','آ','ة','»','«','ژ','ٔ','ء','؟'];
     const allChars = [...lvl1Chars, ...lvl2Chars, ...lvl3Chars];
 
     function initKeyboard() {
@@ -1053,7 +1054,13 @@
         if(e.code === 'Space' || e.code === 'Backspace' || e.code === 'Enter') e.preventDefault();
 
         let keyEl = document.getElementById(e.code);
-        if(keyEl) { keyEl.classList.add('pressed'); setTimeout(() => keyEl.classList.remove('pressed'), 100); }
+        if(keyEl) { 
+            keyEl.classList.add('pressed'); 
+            // 수식 키(Shift 등)가 아닐 때만 100ms 뒤에 눌림 효과 제거
+            if (e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta') {
+                setTimeout(() => keyEl.classList.remove('pressed'), 100); 
+            }
+        }
 
         if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && !isShiftDown) {
             isShiftDown = true;
@@ -1168,6 +1175,12 @@
     });
 
     window.addEventListener('keyup', (e) => {
+        // 수식 키는 손을 뗄 때만 눌림 효과(pressed)를 완전히 제거
+        let keyEl = document.getElementById(e.code);
+        if(keyEl && (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta')) {
+            keyEl.classList.remove('pressed');
+        }
+
         if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
             isShiftDown = false;
             kbLayout.forEach(row => row.forEach(k => {
