@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>페르시아어 문법 훈련소</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        .portal-home-button { position: fixed; top: auto !important; left: 25px !important; bottom: 25px; right: auto !important; width: 55px; height: 55px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; transition: all 0.3s ease; }
+        .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .portal-home-button i { font-size: 1.5rem; }
+
+        :root {
+            --primary: #0b2a4a;
+            --accent: #fa5252;
+            --bg: #e9ecef;
+            --card: #ffffff;
+            --persian-font: 'Noto Sans Arabic', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .container { width: 100%; max-width: 1200px; min-height: 750px; background: var(--card); border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); position: relative; overflow: hidden; display: flex; flex-direction: column; transition: 0.2s; }
+        
+        .top-nav { display: none; background: #f8f9fa; padding: 20px 30px; border-bottom: 2px solid #e9ecef; text-align: left; }
+        .btn-home { background: #ffffff; border: 2px solid #dee2e6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--primary); font-size: 1.1rem; }
+        .btn-home:hover { background: #e9ecef; border-color: #adb5bd; }
+
+        header { background: var(--primary); color: white; padding: 25px; text-align: center; }
+        header h2 { font-size: 2.5rem; margin: 0; }
+        header p { margin-top: 15px; opacity: 0.8; font-size: 1.2rem; }
+
+        .screen { display: none; padding: 50px; flex-grow: 1; }
+        .screen.active { display: block; }
+        #screen-home.active { display: flex; flex-direction: column; padding: 30px; }
+
+        /* --- 홈(Lobby) 화면 --- */
+        .home-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 30px; width: 100%; }
+        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; }
+        .mode-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(11, 42, 74, 0.1); }
+        .mode-icon { font-size: 3.5rem; color: var(--primary); margin-bottom: 20px; }
+        .mode-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: var(--primary); }
+        .mode-card p { font-size: 1.05rem; color: #666; word-break: keep-all; }
+
+        /* 공통 게임 UI */
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; font-weight: bold; font-size: 1.5rem; padding-bottom: 20px; border-bottom: 2px solid #f1f3f5; position: relative; }
+        .btn-start { display: block; width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: auto; }
+        .btn-start:hover { background: #081e36; transform: translateY(-2px); }
+
+        /* 타임어택 MCQ */
+        .mcq-problem-container { text-align: center; margin: 40px 0; }
+        .mcq-problem { font-family: var(--persian-font); font-size: 4.5rem; direction: rtl; color: var(--primary); font-weight: bold; }
+        .mcq-hint { font-size: 1.3rem; color: #868e96; margin-top: 15px; font-weight: bold; }
+        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .mcq-btn { font-family: var(--persian-font); font-size: 2.2rem; padding: 30px; background: #fff; border: 3px solid #dee2e6; border-radius: 12px; cursor: pointer; transition: 0.1s; direction: rtl; }
+        .mcq-btn:hover { border-color: var(--primary); background: #f8f9fa; transform: scale(1.02); }
+        .mcq-btn.wrong { border-color: var(--accent); background: #fff5f5; color: var(--accent); animation: shake 0.4s; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        /* 결과 스크린 */
+        #certificate { background: #fff; padding: 60px; border: 12px solid var(--primary); border-radius: 16px; text-align: center; position: relative; margin-bottom: 30px; }
+        .cert-title { font-size: 2.5rem; color: var(--primary); margin-bottom: 25px; border-bottom: 3px dashed #ccc; padding-bottom: 20px; font-weight: bold; }
+        .cert-rank { font-size: 6rem; font-weight: bold; color: var(--accent); margin: 30px 0; text-shadow: 3px 3px 0px #ffe3e3; }
+        .cert-msg { font-size: 1.6rem; color: #555; margin-bottom: 40px; font-weight: bold; }
+        .cert-stamp { position: absolute; bottom: 25px; right: 30px; font-size: 1.1rem; color: #888; text-align: right; }
+        
+        .mistake-list { text-align: left; background: #f8f9fa; padding: 30px; border-radius: 12px; max-height: 300px; overflow-y: auto; direction: rtl; font-family: var(--persian-font); font-size: 1.5rem; border: 1px solid #dee2e6; }
+        .mistake-item { border-bottom: 1px dashed #ccc; padding: 20px 0; color: var(--accent); }
+        .mistake-item:last-child { border-bottom: none; }
+        .mistake-item span { color: #2b8a3e; margin-right: 20px; display: inline-block; }
+
+        .btn-share { width: 100%; padding: 20px; background: #20c997; color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-share:hover { background: #12b886; }
+
+        @media (max-width: 768px) {
+            .screen { padding: 30px; }
+            .mcq-problem { font-size: 3.5rem; }
+            .mcq-btn { font-size: 1.8rem; padding: 20px; }
+            #certificate { padding: 30px; }
+            .cert-rank { font-size: 4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="index.html" class="portal-home-button" title="메인 페이지로 돌아가기">
+    <i class="fas fa-home"></i>
+</a>
+
+<div class="container" id="main-container">
+    <div class="top-nav" id="top-nav">
+        <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
+    </div>
+
+    <header id="main-header">
+        <h2>페르시아어 문법 훈련소</h2>
+        <p>단어를 넘어 문장의 규칙을 반사적으로 조립하세요</p>
+    </header>
+
+    <div id="screen-home" class="screen active">
+        <div class="home-grid">
+            <div class="mode-card" style="cursor: default;">
+                <i class="fas fa-link mode-icon"></i>
+                <h3>주어-동사 연결</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
+                    🎯 <strong>목표:</strong> 주어에 따른 동사 꼬리 매칭<br>
+                    ⚠️ <strong>규칙:</strong> [현재/과거] 시제 20문항. 오답 +5초
+                </div>
+                <button class="btn-start" onclick="currentMode='conjugator'; startMCQ()">훈련 시작</button>
+            </div>
+
+            <div class="mode-card" style="cursor: default;">
+                <i class="fas fa-search mode-icon"></i>
+                <h3>에저페(e) 판독기</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
+                    🎯 <strong>목표:</strong> 명사 수식/소유 구조의 연결음 파악<br>
+                    ⚠️ <strong>규칙:</strong> 두 단어 사이 에저페 O/X 판단. 20문항
+                </div>
+                <button class="btn-start" onclick="currentMode='ezafe'; startMCQ()">훈련 시작</button>
+            </div>
+
+            <div class="mode-card" style="cursor: default;">
+                <i class="fas fa-magnet mode-icon"></i>
+                <h3>소유격 압축</h3>
+                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
+                    🎯 <strong>목표:</strong> 대명사를 명사의 소유격 꼬리로 변환<br>
+                    ⚠️ <strong>규칙:</strong> (예: 책 + 너 = 너의 책). 20문항 타임어택
+                </div>
+                <button class="btn-start" onclick="currentMode='possessive'; startMCQ()">훈련 시작</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-mcq" class="screen">
+        <div class="game-header">
+            <div>진행도: <span id="mcq-progress">1 / 20</span></div>
+            <div>타이머: <span id="mcq-timer" style="color:var(--primary); font-weight:bold; transition: 0.3s;">00:00</span></div>
+        </div>
+        <div class="mcq-problem-container">
+            <div class="mcq-problem" id="mcq-prob-text"></div>
+            <div class="mcq-hint" id="mcq-hint-text"></div>
+        </div>
+        <div class="mcq-grid" id="mcq-buttons">
+            <button class="mcq-btn" onclick="checkMCQ(0)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(1)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(2)" id="btn-opt-3"></button>
+            <button class="mcq-btn" onclick="checkMCQ(3)" id="btn-opt-4"></button>
+        </div>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <div id="certificate">
+            <div class="cert-title">페르시아어 문법 검정 인증서</div>
+            <div id="res-mode" style="font-size:1.5rem; font-weight:bold; color:#666;"></div>
+            <div class="cert-rank" id="res-rank">A+</div>
+            <div class="cert-msg" id="res-msg">완벽합니다!</div>
+            <div style="font-size: 1.6rem; margin-bottom: 10px;">기록: <strong id="res-score" style="color:var(--primary);"></strong></div>
+            <div class="cert-stamp" id="res-stamp"></div>
+        </div>
+        
+        <div id="mistake-area" style="display:none; margin-bottom:40px;">
+            <h4 style="margin:20px 0 15px 0; font-size:1.5rem; color:var(--primary);"><i class="fas fa-book-open"></i> 오답 노트</h4>
+            <div class="mistake-list" id="mistake-list"></div>
+        </div>
+
+        <button class="btn-share" onclick="copyResultImage()"><i class="fas fa-camera"></i> 인증서 복사하기 (클립보드)</button>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // 1. 하드코딩 문법 데이터셋 구축
+    // ==========================================
+    // (1) 주어-동사 인칭 매칭용
+    const subjects = [
+        { fa: 'من', p: '1s' }, { fa: 'تو', p: '2s' }, { fa: 'او', p: '3s' },
+        { fa: 'ما', p: '1p' }, { fa: 'شما', p: '2p' }, { fa: 'آنها', p: '3p' }
+    ];
+    // 필수 15개 동사 (dashtan, budan 등 예외 처리 완벽 적용)
+    const verbs = [
+        { inf: 'رفتن', past: 'رفت', pres: 'رو', mean: '가다' },
+        { inf: 'خوردن', past: 'خورد', pres: 'خور', mean: '먹다' },
+        { inf: 'نوشتن', past: 'نوشت', pres: 'نویس', mean: '쓰다' },
+        { inf: 'دیدن', past: 'دید', pres: 'بین', mean: '보다' },
+        { inf: 'خریدن', past: 'خرید', pres: 'خر', mean: '사다' },
+        { inf: 'خواندن', past: 'خواند', pres: 'خوان', mean: '읽다' },
+        { inf: 'شدن', past: 'شد', pres: 'شو', mean: '되다' },
+        { inf: 'کردن', past: 'کرد', pres: 'کن', mean: '하다' },
+        { inf: 'آمدن', past: 'آمد', pres: 'آی', mean: '오다' },
+        { inf: 'گفتن', past: 'گفت', pres: 'گوی', mean: '말하다' },
+        { inf: 'دادن', past: 'داد', pres: 'ده', mean: '주다' },
+        { inf: 'دانستن', past: 'دانست', pres: 'دان', mean: '알다' },
+        { inf: 'خواستن', past: 'خواست', pres: 'خواه', mean: '원하다' },
+        { inf: 'داشتن', past: 'داشت', pres: 'دار', mean: '가지다', noMi: true },
+        { inf: 'بودن', past: 'بود', pres: 'هست', mean: '이다', noMi: true, pres3s: 'است' }
+    ];
+    const suffixes = { '1s': 'م', '2s': 'ی', '3s': 'د', '1p': 'یم', '2p': 'ید', '3p': 'ند' };
+
+    // (2) 에저페 판독용 (한쪽으로 몰려도 중복이 발생하지 않도록 각각 20개로 확장)
+    const ezafePairsO = [ 
+        ['کتاب', 'بزرگ', '큰 책'], ['ماشین', 'پدر', '아빠의 차'], ['شهر', 'تهران', '테헤란 시'],
+        ['برادر', 'خوب', '좋은 형'], ['غذای', 'خوشمزه', '맛있는 음식'], ['لباس', 'زیبا', '예쁜 옷'],
+        ['گل', 'سرخ', '빨간 꽃'], ['دست', 'راست', '오른손'], ['دوست', 'من', '나의 친구'],
+        ['دانشگاه', 'تهران', '테헤란 대학교'], ['سیب', 'شیرین', '단 사과'], ['مادر', 'مهربان', '다정한 어머니'],
+        ['مرد', 'پیر', '늙은 남자'], ['زن', 'جوان', '젊은 여자'], ['آب', 'سرد', '차가운 물'],
+        ['چای', 'گرم', '따뜻한 차'], ['کفش', 'سیاه', '검은 신발'], ['در', 'کلاس', '교실 문'],
+        ['پسر', 'خوب', '좋은 소년/아들'], ['دختر', 'زیبا', '예쁜 소녀/딸']
+    ];
+    const ezafePairsX = [ 
+        ['من', 'رفتم', '나는 갔다'], ['او', 'خورد', '그는 먹었다'], ['مرد', 'آمد', '남자가 왔다'],
+        ['تو', 'هستی', '너는 ~이다'], ['ما', 'دیدیم', '우리는 보았다'], ['دانشجو', 'هستم', '(나는) 학생이다'],
+        ['سیب', 'را', '사과를'], ['کتاب', 'را', '책을'], ['خیلی', 'خوب', '아주 좋은'],
+        ['امروز', 'رفتم', '오늘 갔다'], ['این', 'کتاب', '이 책'], ['آن', 'ماشین', '저 차'],
+        ['شما', 'رفتید', '당신들은 갔다'], ['آنها', 'دیدند', '그들은 보았다'], ['آب', 'را', '물을'],
+        ['ماشین', 'را', '차를'], ['خیلی', 'زیبا', '아주 예쁜'], ['فردا', 'می‌روم', '내일 간다'],
+        ['دیروز', 'آمد', '어제 왔다'], ['بسیار', 'خوب', '매우 좋은']
+    ];
+
+    // (3) 소유격 접미사 결합용
+    const possPronouns = [
+        { fa: 'من', suf: 'م' }, { fa: 'تو', suf: 'ت' }, { fa: 'او', suf: 'ش' },
+        { fa: 'ما', suf: 'مان' }, { fa: 'شما', suf: 'تان' }, { fa: 'آنها', suf: 'شان' }
+    ];
+    const possNouns = ['کتاب', 'ماشین', 'دست', 'دوست', 'پدر', 'مادر', 'برادر', 'شهر', 'کار', 'کیف', 'چشم', 'مداد'];
+
+    // ==========================================
+    // 2. 전역 상태 및 화면 통제 로직
+    // ==========================================
+    let currentMode = ''; 
+    let startTime = 0, timerInterval = null;
+    let mcqStep = 0, mcqTotal = 20, mcqMistakes = [];
+    let mcqPenaltySec = 0, mcqClicks = 0;
+    let currentAns = '';
+    let askedQuestions = []; // ★ 중복 방지용 출제 기록 배열
+
+    function goHome() {
+        clearInterval(timerInterval);
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-home').classList.add('active');
+        document.getElementById('top-nav').style.display = 'none';
+        document.getElementById('main-header').style.display = 'block';
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('top-nav').style.display = 'block';
+        document.getElementById('main-header').style.display = 'none';
+    }
+
+    function getFormattedDate() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const h = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        return `${y}.${m}.${d} ${h}:${min}`;
+    }
+
+
+    // ==========================================
+    // 3. 타임어택 (MCQ) 메인 루프
+    // ==========================================
+    function startMCQ() {
+        mcqStep = 0; mcqMistakes = []; mcqPenaltySec = 0; mcqClicks = 0; 
+        askedQuestions = []; // ★ 매 게임 시작 시 기록 100% 리셋
+        
+        let btn3 = document.getElementById('btn-opt-3');
+        let btn4 = document.getElementById('btn-opt-4');
+        if (currentMode === 'ezafe') {
+            btn3.style.display = 'none'; btn4.style.display = 'none';
+        } else {
+            btn3.style.display = 'block'; btn4.style.display = 'block';
+        }
+
+        showScreen('screen-mcq');
+        document.getElementById('mcq-timer').style.color = 'var(--primary)';
+        document.getElementById('mcq-timer').innerText = "00:00"; 
+
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+            let sec = Math.floor((Date.now() - startTime) / 1000) + mcqPenaltySec;
+            document.getElementById('mcq-timer').innerText = `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+        }, 1000);
+        nextMCQProb();
+    }
+
+    function nextMCQProb() {
+        mcqStep++;
+        if (mcqStep > mcqTotal) return endGame();
+        
+        document.getElementById('mcq-progress').innerText = `${mcqStep} / ${mcqTotal}`;
+        
+        let pData = generateMCQData();
+        currentAns = pData.correctOpt; 
+
+        document.getElementById('mcq-prob-text').innerText = pData.qText;
+        document.getElementById('mcq-hint-text').innerText = pData.hintText;
+
+        let btns = document.querySelectorAll('.mcq-btn');
+        btns.forEach((btn, idx) => {
+            if(btn.style.display !== 'none') {
+                btn.innerText = pData.options[idx];
+                btn.dataset.correct = (pData.options[idx] === currentAns) ? 'true' : 'false';
+            }
+        });
+    }
+
+    function checkMCQ(btnIdx) {
+        mcqClicks++; 
+        let btn = document.querySelectorAll('.mcq-btn')[btnIdx];
+        if (btn.dataset.correct === 'true') {
+            nextMCQProb();
+        } else {
+            mcqPenaltySec += 5;
+            let timerEl = document.getElementById('mcq-timer');
+            timerEl.style.color = 'var(--accent)';
+            setTimeout(() => { timerEl.style.color = 'var(--primary)'; }, 500);
+
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 400);
+            
+            let q = document.getElementById('mcq-prob-text').innerText;
+            if(!mcqMistakes.find(m => m.q === q)) {
+                mcqMistakes.push({q: q, wrong: btn.innerText, right: currentAns});
+            }
+        }
+    }
+
+
+    // ==========================================
+    // 4. 문법 모드별 문제 생성 알고리즘 (중복 완벽 방어)
+    // ==========================================
+    function generateMCQData() {
+        let resultData = null;
+        let attempts = 0;
+
+        do {
+            if (currentMode === 'conjugator') {
+                let tense = Math.random() > 0.5 ? 'present' : 'past';
+                let subj = subjects[Math.floor(Math.random() * subjects.length)];
+                let verb = verbs[Math.floor(Math.random() * verbs.length)];
+                
+                let correctOpt = '';
+                if (tense === 'present') {
+                    // بودن 처럼 3인칭 단수 형태가 아예 다른 경우 방어
+                    if (subj.p === '3s' && verb.pres3s) {
+                        correctOpt = verb.pres3s;
+                    } else {
+                        let prefix = verb.noMi ? '' : 'می\u200C';
+                        correctOpt = prefix + verb.pres + suffixes[subj.p];
+                    }
+                } else {
+                    // 과거형 3인칭 단수 꼬리 증발 방어
+                    if (subj.p === '3s') correctOpt = verb.past;
+                    else correctOpt = verb.past + suffixes[subj.p];
+                }
+
+                let optArr = [correctOpt];
+                while (optArr.length < 4) {
+                    let wrongSubj = subjects[Math.floor(Math.random() * subjects.length)];
+                    let wrongOpt = '';
+                    
+                    if (tense === 'present') {
+                        if (wrongSubj.p === '3s' && verb.pres3s) {
+                            wrongOpt = verb.pres3s;
+                        } else {
+                            let prefix = verb.noMi ? '' : 'می\u200C';
+                            wrongOpt = prefix + verb.pres + suffixes[wrongSubj.p];
+                        }
+                    } else {
+                        if (wrongSubj.p === '3s') wrongOpt = verb.past;
+                        else wrongOpt = verb.past + suffixes[wrongSubj.p];
+                    }
+                    
+                    if (!optArr.includes(wrongOpt)) optArr.push(wrongOpt);
+                }
+                
+                let tLabel = tense === 'present' ? '현재' : '과거';
+                resultData = {
+                    qText: `${subj.fa} + ${verb.inf}`,
+                    hintText: `[${tLabel} 시제] ${verb.mean}`,
+                    correctOpt: correctOpt,
+                    options: optArr.sort(() => 0.5 - Math.random())
+                };
+
+            } else if (currentMode === 'ezafe') {
+                let isEzafe = Math.random() > 0.5;
+                let pairData = isEzafe 
+                    ? ezafePairsO[Math.floor(Math.random() * ezafePairsO.length)]
+                    : ezafePairsX[Math.floor(Math.random() * ezafePairsX.length)];
+                
+                let correctOpt = isEzafe ? '⭕ 필요함 (-e)' : '❌ 불필요';
+                let optArr = ['⭕ 필요함 (-e)', '❌ 불필요'];
+
+                resultData = {
+                    qText: `${pairData[0]} ... ${pairData[1]}`,
+                    hintText: `뜻: ${pairData[2]}`,
+                    correctOpt: correctOpt,
+                    options: optArr 
+                };
+
+            } else if (currentMode === 'possessive') {
+                let noun = possNouns[Math.floor(Math.random() * possNouns.length)];
+                let pron = possPronouns[Math.floor(Math.random() * possPronouns.length)];
+                
+                let correctOpt = noun + pron.suf;
+                let optArr = [correctOpt];
+                
+                while (optArr.length < 4) {
+                    let wrongPron = possPronouns[Math.floor(Math.random() * possPronouns.length)];
+                    let wrongOpt = noun + wrongPron.suf;
+                    if (!optArr.includes(wrongOpt)) optArr.push(wrongOpt);
+                }
+
+                resultData = {
+                    qText: `${noun} + ${pron.fa} = ?`,
+                    hintText: `(힌트: ${pron.fa}의)`,
+                    correctOpt: correctOpt,
+                    options: optArr.sort(() => 0.5 - Math.random())
+                };
+            }
+            
+            // ★ 중복 출제 방지 로직 
+            // 만들어진 문제+힌트 텍스트를 고유 키로 활용하여 이전에 나왔는지 검사
+            let uniqueKey = resultData.qText + "|" + resultData.hintText;
+            if (!askedQuestions.includes(uniqueKey)) {
+                askedQuestions.push(uniqueKey);
+                break; // 새 문제면 루프 탈출
+            }
+            
+            attempts++;
+        } while (attempts < 100); // 무한 루프 방어용 안전장치
+
+        return resultData;
+    }
+
+    // ==========================================
+    // 5. 게임 종료 및 결과 처리
+    // ==========================================
+    function endGame() {
+        clearInterval(timerInterval);
+        showScreen('screen-result');
+        document.getElementById('top-nav').style.display = 'block';
+        
+        let totalSec = Math.floor((Date.now() - startTime) / 1000) + mcqPenaltySec;
+        let accuracy = Math.floor((mcqTotal / mcqClicks) * 100);
+        let rank = 'C', msg = '';
+        
+        let titleMap = {
+            'conjugator': '주어-동사 인칭 연결',
+            'ezafe': '에저페(Ezafe) 판독기',
+            'possessive': '소유격 꼬리 압축'
+        };
+        document.getElementById('res-mode').innerText = titleMap[currentMode];
+        
+        let finalScoreStr = `${Math.floor(totalSec/60)}분 ${String(totalSec%60).padStart(2,'0')}초 (정확도 ${accuracy}%)`;
+        
+        if (accuracy < 70) { rank = 'C'; msg = "🚨 정확도가 무너졌습니다. 원리를 다시 복습하세요!"; } 
+        else if (totalSec <= 60 && accuracy >= 95) { rank = 'A+'; msg = "🎉 경이로운 반사 신경! 원어민 수준입니다."; } 
+        else if (totalSec <= 90 && accuracy >= 85) { rank = 'A'; msg = "👏 훌륭합니다! 뼈대가 튼튼하게 잡혔습니다."; } 
+        else if (totalSec <= 120 && accuracy >= 75) { rank = 'B'; msg = "👍 좋습니다! 오답 노트를 확인해 볼까요?"; } 
+        else { rank = 'C'; msg = "💪 끝까지 완주한 것만으로도 대단합니다! 다시 도전!"; }
+
+        if(mcqMistakes.length > 0) {
+            document.getElementById('mistake-area').style.display = 'block';
+            let html = mcqMistakes.map(m => `<div class="mistake-item">문제: ${m.q}<br>❌ 선택: ${m.wrong}<br><span>✅ 정답: ${m.right}</span></div>`).join('');
+            document.getElementById('mistake-list').innerHTML = html;
+        } else {
+            document.getElementById('mistake-area').style.display = 'none';
+        }
+
+        document.getElementById('res-rank').innerText = rank;
+        document.getElementById('res-msg').innerText = msg;
+        document.getElementById('res-score').innerText = finalScoreStr;
+        document.getElementById('res-stamp').innerText = `${getFormattedDate()} 인증됨`;
+    }
+
+    async function copyResultImage() {
+        const btn = document.querySelector('.btn-share');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 이미지 생성 중...';
+        
+        try {
+            const el = document.getElementById('certificate');
+            const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff' });
+            
+            canvas.toBlob(async (blob) => {
+                try {
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    await navigator.clipboard.write([item]);
+                    btn.innerHTML = '<i class="fas fa-check"></i> 클립보드에 복사되었습니다! (Ctrl+V)';
+                    btn.style.background = '#0b2a4a';
+                } catch (err) {
+                    btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 브라우저 보안 권한 필요';
+                }
+            });
+        } catch(e) {
+            btn.innerHTML = '<i class="fas fa-exclamation"></i> 오류 발생';
+        }
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-camera"></i> 인증서 복사하기 (클립보드)';
+            btn.style.background = '#20c997';
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>

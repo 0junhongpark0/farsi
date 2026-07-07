@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>페르시아어 알레프바</title>
+    <title>페르시아 문자 훈련소</title>
     
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
@@ -156,7 +156,7 @@
     </div>
 
     <header id="main-header">
-        <h2>페르시아어 알레프바</h2>
+        <h2>페르시아 문자 훈련소</h2>
         <p>문자의 결합 원리와 획순을 직관적으로 체화하세요</p>
     </header>
 
@@ -287,8 +287,8 @@
     <div class="grammar-content">
         <h3>제1장. 페르시아어 문자의 기본 생태계</h3>
         <ul>
-            <li><strong>진행 방향:</strong> 모든 글자는 오른쪽에서 왼쪽으로 씁니다. (Right-to-Left)</li>
-            <li><strong>알파벳의 수:</strong> 총 32개이며, 아랍어 28개에 페르시아어 고유 문자 4개(<span style="font-family:var(--persian-font); color:var(--primary); font-weight:bold;">پ, چ, ژ, گ</span>)가 추가되었습니다.</li>
+            <li><strong>진행 방향:</strong> 모든 글자는 오른쪽에서 왼쪽으로 씁니다.</li>
+            <li><strong>알파벳의 수:</strong> 총 32개이며, 아랍 문자 28개에 페르시아어 고유 문자 4개(<span style="font-family:var(--persian-font); color:var(--primary); font-weight:bold;">پ, چ, ژ, گ</span>)가 추가로 있습니다.</li>
         </ul>
         
         <h3>제2장. 생존을 위한 필수 규칙</h3>
@@ -761,8 +761,8 @@
         if (traceMode === 'word') return "💡 펜을 떼지 않고 이어지는 글자의 몸통을 모두 끝까지 쓴 뒤, 각 점들을 찍습니다.";
         
         const c = charStr;
-        if (['پ','چ','ژ','ش','ث'].includes(c)) return "💡 펜을 떼지 않고 몸통을 먼저 그린 후, 점 3개는 오른쪽에서 왼쪽으로 2개를 찍고 위(아래)에 1개를 마저 찍습니다.";
-        if (['ت','ق','ی'].includes(c)) return "💡 펜을 떼지 않고 몸통을 먼저 그린 후, 점 2개는 오른쪽에서 왼쪽으로 차례대로 찍습니다.";
+        if (['پ','چ','ژ','ش','ث'].includes(c)) return "💡 펜을 떼지 않고 몸통을 먼저 그린 후, 점 3개를 찍습니다(점 순서는 크게 중요치 않음).";
+        if (['ت','ق','ی'].includes(c)) return "💡 펜을 떼지 않고 몸통을 먼저 그린 후, 점 2개를 찍습니다(점 순서는 크게 중요치 않음).";
         if (['ب','ج','خ','ذ','ز','ض','ظ','غ','ف','ن'].includes(c)) return "💡 펜을 떼지 않고 몸통을 먼저 그린 후, 마지막에 점 1개를 찍습니다.";
         if (['ک','گ'].includes(c)) return "💡 펜을 떼지 않고 몸통을 먼저 그린 후, 상단의 사선(윗선)을 마지막에 긋습니다.";
         return "💡 오른쪽(또는 위쪽)에서 시작하여 부드럽게 긋습니다.";
