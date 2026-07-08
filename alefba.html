@@ -122,11 +122,24 @@
         .mega-text { font-family: var(--persian-font); font-size: 10rem; text-align: center; color: var(--primary); margin: 20px 0; direction: rtl; }
         .pos-text { font-family: var(--persian-font); font-size: 5rem; text-align: center; color: var(--primary); margin: 20px 0; direction: rtl; font-weight: bold; }
         
-        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        .mcq-btn { font-family: var(--persian-font); font-size: 2.5rem; padding: 20px; background: #fff; border: 3px solid #dee2e6; border-radius: 12px; cursor: pointer; transition: 0.1s; direction: rtl; font-weight: bold; color: var(--primary); }
-        .mcq-btn:hover { background: #e3f2fd; border-color: var(--primary); }
-        .mcq-btn.wrong { border-color: var(--accent); background: #fff5f5; color: var(--accent); animation: shake 0.4s; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+	.mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .mcq-btn { 
+            font-family: var(--persian-font); font-size: 2.5rem; padding: 20px; background: #fff; 
+            border: 3px solid #dee2e6; border-radius: 12px; cursor: pointer; transition: 0.1s; 
+            direction: rtl; font-weight: bold; color: var(--primary); 
+            /* 모바일 최적화 방어 코드 추가 */
+            -webkit-appearance: none; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; -webkit-user-select: none;
+        }
+        /* 모바일 터치 시 즉각적인 눌림 피드백 */
+        .mcq-btn:active { transform: scale(0.96); background: #e3f2fd; border-color: var(--primary); }
+        
+        /* PC 마우스 환경에서만 Hover 효과 적용 (모바일 좀비 효과 차단) */
+        @media (hover: hover) and (pointer: fine) {
+            .mcq-btn:hover { background: #e3f2fd; border-color: var(--primary); }
+        }
+        
+        .mcq-btn.wrong { border-color: var(--accent) !important; background: #fff5f5 !important; color: var(--accent) !important; animation: shake 0.4s; }
+	@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
