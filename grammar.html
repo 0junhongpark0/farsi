@@ -73,6 +73,7 @@
         }
         
         .mcq-btn.wrong { border-color: var(--accent) !important; background: #fff5f5 !important; color: var(--accent) !important; animation: shake 0.4s; }
+	.mcq-btn.correct { background: #e3f2fd !important; border-color: var(--primary) !important; transform: scale(0.96); transition: 0.1s; }
 	@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
         /* 결과 스크린 */
@@ -325,11 +326,17 @@
         });
     }
 
-    function checkMCQ(btnIdx) {
+function checkMCQ(btnIdx) {
         mcqClicks++; 
         let btn = document.querySelectorAll('.mcq-btn')[btnIdx];
+        
         if (btn.dataset.correct === 'true') {
-            nextMCQProb();
+            // [수정된 부분] 정답 클래스를 입히고 0.15초 뒤에 다음 문제로 넘어감
+            btn.classList.add('correct');
+            setTimeout(() => {
+                btn.classList.remove('correct');
+                nextMCQProb();
+            }, 150);
         } else {
             mcqPenaltySec += 5;
             let timerEl = document.getElementById('mcq-timer');
@@ -345,7 +352,6 @@
             }
         }
     }
-
 
     // ==========================================
     // 4. 문법 모드별 문제 생성 알고리즘 (중복 완벽 방어)

@@ -139,6 +139,7 @@
         }
         
         .mcq-btn.wrong { border-color: var(--accent) !important; background: #fff5f5 !important; color: var(--accent) !important; animation: shake 0.4s; }
+	.mcq-btn.correct { background: #e3f2fd !important; border-color: var(--primary) !important; transform: scale(0.96); transition: 0.1s; }
 	@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
         @media (max-width: 768px) {
@@ -985,10 +986,15 @@
         });
     }
 
-    function checkPos(idx) {
+function checkPos(idx) {
         let btn = document.querySelectorAll('#pos-options .mcq-btn')[idx];
         if (btn.dataset.correct === 'true') {
-            nextPos();
+            // [수정된 부분] 0.15초 딜레이
+            btn.classList.add('correct');
+            setTimeout(() => {
+                btn.classList.remove('correct');
+                nextPos();
+            }, 150);
         } else {
             gamePenalty += 5;
             let timerEl = document.getElementById('pos-timer');
@@ -1107,10 +1113,15 @@
         });
     }
 
-    function checkSurvival(idx) {
+function checkSurvival(idx) {
         let btn = document.querySelectorAll('#survival-options .mcq-btn')[idx];
         if (btn.dataset.correct === 'true') {
-            nextSurvival();
+            // [수정된 부분] 0.15초 딜레이
+            btn.classList.add('correct');
+            setTimeout(() => {
+                btn.classList.remove('correct');
+                nextSurvival();
+            }, 150);
         } else {
             gamePenalty += 5;
             let timerEl = document.getElementById('survival-timer');
