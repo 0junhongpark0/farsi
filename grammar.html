@@ -39,18 +39,37 @@
         .screen.active { display: block; }
         #screen-home.active { display: flex; flex-direction: column; padding: 30px; }
 
-        /* --- 홈(Lobby) 화면 --- */
-        .home-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 30px; width: 100%; }
-        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; }
+	/* --- 홈(Lobby) 화면 --- */
+        .home-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 30px; width: 100%; align-items: stretch; }
+        @media (max-width: 900px) { .home-grid { grid-template-columns: 1fr; } }
+        
+        /* 카드 높이 통일 및 내부 여백 자동 확장 CSS 개선 */
+        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: flex-start; height: 100%; }
         .mode-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(11, 42, 74, 0.1); }
         .mode-icon { font-size: 3.5rem; color: var(--primary); margin-bottom: 20px; }
         .mode-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: var(--primary); }
-        .mode-card p { font-size: 1.05rem; color: #666; word-break: keep-all; }
+        .mode-card p { font-size: 1.05rem; color: #666; word-break: keep-all; flex-grow: 1; } /* flex-grow:1 로 남는 공간 밀어내기 */
+
+        /* 로비 버튼 분리 디자인 */
+        .btn-group-2 { display: flex; gap: 10px; margin-top: 25px; width: 100%; }
+        .btn-rule { flex: 1; padding: 15px; font-size: 1.1rem; border-radius: 8px; border: 2px solid var(--primary); background: #fff; color: var(--primary); cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-rule:hover { background: #e3f2fd; }
+        .btn-start-half { flex: 1; padding: 15px; font-size: 1.1rem; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-start-half:hover { background: #081e36; }
+
+        /* 단일 버튼용 */
+        .btn-start { display: block; width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: auto; }
+        .btn-start:hover { background: #081e36; transform: translateY(-2px); }
+
+        /* 규칙 페이지 전용 CSS */
+        .rules-container { background: #fff; padding: 40px; border-radius: 12px; border: 2px solid #dee2e6; line-height: 1.8; color: #333; font-size: 1.15rem; }
+        .rules-container h3 { color: var(--primary); border-bottom: 2px dashed #e9ecef; padding-bottom: 15px; margin-bottom: 20px; font-size: 1.8rem; }
+        .rules-container ul { padding-left: 20px; margin-bottom: 20px; }
+        .rules-container li { margin-bottom: 10px; }
+        .rules-alert { color: var(--accent); font-weight: bold; margin-top: 15px; padding: 15px; background: #fff5f5; border-radius: 8px; border-left: 5px solid var(--accent); }
 
         /* 공통 게임 UI */
         .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; font-weight: bold; font-size: 1.5rem; padding-bottom: 20px; border-bottom: 2px solid #f1f3f5; position: relative; }
-        .btn-start { display: block; width: 100%; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: auto; }
-        .btn-start:hover { background: #081e36; transform: translateY(-2px); }
 
         /* 타임어택 MCQ */
         .mcq-problem-container { text-align: center; margin: 40px 0; }
@@ -61,13 +80,10 @@
             font-family: var(--persian-font); font-size: 2.5rem; padding: 20px; background: #fff; 
             border: 3px solid #dee2e6; border-radius: 12px; cursor: pointer; transition: 0.1s; 
             direction: rtl; font-weight: bold; color: var(--primary); 
-            /* 모바일 최적화 방어 코드 추가 */
             -webkit-appearance: none; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; -webkit-user-select: none;
         }
-        /* 모바일 터치 시 즉각적인 눌림 피드백 */
         .mcq-btn:active { transform: scale(0.96); background: #e3f2fd; border-color: var(--primary); }
         
-        /* PC 마우스 환경에서만 Hover 효과 적용 (모바일 좀비 효과 차단) */
         @media (hover: hover) and (pointer: fine) {
             .mcq-btn:hover { background: #e3f2fd; border-color: var(--primary); }
         }
@@ -108,7 +124,7 @@
 
 <div class="container" id="main-container">
     <div class="top-nav" id="top-nav">
-        <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
+        <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 메뉴로 돌아가기</button>
     </div>
 
     <header id="main-header">
@@ -116,40 +132,101 @@
         <p>단어를 넘어 문장의 규칙을 반사적으로 조립하세요</p>
     </header>
 
+    <!-- [로비 스크린] -->
     <div id="screen-home" class="screen active">
         <div class="home-grid">
-            <div class="mode-card" style="cursor: default;">
+            
+            <div class="mode-card">
                 <i class="fas fa-link mode-icon"></i>
-                <h3>주어-동사 연결</h3>
-                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
-                    🎯 <strong>목표:</strong> 주어에 따른 동사 꼬리 매칭<br>
-                    ⚠️ <strong>규칙:</strong> [현재/과거] 시제 20문항. 오답 +5초
+                <h3 class="card-title">에저페(Ezafe) 판독기</h3>
+                <p>두 단어 사이에 숨겨진 연결고리 '-e'를 찾아내는 훈련입니다.</p>
+                <div class="btn-group-2">
+                    <button class="btn-rule" onclick="openRule('ezafe')">📖 가이드 열기</button>
+                    <button class="btn-start-half" onclick="startModeDirectly('ezafe')">⚔️ 훈련 시작</button>
                 </div>
-                <button class="btn-start" onclick="currentMode='conjugator'; startMCQ()">훈련 시작</button>
             </div>
 
-            <div class="mode-card" style="cursor: default;">
-                <i class="fas fa-search mode-icon"></i>
-                <h3>에저페(e) 판독기</h3>
-                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
-                    🎯 <strong>목표:</strong> 명사 수식/소유 구조의 연결음 파악<br>
-                    ⚠️ <strong>규칙:</strong> 두 단어 사이 에저페 O/X 판단. 20문항
+            <div class="mode-card">
+                <i class="fas fa-puzzle-piece mode-icon"></i>
+                <h3 class="card-title">주어-동사 매칭</h3>
+                <p>인칭 대명사에 맞는 정확한 동사의 꼬리(어미)를 결합하는 훈련입니다.</p>
+                <div class="btn-group-2">
+                    <button class="btn-rule" onclick="openRule('verb')">📖 가이드 열기</button>
+                    <button class="btn-start-half" onclick="startModeDirectly('conjugator')">⚔️ 훈련 시작</button>
                 </div>
-                <button class="btn-start" onclick="currentMode='ezafe'; startMCQ()">훈련 시작</button>
             </div>
 
-            <div class="mode-card" style="cursor: default;">
-                <i class="fas fa-magnet mode-icon"></i>
-                <h3>소유격 압축</h3>
-                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
-                    🎯 <strong>목표:</strong> 대명사를 명사의 소유격 꼬리로 변환<br>
-                    ⚠️ <strong>규칙:</strong> (예: 책 + 너 = 너의 책). 20문항 타임어택
+            <div class="mode-card">
+                <i class="fas fa-compress-arrows-alt mode-icon"></i>
+                <h3 class="card-title">소유격 압축기</h3>
+                <p>독립 대명사를 명사 끝에 찰싹 붙여 접미 대명사로 압축하는 훈련입니다.</p>
+                <div class="btn-group-2">
+                    <button class="btn-rule" onclick="openRule('pronoun')">📖 가이드 열기</button>
+                    <button class="btn-start-half" onclick="startModeDirectly('possessive')">⚔️ 훈련 시작</button>
                 </div>
-                <button class="btn-start" onclick="currentMode='possessive'; startMCQ()">훈련 시작</button>
             </div>
+
         </div>
     </div>
 
+    <!-- [문법 규칙 전용 스크린 (가상 페이지 전환 효과)] -->
+    <div id="screen-rules" class="screen">
+        <div class="rules-container" id="rule-content-ezafe" style="display:none;">
+            <h3>[핵심 공식: 에저페(ِ -e)가 필요한 순간]</h3>
+            <p>단어와 단어 사이에 숨겨진 연결고리 '-e' 유무를 판별하세요.</p>
+            <br>
+            <b>⭕ [에저페가 무조건 들어가는 경우]</b>
+            <ul>
+                <li><b>명사 + 명사 (소유/소속):</b> کتابِ من (나의 책), درِ کلاس (교실 문)</li>
+                <li><b>명사 + 형용사 (수식):</b> دخترِ زیبا (예쁜 소녀)</li>
+            </ul>
+            <b>❌ [에저페를 절대 넣으면 안 되는 경우]</b>
+            <ul>
+                <li><b>주어 + 동사:</b> من رفتم (나는 갔다)</li>
+                <li><b>명사 + 목적격 조사(را):</b> کتاب را (책을)</li>
+                <li><b>지시 대명사 + 명사:</b> این ماشین (이 자동차)</li>
+            </ul>
+            <div class="rules-alert">💡 발음 주의: 모음(ا, و, ه, ی)으로 끝나는 단어는 충돌을 막기 위해 '-e' 대신 '-ye(ی)'가 붙습니다. (예: دانشجویِ خوب)</div>
+            <button class="btn-start" onclick="startModeDirectly('ezafe')" style="margin-top: 30px;">⚔️ 숙지 완료! 에저페 훈련 시작</button>
+        </div>
+
+        <div class="rules-container" id="rule-content-verb" style="display:none;">
+            <h3>[핵심 공식: 인칭과 동사 꼬리의 결합]</h3>
+            <p>동사는 주어와 시제에 따라 꼬리(어미)가 다르게 변형됩니다.</p>
+            <br>
+            <ul>
+                <li><b>1인칭 단수 (من) :</b> <b>م- (-am)</b> ➔ (예) می‌روم / رفتم</li>
+                <li><b>2인칭 단수 (تو) :</b> <b>ی- (-i)</b> ➔ (예) می‌روی / رفتی</li>
+                <li><b>1인칭 복수 (ما) :</b> <b>یم- (-im)</b> ➔ (예) می‌رویم / رفتیم</li>
+                <li><b>2인칭 복수 (شما) :</b> <b>ید- (-id)</b> ➔ (예) می‌روید / رفتید</li>
+                <li><b>3인칭 복수 (آنها/ایشان) :</b> <b>ند- (-and)</b> ➔ (예) می‌روند / رفتند</li>
+            </ul>
+            <div class="rules-alert">
+                🚨 3인칭 단수(او / آن) 주의보!<br>
+                - [현재 시제] : <b>د- (-ad)</b>가 붙습니다. ➔ (예) می‌رو<b>د</b><br>
+                - [과거 시제] : 꼬리가 <b>완전히 사라집니다!</b> ➔ (예) رفت (<s>رفتد</s> 아님)
+            </div>
+            <button class="btn-start" onclick="startModeDirectly('conjugator')" style="margin-top: 30px;">⚔️ 숙지 완료! 주어-동사 훈련 시작</button>
+        </div>
+
+        <div class="rules-container" id="rule-content-pronoun" style="display:none;">
+            <h3>[핵심 공식: 대명사를 단어 끝에 압축하기]</h3>
+            <p>독립 대명사(من, تو, او...) 대신 명사 끝에 붙여 쓰는 접미 대명사입니다.</p>
+            <br>
+            <ul>
+                <li><b>1인칭 단수 (من) :</b> <b>ـَم- (-am)</b> ➔ (예) کتاب<b>م</b> (나의 책)</li>
+                <li><b>2인칭 단수 (تو) :</b> <b>ـَت- (-at)</b> ➔ (예) کتاب<b>ت</b> (너의 책)</li>
+                <li><b>3인칭 단수 (او) :</b> <b>ـَش- (-ash)</b> ➔ (예) کتاب<b>ش</b> (그의 책)</li>
+                <li><b>1인칭 복수 (ما) :</b> <b>ـِمان- (-emān)</b> ➔ (예) کتاب<b>مان</b> (우리의 책)</li>
+                <li><b>2인칭 복수 (شما) :</b> <b>ـِتان- (-etān)</b> ➔ (예) کتاب<b>تان</b> (너희의 책)</li>
+                <li><b>3인칭 복수 (آنها) :</b> <b>ـِشان- (-eshān)</b> ➔ (예) کتاب<b>شان</b> (그들의 책)</li>
+            </ul>
+            <div class="rules-alert">🚨 철자 주의: 단어가 '묵음 하(ه)'로 끝날 경우, 글자가 뭉개지는 것을 막기 위해 '알레프(ا)'를 살려 적습니다. (예: خانه ➔ خانه‌ام / xāne-am)</div>
+            <button class="btn-start" onclick="startModeDirectly('possessive')" style="margin-top: 30px;">⚔️ 숙지 완료! 소유격 훈련 시작</button>
+        </div>
+    </div>
+
+    <!-- [게임 스크린] -->
     <div id="screen-mcq" class="screen">
         <div class="game-header">
             <div>진행도: <span id="mcq-progress">1 / 20</span></div>
@@ -167,6 +244,7 @@
         </div>
     </div>
 
+    <!-- [결과 스크린] -->
     <div id="screen-result" class="screen">
         <div id="certificate">
             <div class="cert-title">페르시아어 문법 검정 인증서</div>
@@ -187,6 +265,41 @@
 </div>
 
 <script>
+    // ==========================================
+    // 0. 화면 통제 함수 (가상 페이지 전환 효과)
+    // ==========================================
+    function goHome() {
+        if(timerInterval) clearInterval(timerInterval);
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-home').classList.add('active');
+        document.getElementById('top-nav').style.display = 'none';
+        document.getElementById('main-header').style.display = 'block';
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('top-nav').style.display = 'block';
+        document.getElementById('main-header').style.display = 'none';
+    }
+
+    // [신규] '가이드 열기' 버튼을 눌렀을 때 작동하는 함수
+    function openRule(ruleType) {
+        showScreen('screen-rules');
+        document.getElementById('rule-content-ezafe').style.display = 'none';
+        document.getElementById('rule-content-verb').style.display = 'none';
+        document.getElementById('rule-content-pronoun').style.display = 'none';
+        
+        document.getElementById('rule-content-' + ruleType).style.display = 'block';
+    }
+
+    // [수정] 훈련 시작을 직접 눌렀을 때 작동
+    function startModeDirectly(modeName) {
+        currentMode = modeName;
+        startMCQ();
+    }
+
+
     // ==========================================
     // 1. 하드코딩 문법 데이터셋 구축
     // ==========================================
@@ -243,29 +356,14 @@
     const possNouns = ['کتاب', 'ماشین', 'دست', 'دوست', 'پدر', 'مادر', 'برادر', 'شهر', 'کار', 'کیف', 'چشم', 'مداد'];
 
     // ==========================================
-    // 2. 전역 상태 및 화면 통제 로직
+    // 2. 전역 상태 변수
     // ==========================================
     let currentMode = ''; 
     let startTime = 0, timerInterval = null;
     let mcqStep = 0, mcqTotal = 20, mcqMistakes = [];
     let mcqPenaltySec = 0, mcqClicks = 0;
     let currentAns = '';
-    let askedQuestions = []; // ★ 중복 방지용 출제 기록 배열
-
-    function goHome() {
-        clearInterval(timerInterval);
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('screen-home').classList.add('active');
-        document.getElementById('top-nav').style.display = 'none';
-        document.getElementById('main-header').style.display = 'block';
-    }
-
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        document.getElementById('top-nav').style.display = 'block';
-        document.getElementById('main-header').style.display = 'none';
-    }
+    let askedQuestions = [];
 
     function getFormattedDate() {
         const now = new Date();
@@ -277,13 +375,12 @@
         return `${y}.${m}.${d} ${h}:${min}`;
     }
 
-
     // ==========================================
     // 3. 타임어택 (MCQ) 메인 루프
     // ==========================================
     function startMCQ() {
         mcqStep = 0; mcqMistakes = []; mcqPenaltySec = 0; mcqClicks = 0; 
-        askedQuestions = []; // ★ 매 게임 시작 시 기록 100% 리셋
+        askedQuestions = []; 
         
         let btn3 = document.getElementById('btn-opt-3');
         let btn4 = document.getElementById('btn-opt-4');
@@ -326,12 +423,11 @@
         });
     }
 
-function checkMCQ(btnIdx) {
+    function checkMCQ(btnIdx) {
         mcqClicks++; 
         let btn = document.querySelectorAll('.mcq-btn')[btnIdx];
         
         if (btn.dataset.correct === 'true') {
-            // [수정된 부분] 정답 클래스를 입히고 0.15초 뒤에 다음 문제로 넘어감
             btn.classList.add('correct');
             setTimeout(() => {
                 btn.classList.remove('correct');
@@ -354,7 +450,7 @@ function checkMCQ(btnIdx) {
     }
 
     // ==========================================
-    // 4. 문법 모드별 문제 생성 알고리즘 (중복 완벽 방어)
+    // 4. 문법 모드별 문제 생성 알고리즘
     // ==========================================
     function generateMCQData() {
         let resultData = null;
@@ -368,7 +464,6 @@ function checkMCQ(btnIdx) {
                 
                 let correctOpt = '';
                 if (tense === 'present') {
-                    // بودن 처럼 3인칭 단수 형태가 아예 다른 경우 방어
                     if (subj.p === '3s' && verb.pres3s) {
                         correctOpt = verb.pres3s;
                     } else {
@@ -376,7 +471,6 @@ function checkMCQ(btnIdx) {
                         correctOpt = prefix + verb.pres + suffixes[subj.p];
                     }
                 } else {
-                    // 과거형 3인칭 단수 꼬리 증발 방어
                     if (subj.p === '3s') correctOpt = verb.past;
                     else correctOpt = verb.past + suffixes[subj.p];
                 }
@@ -446,16 +540,14 @@ function checkMCQ(btnIdx) {
                 };
             }
             
-            // ★ 중복 출제 방지 로직 
-            // 만들어진 문제+힌트 텍스트를 고유 키로 활용하여 이전에 나왔는지 검사
             let uniqueKey = resultData.qText + "|" + resultData.hintText;
             if (!askedQuestions.includes(uniqueKey)) {
                 askedQuestions.push(uniqueKey);
-                break; // 새 문제면 루프 탈출
+                break; 
             }
             
             attempts++;
-        } while (attempts < 100); // 무한 루프 방어용 안전장치
+        } while (attempts < 100); 
 
         return resultData;
     }
