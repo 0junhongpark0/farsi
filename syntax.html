@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>페르시아어 문장조립 훈련소</title>
+    
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0b2a4a;
+            --primary-hover: #1a3b5c;
+            --accent: #fa5252;
+            --accent-hover: #e03131;
+            --success: #087f5b;
+            --success-bg: #e6fcf5;
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --border: #dee2e6;
+            --text-main: #333333;
+            --text-muted: #868e96;
+            --persian-font: 'Vazirmatn', 'Sahel', 'Noto Sans Arabic', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Noto Sans KR', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; 
+            min-height: 100vh;
+            padding: 40px 20px; 
+        }
+
+        @keyframes damageFlash {
+            0% { box-shadow: inset 0 0 0px 0px rgba(250, 82, 82, 0); }
+            50% { box-shadow: inset 0 0 80px 15px rgba(250, 82, 82, 0.4); }
+            100% { box-shadow: inset 0 0 0px 0px rgba(250, 82, 82, 0); }
+        }
+        .damage-effect { animation: damageFlash 0.5s ease-out; }
+
+        .container { 
+            width: 100%; max-width: 1000px; min-height: 700px; 
+            background: var(--card); border-radius: 16px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15); 
+            position: relative; display: flex; flex-direction: column; 
+            margin: 0 auto; 
+        }
+
+        .top-nav { display: none; background: #f8f9fa; padding: 15px 30px; border-bottom: 2px solid #e9ecef; justify-content: space-between; align-items: center; }
+        .btn-home { background: #ffffff; border: 2px solid #dee2e6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--primary); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;}
+        .btn-home:hover { background: #e9ecef; border-color: #adb5bd; }
+
+        /* 음성 토글 버튼 */
+        .btn-mute { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--accent); transition: 0.2s; margin: 0; }
+        .btn-mute:hover { opacity: 0.8; }
+
+        header { background: var(--primary); color: white; padding: 25px; text-align: center; border-radius: 16px 16px 0 0; }
+	header h2 { font-size: 2.2rem; margin: 0; cursor: default; user-select: none; }
+        header p { margin-top: 10px; opacity: 0.8; font-size: 1.1rem; }
+
+        .screen { display: none; padding: 25px 40px; flex-grow: 1; }
+        .screen.active { display: block; }
+
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px; width: 100%; }
+        @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } }
+        
+        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 25px 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .mode-icon { font-size: 3.5rem; color: var(--primary); margin-bottom: 15px; }
+        .mode-card h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--primary); }
+        .mode-card p { font-size: 0.95rem; color: #555; word-break: keep-all; line-height: 1.5; margin-bottom: 20px; }
+
+        .btn-group { display: flex; gap: 10px; margin-top: auto; }
+        .btn-start { flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-start:hover { background: #081e36; transform: translateY(-2px); }
+        .btn-extreme { flex: 1; padding: 12px; background: #8b0000; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-extreme:hover { background: #5a0000; transform: translateY(-2px); }
+
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; font-size: 1.2rem; padding-bottom: 10px; border-bottom: 2px solid #f1f3f5; }
+        
+        .progress-wrapper { width: 100%; background: #e9ecef; border-radius: 10px; height: 10px; margin-bottom: 15px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+
+        .question-box { position: relative; background: #e7f5ff; padding: 15px 20px; border-radius: 10px; border-left: 5px solid #339af0; margin-bottom: 15px; }
+        .question-label { font-size: 0.95rem; font-weight: bold; color: #1864ab; margin-bottom: 10px; }
+        
+        .ko-text { font-family: 'Noto Sans KR', sans-serif; font-size: 1.8rem; font-weight: bold; color: var(--primary); direction: ltr; text-align: left; }
+        .fa-text { font-family: var(--persian-font); font-size: 2.5rem; font-weight: bold; color: var(--primary); direction: rtl; text-align: right; line-height: 1.4; display: flex; align-items: center; justify-content: flex-end; gap: 15px; }
+
+        /* 전체 문장 재생 버튼 */
+        .btn-play-sentence {
+            background: #ffffff; border: 2px solid #339af0; color: #1864ab; border-radius: 50%;
+            width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; cursor: pointer; transition: 0.2s; flex-shrink: 0;
+        }
+        .btn-play-sentence:hover { background: #339af0; color: white; transform: scale(1.08); }
+
+        .answer-zone { 
+            display: flex; flex-wrap: wrap; gap: 12px; min-height: 80px; 
+            background: #f8f9fa; border: 2px dashed #ced4da; border-radius: 12px;
+            padding: 15px; margin-bottom: 15px; align-content: flex-start; transition: 0.2s;
+        }
+        .answer-zone.active { border-color: var(--primary); background: #ffffff; }
+
+        .word-bank { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; min-height: 100px; margin-bottom: 15px; }
+
+        .ko-zone { direction: ltr; }
+        .ko-zone .word-tile { font-family: 'Noto Sans KR', sans-serif; font-size: 1.2rem; padding: 12px 18px; }
+        
+        .fa-zone { direction: rtl; }
+        .fa-zone .word-tile { font-family: var(--persian-font); font-size: 1.8rem; padding: 14px 20px 2px 20px; }
+
+        .word-tile {
+            background: #ffffff; color: var(--primary); font-weight: bold;
+            border: 2px solid var(--border); border-radius: 10px; cursor: pointer;
+            box-shadow: 0 4px 0 var(--border); transition: 0.1s;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+            display: inline-block; line-height: 1.2;
+        }
+        .word-tile:active { transform: translateY(4px); box-shadow: 0 0 0 var(--border); }
+        @media (hover: hover) and (pointer: fine) { 
+            .word-tile:hover { background: #e3f2fd; border-color: #90caf9; color: var(--primary); box-shadow: 0 4px 0 #90caf9; } 
+        }
+        .word-tile.disabled { background: #f1f3f5; border-color: #e9ecef; color: #adb5bd; box-shadow: none; pointer-events: none; transform: translateY(4px); }
+
+        .control-panel { border-top: 2px solid var(--border); padding-top: 15px; display: flex; flex-direction: column; position: relative; z-index: 10; }
+        
+        .btn-submit { 
+            width: 100%; padding: 18px; font-size: 1.3rem; font-weight: bold; 
+            border-radius: 10px; border: none; transition: 0.2s;
+            background: #e9ecef; color: #adb5bd; cursor: not-allowed; 
+        }
+        .btn-submit.ready { background: var(--primary); color: white; cursor: pointer; }
+        .btn-submit.ready:hover { background: var(--primary-hover); }
+        .btn-submit.next-success { background: var(--success); color: white; cursor: pointer; }
+        .btn-submit.next-success:hover { background: #099268; }
+        .btn-submit.next-error { background: var(--accent); color: white; cursor: pointer; }
+        .btn-submit.next-error:hover { background: var(--accent-hover); }
+
+        .feedback-box { 
+            display: none; padding: 20px; border-radius: 10px; text-align: center; font-weight: bold; 
+            animation: slideDown 0.3s ease forwards; margin-top: 15px; z-index: 1;
+        }
+        .feedback-box.success { background: var(--success-bg); border: 1px solid #63e6be; color: var(--success); }
+        .feedback-box.error { background: #fff5f5; border: 1px solid #ffc9c9; color: var(--accent); }
+        .feedback-title { font-size: 1.3rem; margin-bottom: 5px; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        .shake { animation: shake 0.4s; }
+
+        .dashboard-box { background: #fff; padding: 40px; border: 4px solid var(--primary); border-radius: 16px; text-align: center; margin-bottom: 30px; }
+        .dashboard-box.extreme-mode { border-color: #8b0000; }
+        
+        .dash-title { font-size: 1.8rem; color: var(--primary); margin-bottom: 20px; font-weight: bold; border-bottom: 2px dashed #ccc; padding-bottom: 15px; }
+        .extreme-mode .dash-title { color: #8b0000; border-bottom-color: #eebfbf; }
+        
+        .dash-rank { font-size: 5rem; font-weight: bold; color: var(--accent); margin: 10px 0; text-shadow: 2px 2px 0px #ffe3e3; }
+        .extreme-mode .dash-rank { color: #8b0000; text-shadow: 2px 2px 0px #ffd0d0; }
+        
+        .dash-stats { display: flex; justify-content: center; gap: 40px; margin: 25px 0; padding: 25px; background: #f8f9fa; border-radius: 12px; border: 1px solid var(--border); flex-wrap: wrap; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .stat-label { font-size: 1.05rem; color: #868e96; font-weight: bold; }
+        .stat-value { font-size: 1.6rem; color: var(--primary); font-weight: bold; }
+        .stat-value.error-txt { color: var(--accent); }
+
+        .dash-msg { font-size: 1.3rem; color: #555; font-weight: bold; margin-bottom: 10px; }
+        
+        .mistake-area { text-align: left; background: #f8f9fa; padding: 25px; border-radius: 12px; max-height: 350px; overflow-y: auto; border: 1px solid #dee2e6; margin-bottom: 20px; }
+        .mistake-item { border-bottom: 1px dashed #ccc; padding: 15px 0; font-size: 1.2rem; color: var(--accent); }
+        .mistake-item:last-child { border-bottom: none; }
+        .mistake-item span { color: #0b2a4a; margin-right: 15px; display: inline-block; font-family: var(--persian-font); font-weight: bold; font-size: 1.6rem; }
+
+        .btn-share { width: 100%; padding: 18px; background: #20c997; color: white; border: none; border-radius: 8px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-share:hover { background: #12b886; }
+
+        .portal-home-button { position: fixed; top: auto !important; left: 25px !important; bottom: 25px; right: auto !important; width: 55px; height: 55px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; transition: all 0.3s ease; }
+        .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+
+        .mode-badge { display: inline-block; padding: 3px 10px; border-radius: 5px; font-size: 1rem; font-weight: bold; vertical-align: middle; margin-left: 10px;}
+        .badge-normal { background: #e3f2fd; color: #0b2a4a; }
+        .badge-extreme { background: #ffe3e3; color: #8b0000; }
+
+        .btn-locked { pointer-events: none !important; background: #f8f9fa !important; color: #adb5bd !important; border-color: #dee2e6 !important; }
+        .lock-timer { font-size: 1.1rem; color: var(--accent); font-weight: bold; margin-left: 15px; transition: 0.3s; }
+
+        /* 히든 테스트 사운드 보드 모달 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; }
+        .test-board-box { background: white; padding: 30px; border-radius: 16px; width: 90%; max-width: 900px; max-height: 85vh; overflow-y: auto; text-align: center; }
+        .test-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px; }
+        .test-tile { background: #f1f3f5; border: 1px solid #ced4da; padding: 8px 12px; border-radius: 6px; font-family: var(--persian-font); font-size: 1.2rem; cursor: pointer; transition: 0.15s; }
+        .test-tile:hover { background: var(--primary); color: white; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            header h2 { font-size: 1.8rem; }
+            .screen { padding: 20px; }
+            .btn-submit { padding: 15px; font-size: 1.1rem; }
+            .dash-stats { gap: 20px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="index.html" class="portal-home-button" title="메인 페이지로 돌아가기"><i class="fas fa-home"></i></a>
+
+<div class="container" id="main-container">
+    <div class="top-nav" id="top-nav">
+        <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
+        <button class="btn-mute" id="muteBtn" onclick="toggleMute()" title="소리 켜기/끄기"><i class="fas fa-volume-mute"></i></button>
+    </div>
+
+    <header id="main-header">
+        <h2 id="main-title" onclick="handleTitleClick()">페르시아어 문장조립 훈련소</h2>
+        <p>어순을 직접 조립하며 문법의 뼈대를 체화하세요</p>
+    </header>
+
+    <div id="screen-home" class="screen active">
+        <div class="home-grid">
+            <div class="mode-card">
+                <i class="fas fa-cubes mode-icon"></i>
+                <h3>Level 1</h3>
+                <p>기초 명사와 형용사를 활용한 '~은/는 ~이다' (be동사) 구조 훈련</p>
+                <div class="btn-group">
+                    <button class="btn-start" onclick="startLevel(1, 'normal')">일반</button>
+                    <button class="btn-extreme" onclick="startLevel(1, 'repeat')">반복</button>
+                </div>
+            </div>
+            
+            <div class="mode-card">
+                <i class="fas fa-link mode-icon"></i>
+                <h3>Level 2</h3>
+                <p>소유격과 명사 수식(에저페)을 활용한 관계 및 물건 묘사 훈련</p>
+                <div class="btn-group">
+                    <button class="btn-start" onclick="startLevel(2, 'normal')">일반</button>
+                    <button class="btn-extreme" onclick="startLevel(2, 'repeat')">반복</button>
+                </div>
+            </div>
+            
+            <div class="mode-card">
+                <i class="fas fa-route mode-icon"></i>
+                <h3>Level 3</h3>
+                <p>기초 자동사와 필수 전치사(به, از, در)를 활용한 동선 표현 훈련</p>
+                <div class="btn-group">
+                    <button class="btn-start" onclick="startLevel(3, 'normal')">일반</button>
+                    <button class="btn-extreme" onclick="startLevel(3, 'repeat')">반복</button>
+                </div>
+            </div>
+
+            <div class="mode-card">
+                <i class="fas fa-bullseye mode-icon"></i>
+                <h3>Level 4</h3>
+                <p>필수 타동사와 목적격 조사(را)의 위치 감각 및 구조 체화 훈련</p>
+                <div class="btn-group">
+                    <button class="btn-start" onclick="startLevel(4, 'normal')">일반</button>
+                    <button class="btn-extreme" onclick="startLevel(4, 'repeat')">반복</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 플레이 스크린 -->
+    <div id="screen-game" class="screen">
+        <div class="game-header">
+            <div>진행도: <span id="current-step">1</span> / <span id="total-step">20</span></div>
+            <div>타이머: <span id="game-timer" style="color:var(--primary); transition: 0.3s;">00:00</span></div>
+        </div>
+
+        <div class="progress-wrapper">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="question-box">
+            <div class="question-label" id="question-label">다음 문장을 조립하세요.</div>
+            <div id="question-text"></div>
+        </div>
+        
+        <div class="answer-zone" id="answer-zone"></div>
+        <div class="word-bank" id="word-bank"></div>
+
+        <div class="control-panel" id="control-panel">
+            <button class="btn-submit" id="btn-submit" onclick="handleCheck()">정답 확인</button>
+            <div class="feedback-box" id="feedback-box">
+                <div class="feedback-title" id="feedback-title">정답입니다!</div>
+                <div id="feedback-correct-answer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 결과창 스크린 -->
+    <div id="screen-result" class="screen">
+        <div class="dashboard-box" id="dashboard-box">
+            <div class="dash-title">훈련 분석 리포트 <span id="res-badge" class="mode-badge"></span></div>
+            <div id="res-mode" style="font-size:1.4rem; font-weight:bold; color:#666; margin-top: 10px;"></div>
+            <div class="dash-rank" id="res-rank">A+</div>
+            <div class="dash-msg" id="res-msg">메시지</div>
+            
+            <div class="dash-stats">
+                <div class="stat-item">
+                    <span class="stat-label">최종 소요 시간</span>
+                    <span class="stat-value" id="res-time">00:00</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">1차 시도 정답률</span>
+                    <span class="stat-value" id="res-acc">100%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">누적 오답 횟수</span>
+                    <span class="stat-value error-txt" id="res-wrong">0회</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="mistake-area" class="mistake-area" style="display:none;">
+            <h4 style="margin-bottom: 15px; font-size:1.4rem; color:var(--primary);"><i class="fas fa-book-open"></i> 오답 노트 (다시 복습해 보세요)</h4>
+            <div id="mistake-list"></div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 10px; width: 100%;">
+            <button class="btn-submit ready" id="btn-return-lobby" onclick="goHome()" style="flex: 1; margin-bottom: 0;">로비로 돌아가기</button>
+            <button class="btn-submit ready" id="btn-retry-level" onclick="restartCurrentLevel()" style="flex: 1; margin-bottom: 0; background: var(--success);">다시하기 <i class="fas fa-redo"></i></button>
+        </div>
+        <button class="btn-share" onclick="copyResultImage()"><i class="fas fa-camera"></i> 리포트 캡처하기 (클립보드)</button>
+    </div>
+</div>
+
+<!-- 개발자용 히든 사운드 보드 모달 -->
+<div id="hiddenAudioModal" class="modal-overlay">
+    <div class="test-board-box">
+        <h3 style="color:var(--primary); margin-bottom: 10px;">🔊 전체 음성 검수 보드</h3>
+        <p style="color:#666; font-size:0.95rem; margin-bottom: 15px;">클릭 시 재생(0.85 배속)</p>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold; margin-right: 15px; cursor: pointer;">
+                <input type="radio" name="testGender" value="m" checked onchange="testGender = 'm'"> 👨 남성 성우 (_m)
+            </label>
+            <label style="font-weight: bold; cursor: pointer;">
+                <input type="radio" name="testGender" value="f" onchange="testGender = 'f'"> 👩 여성 성우 (_f)
+            </label>
+        </div>
+
+        <button onclick="closeTestBoard()" style="padding:6px 15px; background:var(--accent); color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold; margin-bottom:15px;">검수창 닫기</button>
+
+        <div class="test-grid" id="test-board-grid"></div>
+    </div>
+</div>
+
+<script>
+    // [문장 및 단어코드]
+    const rawDataL1 = [
+        { ko: ["이", "공항은", "붐빕니다."], fa: ["این", "فرودگاه", "شلوغ", "است"], k_full: "이 공항은 붐빕니다.", f_full: "این فرودگاه شلوغ است" },
+        { ko: ["부엌은", "어둡습니다."], fa: ["آشپزخانه", "تاریک", "است"], k_full: "부엌은 어둡습니다.", f_full: "آشپزخانه تاریک است" },
+        { ko: ["그", "바다는", "가깝습니다."], fa: ["آن", "دریا", "نزدیک", "است"], k_full: "그 바다는 가깝습니다.", f_full: "آن دریا نزدیک است" },
+        { ko: ["이", "상자는", "무겁습니다."], fa: ["این", "جعبه", "سنگین", "است"], k_full: "이 상자는 무겁습니다.", f_full: "این جعبه سنگین است" },
+        { ko: ["저", "산은", "멉니다."], fa: ["آن", "کوه", "دور", "است"], k_full: "저 산은 멉니다.", f_full: "آن کوه دور است" },
+        { ko: ["나는", "졸립니다."], fa: ["من", "خواب آلود", "هستم"], k_full: "나는 졸립니다.", f_full: "من خواب آلود هستم" },
+        { ko: ["욕실은", "더럽습니다."], fa: ["حمام", "کثیف", "است"], k_full: "욕실은 더럽습니다.", f_full: "حمام کثیف است" },
+        { ko: ["너는", "뚱뚱합니다."], fa: ["تو", "چاق", "هستی"], k_full: "너는 뚱뚱합니다.", f_full: "تو چاق هستی" },
+        { ko: ["이", "카펫은", "멋집니다."], fa: ["این", "فرش", "شیک", "است"], k_full: "이 카펫은 멋집니다.", f_full: "این فرش شیک است" },
+        { ko: ["저", "개는", "귀엽습니다."], fa: ["آن", "سگ", "بانمک", "است"], k_full: "저 개는 귀엽습니다.", f_full: "آن سگ بانمک است" },
+        { ko: ["침실은", "조용합니다."], fa: ["اتاق خواب", "ساکت", "است"], k_full: "침실은 조용합니다.", f_full: "اتاق خواب ساکت است" },
+        { ko: ["바람은", "차갑습니다."], fa: ["باد", "سرد", "است"], k_full: "바람은 차갑습니다.", f_full: "باد سرد است" },
+        { ko: ["이", "노트북은", "오래되었습니다."], fa: ["این", "لپ تاپ", "قدیمی", "است"], k_full: "이 노트북은 오래되었습니다.", f_full: "این لپ تاپ قدیمی است" },
+        { ko: ["그", "환자는", "예민합니다."], fa: ["آن", "بیمار", "حساس", "است"], k_full: "그 환자는 예민합니다.", f_full: "آن بیمار حساس است" },
+        { ko: ["우리는", "피곤합니다."], fa: ["ما", "خسته", "هستیم"], k_full: "우리는 피곤합니다.", f_full: "ما خسته هستیم" },
+        { ko: ["이", "공항은", "큽니다."], fa: ["این", "فرودگاه", "بزرگ", "است"], k_full: "이 공항은 큽니다.", f_full: "این فرودگاه بزرگ است" },
+        { ko: ["저", "공항은", "멉니다."], fa: ["آن", "فرودگاه", "دور", "است"], k_full: "저 공항은 멉니다.", f_full: "آن فرودگاه دور است" },
+        { ko: ["이", "부엌은", "더럽습니다."], fa: ["این", "آشپزخانه", "کثیف", "است"], k_full: "이 부엌은 더럽습니다.", f_full: "این آشپزخانه کثیف است" },
+        { ko: ["저", "부엌은", "큽니다."], fa: ["آن", "آشپزخانه", "بزرگ", "است"], k_full: "저 부엌은 큽니다.", f_full: "آن آشپزخانه بزرگ است" },
+        { ko: ["이", "바다는", "멉니다."], fa: ["این", "دریا", "دور", "است"], k_full: "이 바다는 멉니다.", f_full: "این دریا دور است" },
+        { ko: ["저", "상자는", "오래되었습니다."], fa: ["آن", "جعبه", "قدیمی", "است"], k_full: "저 상자는 오래되었습니다.", f_full: "آن جعبه قدیمی است" },
+        { ko: ["저", "산은", "가깝습니다."], fa: ["آن", "کوه", "نزدیک", "است"], k_full: "저 산은 가깝습니다.", f_full: "آن کوه نزدیک است" },
+        { ko: ["이", "욕실은", "어둡습니다."], fa: ["این", "حمام", "تاریک", "است"], k_full: "이 욕실은 어둡습니다.", f_full: "این حمام تاریک است" },
+        { ko: ["저", "욕실은", "더럽습니다."], fa: ["آن", "حمام", "کثیف", "است"], k_full: "저 욕실은 더럽습니다.", f_full: "آن حمام کثیف است" },
+        { ko: ["이", "침실은", "큽니다."], fa: ["این", "اتاق خواب", "بزرگ", "است"], k_full: "이 침실은 큽니다.", f_full: "این اتاق خواب بزرگ است" },
+        { ko: ["저", "침실은", "어둡습니다."], fa: ["آن", "اتاق خواب", "تاریک", "است"], k_full: "저 침실은 어둡습니다.", f_full: "آن اتاق خواب تاریک است" },
+        { ko: ["이", "노트북은", "무겁습니다."], fa: ["این", "لپ تاپ", "سنگین", "است"], k_full: "이 노트북은 무겁습니다.", f_full: "این لپ تاپ سنگین است" },
+        { ko: ["이", "환자는", "피곤합니다."], fa: ["این", "بیمار", "خسته", "است"], k_full: "이 환자는 피곤합니다.", f_full: "این بیمار خسته است" },
+        { ko: ["저", "집은", "큽니다."], fa: ["آن", "خانه", "بزرگ", "است"], k_full: "저 집은 큽니다.", f_full: "آن خانه بزرگ است" },
+        { ko: ["이", "집은", "오래되었습니다."], fa: ["این", "خانه", "قدیمی", "است"], k_full: "이 집은 오래되었습니다.", f_full: "این خانه قدیمی است" },
+        { ko: ["이", "개는", "뚱뚱합니다."], fa: ["این", "سگ", "چاق", "است"], k_full: "이 개는 뚱뚱합니다.", f_full: "این سگ چاق است" },
+        { ko: ["저", "개는", "까맣습니다."], fa: ["آن", "سگ", "سیاه", "است"], k_full: "저 개는 까맣습니다.", f_full: "آن سگ سیاه است" },
+        { ko: ["이", "개는", "하얗습니다."], fa: ["این", "سگ", "سفید", "است"], k_full: "이 개는 하얗습니다.", f_full: "این سگ سفید است" },
+        { ko: ["저", "카펫은", "큽니다."], fa: ["آن", "فرش", "بزرگ", "است"], k_full: "저 카펫은 큽니다.", f_full: "آن فرش بزرگ است" },
+        { ko: ["이", "카펫은", "오래되었습니다."], fa: ["این", "فرش", "قدیمی", "است"], k_full: "이 카펫은 오래되었습니다.", f_full: "این فرش قدیمی است" },
+        { ko: ["저", "잡지는", "오래되었습니다."], fa: ["آن", "مجله", "قدیمی", "است"], k_full: "저 잡지는 오래되었습니다.", f_full: "آن مجله قدیمی است" },
+        { ko: ["이", "잡지는", "더럽습니다."], fa: ["این", "مجله", "کثیف", "است"], k_full: "이 잡지는 더럽습니다.", f_full: "این مجله کثیف است" },
+        { ko: ["저", "곰은", "뚱뚱합니다."], fa: ["آن", "خرس", "چاق", "است"], k_full: "저 곰은 뚱뚱합니다.", f_full: "آن خرس چاق است" },
+        { ko: ["이", "곰은", "귀엽습니다."], fa: ["این", "خرس", "بانمک", "است"], k_full: "이 곰은 귀엽습니다.", f_full: "این خرس بانمک است" },
+        { ko: ["저", "곰은", "큽니다."], fa: ["آن", "خرس", "بزرگ", "است"], k_full: "저 곰은 큽니다.", f_full: "آن خرس بزرگ است" },
+        { ko: ["이", "사과는", "초록색입니다."], fa: ["این", "سیب", "سبز", "است"], k_full: "이 사과는 초록색입니다.", f_full: "این سیب سبز است" },
+        { ko: ["저", "사과는", "큽니다."], fa: ["آن", "سیب", "بزرگ", "است"], k_full: "저 사과는 큽니다.", f_full: "آن سیب بزرگ است" },
+        { ko: ["이", "지갑은", "무겁습니다."], fa: ["این", "کیف پول", "سنگین", "است"], k_full: "이 지갑은 무겁습니다.", f_full: "این کیف پول سنگین است" },
+        { ko: ["저", "지갑은", "오래되었습니다."], fa: ["آن", "کیف پول", "قدیمی", "است"], k_full: "저 지갑은 오래되었습니다.", f_full: "آن کیف پول قدیمی است" },
+        { ko: ["이", "선물은", "멋집니다."], fa: ["این", "هدیه", "شیک", "است"], k_full: "이 선물은 멋집니다.", f_full: "این هدیه شیک است" },
+        { ko: ["저", "선물은", "무겁습니다."], fa: ["آن", "هدیه", "سنگین", "است"], k_full: "저 선물은 무겁습니다.", f_full: "آن هدیه سنگین است" },
+        { ko: ["나는", "피곤합니다."], fa: ["من", "خسته", "هستم"], k_full: "나는 피곤합니다.", f_full: "من خسته هستم" },
+        { ko: ["나는", "친절합니다."], fa: ["من", "مهربان", "هستم"], k_full: "나는 친절합니다.", f_full: "من مهربان هستم" },
+        { ko: ["나는", "예민합니다."], fa: ["من", "حساس", "هستم"], k_full: "나는 예민합니다.", f_full: "من حساس هستم" },
+        { ko: ["나는", "미혼입니다."], fa: ["من", "مجرد", "هستم"], k_full: "나는 미혼입니다.", f_full: "من مجرد هستم" },
+        { ko: ["나는", "뚱뚱합니다."], fa: ["من", "چاق", "هستم"], k_full: "나는 뚱뚱합니다.", f_full: "من چاق هستم" },
+        { ko: ["너는", "피곤합니다."], fa: ["تو", "خسته", "هستی"], k_full: "너는 피곤합니다.", f_full: "تو خسته هستی" },
+        { ko: ["너는", "친절합니다."], fa: ["تو", "مهربان", "هستی"], k_full: "너는 친절합니다.", f_full: "تو مهربان هستی" },
+        { ko: ["너는", "예민합니다."], fa: ["تو", "حساس", "هستی"], k_full: "너는 예민합니다.", f_full: "تو حساس هستی" },
+        { ko: ["너는", "미혼입니다."], fa: ["تو", "مجرد", "هستی"], k_full: "너는 미혼입니다.", f_full: "تو مجرد هستی" },
+        { ko: ["우리는", "친절합니다."], fa: ["ما", "مهربان", "هستیم"], k_full: "우리는 친절합니다.", f_full: "ما مهربان هستیم" }
+    ];
+
+    const rawDataL2 = [
+        { ko: ["이것은", "나의", "지갑입니다."], fa: ["این", "کیف پولِ", "من", "است"], k_full: "이것은 나의 지갑입니다.", f_full: "این کیف پولِ من است" },
+        { ko: ["그들의", "배우자는", "친절합니다."], fa: ["همسرِ", "آنها", "مهربان", "است"], k_full: "그들의 배우자는 친절합니다.", f_full: "همسرِ آنها مهربان است" },
+        { ko: ["나는", "(남자)사촌이", "있습니다."], fa: ["من", "پسر عمو", "دارم"], k_full: "나는 (남자)사촌이 있습니다.", f_full: "من پسر عمو دارم" },
+        { ko: ["오래된", "신발"], fa: ["کفشِ", "قدیمی"], k_full: "오래된 신발", f_full: "کفشِ قدیمی" },
+        { ko: ["하얀색", "바지"], fa: ["شلوارِ", "سفید"], k_full: "하얀색 바지", f_full: "شلوارِ سفید" },
+        { ko: ["내", "(여자)이종사촌은", "미혼입니다."], fa: ["دختر خاله‌ ی", "من", "مجرد", "است"], k_full: "내 (여자)이종사촌은 미혼입니다.", f_full: "دختر خاله ‌ی من مجرد است" },
+        { ko: ["너는", "노트북이", "있니?"], fa: ["تو", "لپ تاپ", "داری؟"], k_full: "너는 노트북이 있니?", f_full: "تو لپ تاپ داری؟" },
+        { ko: ["까만색", "개"], fa: ["سگِ", "سیاه"], k_full: "까만색 개", f_full: "سگِ سیاه" },
+        { ko: ["이것은", "나의", "수건입니다."], fa: ["این", "حوله ‌ی", "من", "است"], k_full: "이것은 나의 수건입니다.", f_full: "این حوله ‌ی من است" },
+        { ko: ["그녀는", "나의", "이모입니다."], fa: ["او", "خاله‌ ی", "من", "است"], k_full: "그녀는 나의 이모입니다.", f_full: "او خاله‌ ی من است" },
+        { ko: ["큰", "거실"], fa: ["اتاق پذیراییِ", "بزرگ"], k_full: "큰 거실", f_full: "اتاق پذیراییِ بزرگ" },
+        { ko: ["초록색", "사과"], fa: ["سیبِ", "سبز"], k_full: "초록색 사과", f_full: "سیبِ سبز" },
+        { ko: ["이것은", "나의", "장화입니다."], fa: ["این", "چکمه‌ ی", "من", "است"], k_full: "이것은 나의 장화입니다.", f_full: "این چکمه ‌ی من است" },
+        { ko: ["그들은", "돈이", "없습니다."], fa: ["آنها", "پول", "ندارند"], k_full: "그들은 돈이 없습니다.", f_full: "آنها پول ندارند" },
+        { ko: ["분홍색", "양말"], fa: ["جورابِ", "صورتی"], k_full: "분홍색 양말", f_full: "جورابِ صورتی" },
+        { ko: ["까만색", "신발"], fa: ["کفشِ", "سیاه"], k_full: "까만색 신발", f_full: "کفشِ سیاه" },
+        { ko: ["초록색", "바지"], fa: ["شلوارِ", "سبز"], k_full: "초록색 바지", f_full: "شلوارِ سبز" },
+        { ko: ["하얀색", "양말"], fa: ["جورابِ", "سفید"], k_full: "하얀색 양말", f_full: "جورابِ سفید" },
+        { ko: ["까만색", "양말"], fa: ["جورابِ", "سیاه"], k_full: "까만색 양말", f_full: "جورابِ سیاه" },
+        { ko: ["초록색", "수건"], fa: ["حوله ‌ی", "سبز"], k_full: "초록색 수건", f_full: "حوله ‌ی سبز" },
+        { ko: ["하얀색", "수건"], fa: ["حوله ‌ی", "سفید"], k_full: "하얀색 수건", f_full: "حوله ‌ی سفید" },
+        { ko: ["오래된", "장화"], fa: ["چکمه‌ ی", "قدیمی"], k_full: "오래된 장화", f_full: "چکمه‌ ی قدیمی" },
+        { ko: ["까만색", "장화"], fa: ["چکمه‌ ی", "سیاه"], k_full: "까만색 장화", f_full: "چکمه‌ ی سیاه" },
+        { ko: ["어두운", "거실"], fa: ["اتاق پذیراییِ", "تاریک"], k_full: "어두운 거실", f_full: "اتاق پذیراییِ تاریک" },
+        { ko: ["귀여운", "개"], fa: ["سگِ", "بانمک"], k_full: "귀여운 개", f_full: "سگِ بانمک" },
+        { ko: ["하얀색", "개"], fa: ["سگِ", "سفید"], k_full: "하얀색 개", f_full: "سگِ سفید" },
+        { ko: ["이것은", "나의", "신발입니다."], fa: ["این", "کفشِ", "من", "است"], k_full: "이것은 나의 신발입니다.", f_full: "این کفشِ من است" },
+        { ko: ["이것은", "나의", "양말입니다."], fa: ["این", "جورابِ", "من", "است"], k_full: "이것은 나의 양말입니다.", f_full: "این جورابِ من است" },
+        { ko: ["이것은", "나의", "바지입니다."], fa: ["این", "شلوارِ", "من", "است"], k_full: "이것은 나의 바지입니다.", f_full: "این شلوارِ من است" },
+        { ko: ["이분은", "나의", "배우자입니다."], fa: ["این", "همسرِ", "من", "است"], k_full: "이분은 나의 배우자입니다.", f_full: "این همسرِ من است" },
+        { ko: ["저분은", "나의", "배우자입니다."], fa: ["آن", "همسرِ", "من", "است"], k_full: "저분은 나의 배우자입니다.", f_full: "آن همسرِ من است" },
+        { ko: ["이분은", "나의", "이모입니다."], fa: ["این", "خاله‌ ی", "من", "است"], k_full: "이분은 나의 이모입니다.", f_full: "این خاله‌ ی من است" },
+        { ko: ["내", "이모는", "친절합니다."], fa: ["خاله‌ ی", "من", "مهربان", "است"], k_full: "내 이모는 친절합니다.", f_full: "خاله‌ ی من مهربان است" },
+        { ko: ["내", "이종사촌은", "뚱뚱합니다."], fa: ["دختر خاله ‌ی", "من", "چاق", "است"], k_full: "내 이종사촌은 뚱뚱합니다.", f_full: "دختر خاله ‌ی من چاق است" },
+        { ko: ["그들의", "배우자는", "예민합니다."], fa: ["همسرِ", "آنها", "حساس", "است"], k_full: "그들의 배우자는 예민합니다.", f_full: "همسرِ آنها حساس است" },
+        { ko: ["그들의", "개는", "귀엽습니다."], fa: ["سگِ", "آنها", "بانمک", "است"], k_full: "그들의 개는 귀엽습니다.", f_full: "سگِ آنها بانمک است" },
+        { ko: ["나는", "돈이", "있습니다."], fa: ["من", "پول", "دارم"], k_full: "나는 돈이 있습니다.", f_full: "من پول دارم" },
+        { ko: ["나는", "개가", "있습니다."], fa: ["من", "سگ", "دارم"], k_full: "나는 개가 있습니다.", f_full: "من سگ دارم" },
+        { ko: ["나는", "하얀색", "수건이", "있습니다."], fa: ["من", "حوله ‌ی", "سفید", "دارم"], k_full: "나는 하얀색 수건이 있습니다.", f_full: "من حوله ‌ی سفید دارم" },
+        { ko: ["나는", "까만색", "개가", "있습니다."], fa: ["من", "سگِ", "سیاه", "دارم"], k_full: "나는 까만색 개가 있습니다.", f_full: "من سگِ سیاه دارم" },
+        { ko: ["그들은", "노트북이", "없습니다."], fa: ["آنها", "لپ تاپ", "ندارند"], k_full: "그들은 노트북이 없습니다.", f_full: "آنها لپ تاپ ندارند" },
+        { ko: ["그들은", "돈이", "없습니다."], fa: ["آنها", "پول", "ندارند"], k_full: "그들은 돈이 없습니다.", f_full: "آنها پول ندارند" },
+        { ko: ["그들은", "사촌이", "없습니다."], fa: ["آنها", "پسر عمو", "ندارند"], k_full: "그들은 사촌이 없습니다.", f_full: "آنها پسر عمو ندارند" },
+        { ko: ["너는", "돈이", "있니?"], fa: ["تو", "پول", "داری؟"], k_full: "너는 돈이 있니?", f_full: "تو پول داری؟" },
+        { ko: ["너는", "큰", "지갑이", "있니?"], fa: ["تو", "کیف پول", "بزرگ", "داری؟"], k_full: "너는 큰 지갑이 있니?", f_full: "تو کیف پول بزرگ داری؟" },
+        { ko: ["너는", "까만색", "개가", "있니?"], fa: ["تو", "سگ", "سیاه", "داری؟"], k_full: "너는 까만색 개가 있니?", f_full: "تو سگ سیاه داری؟" },
+    ];
+
+    const rawDataL3 = [
+        { ko: ["나는", "바다에", "갑니다."], fa: ["من", "به", "دریا", "می‌روم"], k_full: "나는 바다에 갑니다.", f_full: "من به دریا می‌روم" },
+        { ko: ["그는", "마을에서", "돌아왔습니다."], fa: ["او", "از", "روستا", "برگشت"], k_full: "그는 마을에서 돌아왔습니다.", f_full: "او از روستا برگشت" },
+        { ko: ["우리는", "공항에", "도착했습니다."], fa: ["ما", "به", "فرودگاه", "رسیدیم"], k_full: "우리는 공항에 도착했습니다.", f_full: "ما به فرودگاه رسیدیم" },
+        { ko: ["그들은", "미용실에", "갑니다."], fa: ["آنها", "به", "آرایشگاه", "می‌روند"], k_full: "그들은 미용실에 갑니다.", f_full: "آنها به آرایشگاه می‌روند" },
+        { ko: ["너는", "경찰서에서", "왔니?"], fa: ["تو", "از", "کلانتری", "آمدی؟"], k_full: "너는 경찰서에서 왔니?", f_full: "تو از کلانتری آمدی؟" },
+        { ko: ["나는", "사무실에서", "일합니다."], fa: ["من", "در", "اداره", "کار می‌کنم"], k_full: "나는 사무실에서 일합니다.", f_full: "من در اداره کار می‌کنم" },
+        { ko: ["그는", "숲에", "갑니다."], fa: ["او", "به", "جنگل", "می‌رود"], k_full: "그는 숲에 갑니다.", f_full: "او به جنگل می‌رود" },
+        { ko: ["우리는", "대사관에", "도착했습니다."], fa: ["ما", "به", "سفارت", "رسیدیم"], k_full: "우리는 대사관에 도착했습니다.", f_full: "ما به سفارت رسیدیم" },
+        { ko: ["당신(들)은", "쇼핑몰에서", "돌아왔습니다."], fa: ["شما", "از", "پاساژ", "برگشتید"], k_full: "당신(들)은 쇼핑몰에서 돌아왔습니다.", f_full: "شما از پاساژ برگشتید" },
+        { ko: ["나는", "집에서", "요리합니다."], fa: ["من", "در", "خانه", "آشپزی می‌کنم"], k_full: "나는 집에서 요리합니다.", f_full: "من در خانه آشپزی می‌کنم" },
+        { ko: ["그는", "카페에", "갑니다."], fa: ["او", "به", "کافه", "می‌رود"], k_full: "그는 카페에 갑니다.", f_full: "او به کافه می‌رود" },
+        { ko: ["우리는", "병원에서", "돌아왔습니다."], fa: ["ما", "از", "بیمارستان", "برگشتیم"], k_full: "우리는 병원에서 돌아왔습니다.", f_full: "ما از بیمارستان برگشتیم" },
+        { ko: ["너는", "대학교에", "있니?"], fa: ["تو", "در", "دانشگاه", "هستی؟"], k_full: "너는 대학교에 있니?", f_full: "تو در دانشگاه هستی؟" },
+        { ko: ["그들은", "감옥에", "도착했습니다."], fa: ["آنها", "به", "زندان", "رسیدند"], k_full: "그들은 감옥에 도착했습니다.", f_full: "آنها به زندان رسیدند" },
+        { ko: ["나는", "수영장에서", "수영합니다."], fa: ["من", "در", "استخر", "شنا می‌کنم"], k_full: "나는 수영장에서 수영합니다.", f_full: "من در استخر شنا می‌کنم" },
+        { ko: ["그는", "다리에", "갑니다."], fa: ["او", "به", "پل", "می‌رود"], k_full: "그는 다리에 갑니다.", f_full: "او به پل می‌رود" },
+        { ko: ["우리는", "묘지에", "도착했습니다."], fa: ["ما", "به", "آرامگاه", "رسیدیم"], k_full: "우리는 묘지에 도착했습니다.", f_full: "ما به آرامگاه رسیدیم" },
+        { ko: ["너는", "공장에서", "일하니?"], fa: ["تو", "در", "کارخانه", "کار می‌کنی؟"], k_full: "너는 공장에서 일하니?", f_full: "تو در کارخانه کار می‌کنی؟" },
+        { ko: ["그들은", "산에서", "돌아왔습니다."], fa: ["آنها", "از", "کوه", "برگشتند"], k_full: "그들은 산에서 돌아왔습니다.", f_full: "آنها از کوه برگشتند" },
+        { ko: ["나는", "화장실에", "갑니다."], fa: ["من", "به", "دستشویی", "می‌روم"], k_full: "나는 화장실에 갑니다.", f_full: "من به دستشویی می‌روم" },
+        { ko: ["나는", "카페에", "갑니다."], fa: ["من", "به", "کافه", "می‌روم"], k_full: "나는 카페에 갑니다.", f_full: "من به کافه می‌روم" },
+        { ko: ["그는", "대학교에", "갑니다."], fa: ["او", "به", "دانشگاه", "می‌رود"], k_full: "그는 대학교에 갑니다.", f_full: "او به دانشگاه می‌رود" },
+        { ko: ["그들은", "공항에", "갑니다."], fa: ["آنها", "به", "فرودگاه", "می‌روند"], k_full: "그들은 공항에 갑니다.", f_full: "آنها به فرودگاه می‌روند" },
+        { ko: ["우리는", "마을에서", "돌아왔습니다."], fa: ["ما", "از", "روستا", "برگشتیم"], k_full: "우리는 마을에서 돌아왔습니다.", f_full: "ما از روستا برگشتیم" },
+        { ko: ["그들은", "병원에서", "돌아왔습니다."], fa: ["آنها", "از", "بیمارستان", "برگشتند"], k_full: "그들은 병원에서 돌아왔습니다.", f_full: "آنها از بیمارستان برگشتند" },
+        { ko: ["너는", "수영장에서", "왔니?"], fa: ["تو", "از", "استخر", "آمدی؟"], k_full: "너는 수영장에서 왔니?", f_full: "تو از استخر آمدی؟" },
+        { ko: ["나는", "공장에서", "일합니다."], fa: ["من", "در", "کارخانه", "کار می‌کنم"], k_full: "나는 공장에서 일합니다.", f_full: "من در کارخانه کار می‌کنم" },
+        { ko: ["너는", "사무실에서", "일하니?"], fa: ["تو", "در", "اداره", "کار می‌کنی؟"], k_full: "너는 사무실에서 일하니?", f_full: "تو در اداره کار می‌کنی؟" },
+        { ko: ["우리는", "집에", "도착했습니다."], fa: ["ما", "به", "خانه", "رسیدیم"], k_full: "우리는 집에 도착했습니다.", f_full: "ما به خانه رسیدیم" },
+        { ko: ["그들은", "다리에", "도착했습니다."], fa: ["آنها", "به", "پل", "رسیدند"], k_full: "그들은 다리에 도착했습니다.", f_full: "آنها به پل رسیدند" },
+        { ko: ["나는", "병원에", "갑니다."], fa: ["من", "به", "بیمارستان", "می‌روم"], k_full: "나는 병원에 갑니다.", f_full: "من به بیمارستان می‌روم" },
+        { ko: ["그는", "집에서", "돌아왔습니다."], fa: ["او", "از", "خانه", "برگشت"], k_full: "그는 집에서 돌아왔습니다.", f_full: "او از خانه برگشت" },
+        { ko: ["우리는", "쇼핑몰에", "도착했습니다."], fa: ["ما", "به", "پاساژ", "رسیدیم"], k_full: "우리는 쇼핑몰에 도착했습니다.", f_full: "ما به پاساژ رسیدیم" },
+        { ko: ["그들은", "산에", "갑니다."], fa: ["آنها", "به", "کوه", "می‌روند"], k_full: "그들은 산에 갑니다.", f_full: "آنها به کوه می‌روند" },
+        { ko: ["너는", "경찰서에", "있니?"], fa: ["تو", "در", "کلانتری", "هستی؟"], k_full: "너는 경찰서에 있니?", f_full: "تو در کلانتری هستی؟" },
+        { ko: ["나는", "대학교에", "갑니다."], fa: ["من", "به", "دانشگاه", "می‌روم"], k_full: "나는 대학교에 갑니다.", f_full: "من به دانشگاه می‌روم" },
+        { ko: ["그는", "바다에", "갑니다."], fa: ["او", "به", "دریا", "می‌رود"], k_full: "그는 바다에 갑니다.", f_full: "او به دریا می‌رود" },
+        { ko: ["그들은", "숲에", "갑니다."], fa: ["آنها", "به", "جنگل", "می‌روند"], k_full: "그들은 숲에 갑니다.", f_full: "آنها به جنگل می‌روند" },
+        { ko: ["우리는", "공항에서", "돌아왔습니다."], fa: ["ما", "از", "فرودگاه", "برگشتیم"], k_full: "우리는 공항에서 돌아왔습니다.", f_full: "ما از فرودگاه برگشتیم" },
+        { ko: ["그들은", "쇼핑몰에서", "돌아왔습니다."], fa: ["آنها", "از", "پاساژ", "برگشتند"], k_full: "그들은 쇼핑몰에서 돌아왔습니다.", f_full: "آنها از پاساژ برگشتند" },
+        { ko: ["너는", "마을에서", "왔니?"], fa: ["تو", "از", "روستا", "آمدی؟"], k_full: "너는 마을에서 왔니?", f_full: "تو از روستا آمدی؟" },
+        { ko: ["나는", "카페에서", "일합니다."], fa: ["من", "در", "کافه", "کار می‌کنم"], k_full: "나는 카페에서 일합니다.", f_full: "من در کافه کار می‌کنم" },
+        { ko: ["너는", "병원에서", "일하니?"], fa: ["تو", "در", "بیمارستان", "کار می‌کنی؟"], k_full: "너는 병원에서 일하니?", f_full: "تو در بیمارستان کار می‌کنی؟" },
+        { ko: ["우리는", "공장에", "도착했습니다."], fa: ["ما", "به", "کارخانه", "رسیدیم"], k_full: "우리는 공장에 도착했습니다.", f_full: "ما به کارخانه رسیدیم" },
+        { ko: ["그들은", "대학교에", "도착했습니다."], fa: ["آنها", "به", "دانشگاه", "رسیدند"], k_full: "그들은 대학교에 도착했습니다.", f_full: "آنها به دانشگاه رسیدند" },
+        { ko: ["나는", "숲에", "갑니다."], fa: ["من", "به", "جنگل", "می‌روم"], k_full: "나는 숲에 갑니다.", f_full: "من به جنگل می‌روم" },
+        { ko: ["그는", "사무실에서", "돌아왔습니다."], fa: ["او", "از", "اداره", "برگشت"], k_full: "그는 사무실에서 돌아왔습니다.", f_full: "او از اداره برگشت" },
+        { ko: ["우리는", "카페에", "도착했습니다."], fa: ["ما", "به", "کافه", "رسیدیم"], k_full: "우리는 카페에 도착했습니다.", f_full: "ما به کافه رسیدیم" },
+        { ko: ["그들은", "마을에", "갑니다."], fa: ["آنها", "به", "روستا", "می‌روند"], k_full: "그들은 마을에 갑니다.", f_full: "آنها به روستا می‌روند" },
+        { ko: ["너는", "집에", "있니?"], fa: ["تو", "در", "خانه", "هستی؟"], k_full: "너는 집에 있니?", f_full: "تو در خانه هستی؟" },
+        { ko: ["너는", "사무실에", "있니?"], fa: ["تو", "در", "اداره", "هستی؟"], k_full: "너는 사무실에 있니?", f_full: "تو در اداره هستی؟" },
+        { ko: ["우리는", "화장실에서", "돌아왔습니다."], fa: ["ما", "از", "دستشویی", "برگشتیم"], k_full: "우리는 화장실에서 돌아왔습니다.", f_full: "ما از دستشویی برگشتیم" },
+        { ko: ["나는", "미용실에", "갑니다."], fa: ["من", "به", "آرایشگاه", "می‌روم"], k_full: "나는 미용실에 갑니다.", f_full: "من به آرایشگاه می‌روم" },
+        { ko: ["그는", "미용실에서", "돌아왔습니다."], fa: ["او", "از", "آرایشگاه", "برگشت"], k_full: "그는 미용실에서 돌아왔습니다.", f_full: "او از آرایشگاه برگشت" }
+    ];
+
+    const rawDataL4 = [
+        { ko: ["나는", "수박을", "먹습니다."], fa: ["من", "هندوانه", "را", "می‌خورم"], k_full: "나는 수박을 먹습니다.", f_full: "من هندوانه را می‌خورم" },
+        { ko: ["그는", "음료를", "마십니다."], fa: ["او", "نوشیدنی", "را", "می‌نوشد"], k_full: "그는 음료를 마십니다.", f_full: "او نوشیدنی را می‌نوشد" },
+        { ko: ["우리는", "그릇을", "씻습니다."], fa: ["ما", "ظرف", "را", "می‌شوییم"], k_full: "우리는 그릇을 씻습니다.", f_full: "ما ظرف را می‌شوییم" },
+        { ko: ["너는", "외투를", "입습니다."], fa: ["تو", "پالتو", "را", "می‌پوشی"], k_full: "너는 외투를 입습니다.", f_full: "تو پالتو را می‌پوشی" },
+        { ko: ["그들은", "사과를", "샀습니다."], fa: ["آنها", "سیب", "را", "خریدند"], k_full: "그들은 사과를 샀습니다.", f_full: "آنها سیب را خریدند" },
+        { ko: ["나는", "드라마를", "시청합니다."], fa: ["من", "سریال", "را", "تماشا می‌کنم"], k_full: "나는 드라마를 시청합니다.", f_full: "من سریال را تماشا می‌کنم" },
+        { ko: ["그는", "창문을", "열었습니다."], fa: ["او", "پنجره", "را", "باز کرد"], k_full: "그는 창문을 열었습니다.", f_full: "او پنجره را باز کرد" },
+        { ko: ["너는", "선물을", "보냅니다."], fa: ["تو", "هدیه", "را", "می‌فرستی"], k_full: "너는 선물을 보냅니다.", f_full: "تو هدیه را می‌فرستی" },
+        { ko: ["우리는", "새를", "보았습니다."], fa: ["ما", "پرنده", "را", "دیدیم"], k_full: "우리는 새를 보았습니다.", f_full: "ما پرنده را دیدیم" },
+        { ko: ["나는", "우유를", "원합니다."], fa: ["من", "شیر", "را", "می‌خواهم"], k_full: "나는 우유를 원합니다.", f_full: "من شیر را می‌خواهم" },
+        { ko: ["그는", "양파를", "다집니다."], fa: ["او", "پیاز", "را", "خرد می‌کند"], k_full: "그는 양파를 다집니다.", f_full: "او پیاز را خرد می‌کند" },
+        { ko: ["우리는", "카펫을", "샀습니다."], fa: ["ما", "فرش", "را", "خریدیم"], k_full: "우리는 카펫을 샀습니다.", f_full: "ما فرش را خریدیم" },
+        { ko: ["너는", "토마토를", "씻습니다."], fa: ["تو", "گوجه فرنگی", "را", "می‌شویی"], k_full: "너는 토마토를 씻습니다.", f_full: "تو گوجه فرنگی را می‌شویی" },
+        { ko: ["그들은", "곰을", "보았습니다."], fa: ["آنها", "خرس", "را", "دیدند"], k_full: "그들은 곰을 보았습니다.", f_full: "آنها خرس را دیدند" },
+        { ko: ["나는", "바나나를", "먹습니다."], fa: ["من", "موز", "را", "می‌خورم"], k_full: "나는 바나나를 먹습니다.", f_full: "من موز را می‌خورم" },
+        { ko: ["그는", "지갑을", "잃어버렸습니다."], fa: ["او", "کیف پول", "را", "گم کرد"], k_full: "그는 지갑을 잃어버렸습니다.", f_full: "او کیف پول را گم کرد" },
+        { ko: ["우리는", "잡지를", "읽습니다."], fa: ["ما", "مجله", "را", "می‌خوانیم"], k_full: "우리는 잡지를 읽습니다.", f_full: "ما مجله را می‌خوانیم" },
+        { ko: ["너는", "에어컨을", "켭니다."], fa: ["تو", "کولر", "را", "روشن می‌کنی"], k_full: "너는 에어컨을 켭니다.", f_full: "تو کولر را روشن می‌کنی" },
+        { ko: ["그들은", "트럭을", "샀습니다."], fa: ["آنها", "کامیون", "را", "خریدند"], k_full: "그들은 트럭을 샀습니다.", f_full: "آنها کامیون را خریدند" },
+        { ko: ["나는", "물을", "마십니다."], fa: ["من", "آب", "را", "می‌نوشم"], k_full: "나는 물을 마십니다.", f_full: "من آب را می‌نوشم" },
+        { ko: ["나는", "사과를", "먹습니다."], fa: ["من", "سیب", "را", "می‌خورم"], k_full: "나는 사과를 먹습니다.", f_full: "من سیب را می‌خورم" },
+        { ko: ["나는", "양파를", "먹습니다."], fa: ["من", "پیاز", "را", "می‌خورم"], k_full: "나는 양파를 먹습니다.", f_full: "من پیاز را می‌خورم" },
+        { ko: ["나는", "토마토를", "먹습니다."], fa: ["من", "گوجه فرنگی", "را", "می‌خورم"], k_full: "나는 토마토를 먹습니다.", f_full: "من گوجه فرنگی را می‌خورم" },
+        { ko: ["그는", "우유를", "마십니다."], fa: ["او", "شیر", "را", "می‌نوشد"], k_full: "그는 우유를 마십니다.", f_full: "او شیر را می‌نوشد" },
+        { ko: ["나는", "음료를", "마십니다."], fa: ["من", "نوشیدنی", "را", "می‌نوشم"], k_full: "나는 음료를 마십니다.", f_full: "من نوشیدنی را می‌نوشم" },
+        { ko: ["우리는", "사과를", "씻습니다."], fa: ["ما", "سیب", "را", "می‌شوییم"], k_full: "우리는 사과를 씻습니다.", f_full: "ما سیب را می‌شوییم" },
+        { ko: ["우리는", "수박을", "씻습니다."], fa: ["ما", "هندوانه", "را", "می‌شوییم"], k_full: "우리는 수박을 씻습니다.", f_full: "ما هندوانه را می‌شوییم" },
+        { ko: ["너는", "수박을", "씻습니다."], fa: ["تو", "هندوانه", "را", "می‌شویی"], k_full: "너는 수박을 씻습니다.", f_full: "تو هندوانه را می‌شویی" },
+        { ko: ["너는", "사과를", "씻습니다."], fa: ["تو", "سیب", "را", "می‌شویی"], k_full: "너는 사과를 씻습니다.", f_full: "تو سیب را می‌شویی" },
+        { ko: ["그들은", "선물을", "샀습니다."], fa: ["آنها", "هدیه", "را", "خریدند"], k_full: "그들은 선물을 샀습니다.", f_full: "آنها هدیه را خریدند" },
+        { ko: ["그들은", "노트북을", "샀습니다."], fa: ["آنها", "لپ تاپ", "را", "خریدند"], k_full: "그들은 노트북을 샀습니다.", f_full: "آنها لپ تاپ را خریدند" },
+        { ko: ["우리는", "물을", "샀습니다."], fa: ["ما", "آب", "را", "خریدیم"], k_full: "우리는 물을 샀습니다.", f_full: "ما آب را خریدیم" },
+        { ko: ["우리는", "트럭을", "샀습니다."], fa: ["ما", "کامیون", "را", "خریدیم"], k_full: "우리는 트럭을 샀습니다.", f_full: "ما کامیون را خریدیم" },
+        { ko: ["우리는", "지갑을", "샀습니다."], fa: ["ما", "کیف پول", "را", "خریدیم"], k_full: "우리는 지갑을 샀습니다.", f_full: "ما کیف پول را خریدیم" },
+        { ko: ["그는", "지갑을", "열었습니다."], fa: ["او", "کیف پول", "را", "باز کرد"], k_full: "그는 지갑을 열었습니다.", f_full: "او کیف پول را باز کرد" },
+        { ko: ["그는", "상자를", "열었습니다."], fa: ["او", "جعبه", "را", "باز کرد"], k_full: "그는 상자를 열었습니다.", f_full: "او جعبه را باز کرد" },
+        { ko: ["너는", "사과를", "보냅니다."], fa: ["تو", "سیب", "را", "می‌فرستی"], k_full: "너는 사과를 보냅니다.", f_full: "تو سیب را می‌فرستی" },
+        { ko: ["너는", "상자를", "보냅니다."], fa: ["تو", "جعبه", "را", "می‌فرستی"], k_full: "너는 상자를 보냅니다.", f_full: "تو جعبه را می‌فرستی" },
+        { ko: ["우리는", "곰을", "보았습니다."], fa: ["ما", "خرس", "را", "دیدیم"], k_full: "우리는 곰을 보았습니다.", f_full: "ما خرس را دیدیم" },
+        { ko: ["우리는", "개를", "보았습니다."], fa: ["ما", "سگ", "را", "دیدیم"], k_full: "우리는 개를 보았습니다.", f_full: "ما سگ را دیدیم" },
+        { ko: ["그들은", "개를", "보았습니다."], fa: ["آنها", "سگ", "را", "دیدند"], k_full: "그들은 개를 보았습니다.", f_full: "آنها سگ را دیدند" },
+        { ko: ["그들은", "새를", "보았습니다."], fa: ["آنها", "پرنده", "را", "دیدند"], k_full: "그들은 새를 보았습니다.", f_full: "آنها پرنده را دیدند" },
+        { ko: ["나는", "돈을", "원합니다."], fa: ["من", "پول", "را", "می‌خواهم"], k_full: "나는 돈을 원합니다.", f_full: "من پول را می‌خواهم" },
+        { ko: ["나는", "노트북을", "원합니다."], fa: ["من", "لپ تاپ", "را", "می‌خواهم"], k_full: "나는 노트북을 원합니다.", f_full: "من لپ تاپ را می‌خواهم" },
+        { ko: ["나는", "물을", "원합니다."], fa: ["من", "آب", "را", "می‌خواهم"], k_full: "나는 물을 원합니다.", f_full: "من آب را می‌خواهم" },
+        { ko: ["나는", "사과를", "원합니다."], fa: ["من", "سیب", "را", "می‌خواهم"], k_full: "나는 사과를 원합니다.", f_full: "من سیب را می‌خواهم" },
+        { ko: ["그는", "토마토를", "다집니다."], fa: ["او", "گوجه فرنگی", "را", "خرد می‌کند"], k_full: "그는 토마토를 다집니다.", f_full: "او گوجه فرنگی را خرد می‌کند" },
+        { ko: ["그는", "수박을", "다집니다."], fa: ["او", "هندوانه", "را", "خرد می‌کند"], k_full: "그는 수박을 다집니다.", f_full: "او هندوانه را خرد می‌کند" },
+        { ko: ["그는", "노트북을", "잃어버렸습니다."], fa: ["او", "لپ تاپ", "را", "گم کرد"], k_full: "그는 노트북을 잃어버렸습니다.", f_full: "او لپ تاپ را گم کرد" },
+        { ko: ["그는", "돈을", "잃어버렸습니다."], fa: ["او", "پول", "را", "گم کرد"], k_full: "그는 돈을 잃어버렸습니다.", f_full: "او پول را گم کرد" },
+        { ko: ["그는", "개를", "잃어버렸습니다."], fa: ["او", "سگ", "را", "گم کرد"], k_full: "그는 개를 잃어버렸습니다.", f_full: "او سگ را گم کرد" },
+        { ko: ["너는", "노트북을", "켭니다."], fa: ["تو", "لپ تاپ", "را", "روشن می‌کنی"], k_full: "너는 노트북을 켭니다.", f_full: "تو لپ تاپ را روشن می‌کنی" },
+    ];
+
+    // 음성 매핑 테이블
+    const audioMap = {
+        // syntax_audio_1
+        "من": { f: "syntax_audio_1", name: "man_audio" },
+        "تو": { f: "syntax_audio_1", name: "to_audio" },
+        "او": { f: "syntax_audio_1", name: "u_audio" },
+        "ما": { f: "syntax_audio_1", name: "ma_audio" },
+        "شما": { f: "syntax_audio_1", name: "shoma_audio" },
+        "آنها": { f: "syntax_audio_1", name: "anha_audio" },
+        "این": { f: "syntax_audio_1", name: "in_audio" },
+        "آن": { f: "syntax_audio_1", name: "an_audio" },
+
+        // syntax_audio_2
+        "به": { f: "syntax_audio_2", name: "be_audio" },
+        "از": { f: "syntax_audio_2", name: "az_audio" },
+        "در": { f: "syntax_audio_2", name: "dar_audio" },
+        "را": { f: "syntax_audio_2", name: "ra_audio" },
+
+        // syntax_audio_3
+        "است": { f: "syntax_audio_3", name: "ast_audio" },
+        "هستم": { f: "syntax_audio_3", name: "hastam_audio" },
+        "هستی": { f: "syntax_audio_3", name: "hasti_audio" },
+        "هستیم": { f: "syntax_audio_3", name: "hastim_audio" },
+        "دارم": { f: "syntax_audio_3", name: "daram_audio" },
+        "ندارند": { f: "syntax_audio_3", name: "nadarand_audio" },
+        "داری؟": { f: "syntax_audio_3", name: "dari_q_audio" },
+        "هستی؟": { f: "syntax_audio_3", name: "hasti_q_audio" },
+
+        // syntax_audio_4
+        "فرودگاه": { f: "syntax_audio_4", name: "forudgah_audio" },
+        "آشپزخانه": { f: "syntax_audio_4", name: "ashpazxane_audio" },
+        "دریا": { f: "syntax_audio_4", name: "darya_audio" },
+        "جعبه": { f: "syntax_audio_4", name: "jabe_audio" },
+        "کوه": { f: "syntax_audio_4", name: "kuh_audio" },
+        "حمام": { f: "syntax_audio_4", name: "hammam_audio" },
+        "سریال": { f: "syntax_audio_4", name: "serial_audio" },
+        "اتاق خواب": { f: "syntax_audio_4", name: "otaqexab_audio" },
+        "باد": { f: "syntax_audio_4", name: "bad_audio" },
+        "لپ تاپ": { f: "syntax_audio_4", name: "laptap_audio" },
+        "بیمار": { f: "syntax_audio_4", name: "bimar_audio" },
+        "پسر عمو": { f: "syntax_audio_4", name: "pesaramu_audio" },
+        "روستا": { f: "syntax_audio_4", name: "rusta_audio" },
+        "آرایشگاه": { f: "syntax_audio_4", name: "arayeshgah_audio" },
+        "کلانتری": { f: "syntax_audio_4", name: "kalantari_audio" },
+        "اداره": { f: "syntax_audio_4", name: "edare_audio" },
+        "جنگل": { f: "syntax_audio_4", name: "jangal_audio" },
+        "سفارت": { f: "syntax_audio_4", name: "sefarat_audio" },
+        "پاساژ": { f: "syntax_audio_4", name: "pasazh_audio" },
+        "خانه": { f: "syntax_audio_4", name: "xane_audio" },
+        "کافه": { f: "syntax_audio_4", name: "kafe_audio" },
+        "بیمارستان": { f: "syntax_audio_4", name: "bimarestan_audio" },
+        "دانشگاه": { f: "syntax_audio_4", name: "daneshgah_audio" },
+        "زندان": { f: "syntax_audio_4", name: "zendan_audio" },
+        "استخر": { f: "syntax_audio_4", name: "estakhr_audio" },
+        "پل": { f: "syntax_audio_4", name: "pol_audio" },
+        "آرامگاه": { f: "syntax_audio_4", name: "aramgah_audio" },
+        "کارخانه": { f: "syntax_audio_4", name: "karxane_audio" },
+        "هندوانه": { f: "syntax_audio_4", name: "hendevane_audio" },
+        "نوشیدنی": { f: "syntax_audio_4", name: "nushidani_audio" },
+        "ظرف": { f: "syntax_audio_4", name: "zarf_audio" },
+        "پالتو": { f: "syntax_audio_4", name: "palto_audio" },
+        "موز": { f: "syntax_audio_4", name: "mouz_audio" },
+        "پنجره": { f: "syntax_audio_4", name: "panjere_audio" },
+        "هدیه": { f: "syntax_audio_4", name: "hediye_audio" },
+        "پرنده": { f: "syntax_audio_4", name: "parande_audio" },
+        "شیر": { f: "syntax_audio_4", name: "shir_audio" },
+        "پیاز": { f: "syntax_audio_4", name: "piaz_audio" },
+        "فرش": { f: "syntax_audio_4", name: "farsh_audio" },
+        "گوجه فرنگی": { f: "syntax_audio_4", name: "gojefarangi_audio" },
+        "خرس": { f: "syntax_audio_4", name: "xers_audio" },
+        "مجله": { f: "syntax_audio_4", name: "majalle_audio" },
+        "کولر": { f: "syntax_audio_4", name: "kuler_audio" },
+        "کامیون": { f: "syntax_audio_4", name: "kamiyon_audio" },
+        "دستشویی": { f: "syntax_audio_4", name: "dastshuyi_audio" },
+        "آب": { f: "syntax_audio_4", name: "ab_audio" },
+        "سیب": { f: "syntax_audio_4", name: "sib_audio" },
+        "سگ": { f: "syntax_audio_4", name: "sag_audio" },
+        "کیف پول": { f: "syntax_audio_4", name: "kifepul_audio" },
+        "پول": { f: "syntax_audio_4", name: "pul_audio" },
+
+        // syntax_audio_5 (에저페 결합형)
+        "کیف پولِ": { f: "syntax_audio_5", name: "kifepul_ez_audio" },
+        "همسرِ": { f: "syntax_audio_5", name: "hamsar_ez_audio" },
+        "کفشِ": { f: "syntax_audio_5", name: "kafsh_ez_audio" },
+        "شلوارِ": { f: "syntax_audio_5", name: "shalvar_ez_audio" },
+        "دختر خاله‌ ی": { f: "syntax_audio_5", name: "doxtarxale_ez_audio" },
+        "سگِ": { f: "syntax_audio_5", name: "sag_ez_audio" },
+        "حوله ‌ی": { f: "syntax_audio_5", name: "houle_ez_audio" },
+        "خاله‌ ی": { f: "syntax_audio_5", name: "xale_ez_audio" },
+        "اتاق پذیراییِ": { f: "syntax_audio_5", name: "otaqepazirayi_ez_audio" },
+        "سیبِ": { f: "syntax_audio_5", name: "sib_ez_audio" },
+        "چکمه ‌ی": { f: "syntax_audio_5", name: "chakme_ez_audio" },
+        "جورابِ": { f: "syntax_audio_5", name: "jurab_ez_audio" },
+
+        // syntax_audio_6
+        "شلوغ": { f: "syntax_audio_6", name: "sholuq_audio" },
+        "تاریک": { f: "syntax_audio_6", name: "tarik_audio" },
+        "نزدیک": { f: "syntax_audio_6", name: "nazdik_audio" },
+        "سنگین": { f: "syntax_audio_6", name: "sangin_audio" },
+        "دور": { f: "syntax_audio_6", name: "dur_audio" },
+        "خواب آلود": { f: "syntax_audio_6", name: "xabalud_audio" },
+        "کثیف": { f: "syntax_audio_6", name: "kasif_audio" },
+        "چاق": { f: "syntax_audio_6", name: "chaq_audio" },
+        "شیک": { f: "syntax_audio_6", name: "shik_audio" },
+        "بانمک": { f: "syntax_audio_6", name: "banamak_audio" },
+        "ساکت": { f: "syntax_audio_6", name: "saket_audio" },
+        "سرد": { f: "syntax_audio_6", name: "sard_audio" },
+        "قدیمی": { f: "syntax_audio_6", name: "qadimi_audio" },
+        "حساس": { f: "syntax_audio_6", name: "hassas_audio" },
+        "خسته": { f: "syntax_audio_6", name: "xaste_audio" },
+        "مهربان": { f: "syntax_audio_6", name: "mehraban_audio" },
+        "سفید": { f: "syntax_audio_6", name: "sefid_audio" },
+        "مجرد": { f: "syntax_audio_6", name: "mojarrad_audio" },
+        "سیاه": { f: "syntax_audio_6", name: "siyah_audio" },
+        "بزرگ": { f: "syntax_audio_6", name: "bozorg_audio" },
+        "سبز": { f: "syntax_audio_6", name: "sabz_audio" },
+        "صورتی": { f: "syntax_audio_6", name: "surati_audio" },
+
+        // syntax_audio_7
+        "می‌روم": { f: "syntax_audio_7", name: "miravam_audio" },
+        "برگشت": { f: "syntax_audio_7", name: "bargasht_audio" },
+        "رسیدیم": { f: "syntax_audio_7", name: "residim_audio" },
+        "می‌روند": { f: "syntax_audio_7", name: "miravand_audio" },
+        "آمدی؟": { f: "syntax_audio_7", name: "amadi_q_audio" },
+        "کار می‌کنم": { f: "syntax_audio_7", name: "karmikonam_audio" },
+        "برگشتید": { f: "syntax_audio_7", name: "bargashtid_audio" },
+        "آشپزی می‌کنم": { f: "syntax_audio_7", name: "ashpazimikonam_audio" },
+        "برگشتیم": { f: "syntax_audio_7", name: "bargashtim_audio" },
+        "رسیدند": { f: "syntax_audio_7", name: "residand_audio" },
+        "شنا می‌کنم": { f: "syntax_audio_7", name: "shenamikonam_audio" },
+        "کار می‌کنی؟": { f: "syntax_audio_7", name: "karmikoni_q_audio" },
+        "برگشتند": { f: "syntax_audio_7", name: "bargashtand_audio" },
+        "می‌خورم": { f: "syntax_audio_7", name: "mixoram_audio" },
+        "می‌نوشد": { f: "syntax_audio_7", name: "minushad_audio" },
+        "می‌شوییم": { f: "syntax_audio_7", name: "mishuyim_audio" },
+        "می‌پوشی": { f: "syntax_audio_7", name: "mipushi_audio" },
+        "خریدند": { f: "syntax_audio_7", name: "xaridand_audio" },
+        "تماشا می‌کنم": { f: "syntax_audio_7", name: "tamashamikonam_audio" },
+        "باز کرد": { f: "syntax_audio_7", name: "bazkard_audio" },
+        "می‌فرستی": { f: "syntax_audio_7", name: "miferesti_audio" },
+        "دیدیم": { f: "syntax_audio_7", name: "didim_audio" },
+        "می‌خواهم": { f: "syntax_audio_7", name: "mixaham_audio" },
+        "خرد می‌کند": { f: "syntax_audio_7", name: "xordmikonad_audio" },
+        "خریدیم": { f: "syntax_audio_7", name: "xaridim_audio" },
+        "می‌رود": { f: "syntax_audio_7", name: "miravad_audio" },
+        "می‌شویی": { f: "syntax_audio_7", name: "mishuyi_audio" },
+        "دیدند": { f: "syntax_audio_7", name: "didand_audio" },
+        "گم کرد": { f: "syntax_audio_7", name: "gomkard_audio" },
+        "می‌خوانیم": { f: "syntax_audio_7", name: "mixanim_audio" },
+        "روشن می‌کنی": { f: "syntax_audio_7", name: "roshanmikoni_audio" },
+        "می‌نوشم": { f: "syntax_audio_7", name: "minusham_audio" }
+    };
+
+    function prepareLevelData(rawArray) {
+        const allFa = rawArray.flatMap(d => d.fa);
+        const allKo = rawArray.flatMap(d => d.ko);
+        
+        return rawArray.map(item => {
+            let faWrong = [];
+            while(faWrong.length < 3) {
+                let w = allFa[Math.floor(Math.random() * allFa.length)];
+                if(!item.fa.includes(w) && !faWrong.includes(w)) faWrong.push(w);
+            }
+            let koWrong = [];
+            while(koWrong.length < 3) {
+                let w = allKo[Math.floor(Math.random() * allKo.length)];
+                if(!item.ko.includes(w) && !koWrong.includes(w)) koWrong.push(w);
+            }
+            return {
+                ko_sentence: item.k_full, fa_sentence: item.f_full,
+                fa_correct: item.fa, ko_correct: item.ko,
+                fa_pool: [...item.fa, ...faWrong], ko_pool: [...item.ko, ...koWrong]
+            };
+        });
+    }
+
+    let sentenceData = [];
+    let gameQueue = []; 
+    let currentQuestionIdx = 0;
+    let totalQuestions = 20;
+    let selectedWords = []; 
+    let currentPool = []; 
+    let isChecked = false; 
+    let currentMode = ''; 
+    let timerInterval = null; 
+    let startTime = 0;
+    let penaltySec = 0;
+    let mistakes = [];
+    let isResultLocked = false;
+    let currentLevelName = '';
+    let gameDifficulty = '';
+    let currentLevelNum = 1; 
+    let perfectAnswers = 0; 
+    let totalWrongCount = 0; 
+    let currentQuestionMistake = false;
+    let isDebouncing = false; 
+
+    // === 오디오 전동 스펙 및 상태 관리 ===
+    let isMuted = true; // 기본 설정: 음소거
+    let currentVoiceGender = 'm'; // 문항당 남/여 무작위 고정 변수
+    let currentAudioObj = null; // 오디오 인터럽트 제어용
+    let titleClickCount = 0, titleClickTimer = null; // 히든 검수 보드용
+    let testGender = 'm'; // 검수 모달 성우 토글
+
+    function normalizeText(txt) {
+        if (!txt) return "";
+        return txt.replace(/[\u200c\u200d]/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function lookupAudioEntry(txt) {
+        let clean = normalizeText(txt);
+        if (audioMap[clean]) return audioMap[clean];
+        if (audioMap[txt]) return audioMap[txt];
+        for (let k in audioMap) {
+            if (normalizeText(k) === clean) return audioMap[k];
+        }
+        return null;
+    }
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        const icon = document.querySelector('#muteBtn i');
+        if (isMuted) {
+            icon.className = 'fas fa-volume-mute';
+            document.getElementById('muteBtn').style.color = 'var(--accent)';
+            if (currentAudioObj) { currentAudioObj.pause(); currentAudioObj = null; }
+        } else {
+            icon.className = 'fas fa-volume-up';
+            document.getElementById('muteBtn').style.color = 'var(--primary)';
+        }
+    }
+
+    // 단일 단어 음성 재생 (0.85배속 & 인터럽트 지원)
+    function playWordAudio(wordText, overrideGender = null) {
+        if (isMuted) return;
+        if (currentAudioObj) {
+            currentAudioObj.pause();
+            currentAudioObj.currentTime = 0;
+        }
+
+        let entry = lookupAudioEntry(wordText);
+        if (!entry) return;
+
+        let gender = overrideGender || currentVoiceGender;
+        let fileName = entry.name + "_" + gender;
+        // 미수임 예외 처리 파일명 동기화
+        if (gender === 'f' && entry.name === 'mishuyim_audio') {
+            fileName = 'mishuiyim_audio_f';
+        }
+
+        let src = `${entry.f}/${fileName}.m4a`;
+        currentAudioObj = new Audio(src);
+        currentAudioObj.playbackRate = 0.85;
+        currentAudioObj.play().catch(e => console.log("Audio play error:", e));
+    }
+
+    // 오버랩(꼬리 물기) 통문장 순차적 재생
+    let currentSentenceAudios = []; // 통문장 재생 시 겹쳐서 재생되는 오디오 객체들을 추적
+
+    // === [추가] 모든 오디오 즉시 차단 함수 ===
+    function stopAllAudio() {
+        if (currentAudioObj) {
+            currentAudioObj.pause();
+            currentAudioObj.currentTime = 0;
+            currentAudioObj = null;
+        }
+        if (typeof currentSentenceAudios !== 'undefined' && currentSentenceAudios.length > 0) {
+            currentSentenceAudios.forEach(a => {
+                a.pause();
+                a.ontimeupdate = null;
+                a.onended = null;
+            });
+            currentSentenceAudios = [];
+        }
+    }
+
+    function playSentenceAudio(wordArray, overrideGender = null) {
+        if (isMuted || !wordArray || wordArray.length === 0) return;
+        
+        // 기존 단일 재생 중이던 오디오 정지
+        if (currentAudioObj) {
+            currentAudioObj.pause();
+            currentAudioObj.currentTime = 0;
+            currentAudioObj = null;
+        }
+        // 이전에 통문장 재생으로 겹쳐서 돌고 있던 오디오 배열 싹 다 강제 정지
+        currentSentenceAudios.forEach(a => {
+            a.pause();
+            a.ontimeupdate = null;
+            a.onended = null;
+        });
+        currentSentenceAudios = [];
+
+        let gender = overrideGender || currentVoiceGender;
+        let idx = 0;
+        const overlapSec = 1; // 통문장 딜레이 꼼수: 다음 단어 미리 출발 (발음이 너무 겹치면 이 값을 0.1 등으로 낮출 것)
+
+        function playNext() {
+            if (idx >= wordArray.length || isMuted) return;
+            
+            let word = wordArray[idx];
+            let entry = lookupAudioEntry(word);
+            idx++;
+
+            if (!entry) {
+                playNext();
+                return;
+            }
+
+            let fileName = entry.name + "_" + gender;
+            if (gender === 'f' && entry.name === 'mishuyim_audio') {
+                fileName = 'mishuiyim_audio_f';
+            }
+
+            let src = `${entry.f}/${fileName}.m4a`;
+            let audioNode = new Audio(src);
+            audioNode.playbackRate = 1.0; // 문장 재생은 1배속 유지
+            
+            currentSentenceAudios.push(audioNode);
+            currentAudioObj = audioNode; // 로비 복귀 등 글로벌 컨트롤 대응용
+
+            let nextCalled = false;
+
+            // 🎯 핵심 로직: 완전히 끝나기 전에 남은 시간을 계산하여 미리 다음 단어 호출
+            audioNode.ontimeupdate = () => {
+                if (!nextCalled && audioNode.duration > 0) {
+                    if (audioNode.duration - audioNode.currentTime <= overlapSec) {
+                        nextCalled = true;
+                        playNext();
+                    }
+                }
+            };
+
+            // onended는 timeupdate 이벤트가 건너뛰어지는 만약의 사태를 대비한 안전장치 및 메모리 정리용
+            audioNode.onended = () => {
+                if (!nextCalled) {
+                    nextCalled = true;
+                    playNext();
+                }
+                // 재생이 완전히 끝난 오디오는 배열에서 제거
+                currentSentenceAudios = currentSentenceAudios.filter(a => a !== audioNode);
+            };
+
+            audioNode.play().catch(e => {
+                console.log("Sentence audio overlap playback error:", e);
+                if (!nextCalled) {
+                    nextCalled = true;
+                    playNext();
+                }
+            });
+        }
+        
+        playNext();
+    }
+
+    function restartCurrentLevel() {
+        if (isResultLocked) return; 
+        startLevel(currentLevelNum, gameDifficulty);
+    }
+
+    function goHome() {
+        if (isResultLocked) return; 
+
+	stopAllAudio(); // 🎯 뒤로가기 누르는 즉시 사운드 컷
+
+        clearInterval(timerInterval);
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-home').classList.add('active');
+        document.getElementById('top-nav').style.display = 'none';
+        document.getElementById('main-header').style.display = 'block';
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('top-nav').style.display = 'flex';
+        document.getElementById('main-header').style.display = 'none';
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function startLevel(levelNum, difficulty) {
+        currentLevelNum = levelNum; 
+        let raw;
+        if (levelNum === 1) { raw = rawDataL1; currentLevelName = "Level 1"; }
+        else if (levelNum === 2) { raw = rawDataL2; currentLevelName = "Level 2"; }
+        else if (levelNum === 3) { raw = rawDataL3; currentLevelName = "Level 3"; }
+        else if (levelNum === 4) { raw = rawDataL4; currentLevelName = "Level 4"; }
+
+        sentenceData = prepareLevelData(raw);
+        gameDifficulty = difficulty;
+        totalQuestions = difficulty === 'repeat' ? 50 : 20;
+
+        gameQueue = [];
+        let cycles = Math.ceil(totalQuestions / sentenceData.length);
+        for(let i=0; i<cycles; i++) {
+            gameQueue = gameQueue.concat(shuffleArray([...sentenceData]));
+        }
+        gameQueue = gameQueue.slice(0, totalQuestions);
+
+        currentQuestionIdx = 0;
+        penaltySec = 0;
+        mistakes = [];
+        perfectAnswers = 0;
+        totalWrongCount = 0;
+        isChecked = false; 
+        isDebouncing = false;
+        
+        document.getElementById('total-step').innerText = totalQuestions;
+        showScreen('screen-game');
+        
+        clearInterval(timerInterval);
+        startTime = Date.now();
+        document.getElementById('game-timer').style.color = 'var(--primary)';
+        timerInterval = setInterval(() => {
+            let sec = Math.floor((Date.now() - startTime) / 1000) + penaltySec;
+            document.getElementById('game-timer').innerText = `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+        }, 1000);
+
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+	stopAllAudio(); // 🎯 '다음 문제'로 넘어갈 때 이전 문제의 사운드 즉시 컷
+
+        const data = gameQueue[currentQuestionIdx];
+        document.getElementById('current-step').innerText = currentQuestionIdx + 1;
+        selectedWords = [];
+        currentQuestionMistake = false; 
+        
+        // [합의안 반영] 문항당 남성/여성 성우를 딱 한 번 무작위 고정!
+        currentVoiceGender = Math.random() < 0.5 ? 'm' : 'f';
+
+        currentMode = Math.random() < 0.5 ? 'ko2fa' : 'fa2ko';
+        
+        const qLabel = document.getElementById('question-label');
+        const qText = document.getElementById('question-text');
+        const ansZone = document.getElementById('answer-zone');
+        const wordBank = document.getElementById('word-bank');
+
+        if (currentMode === 'ko2fa') {
+            qLabel.innerText = "다음 한국어 문장을 페르시아어 어순에 맞게 조립하세요.";
+            qText.innerText = data.ko_sentence;
+            qText.className = 'ko-text';
+            ansZone.className = 'answer-zone fa-zone';
+            wordBank.className = 'word-bank fa-zone';
+            currentPool = shuffleArray([...data.fa_pool]);
+        } else {
+            qLabel.innerText = "다음 페르시아어 문장을 한국어로 올바르게 번역하세요.";
+            // [합의안 반영] Fa ➔ Ko 모드 시 우상단 전체 음성 재생 버튼 신설
+            qText.className = 'fa-text';
+            qText.innerHTML = `
+                <span>${data.fa_sentence}</span>
+                <button class="btn-play-sentence" onclick="playSentenceAudio(gameQueue[currentQuestionIdx].fa_correct)" title="문장 전체 듣기">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+            `;
+            ansZone.className = 'answer-zone ko-zone';
+            wordBank.className = 'word-bank ko-zone';
+            currentPool = shuffleArray([...data.ko_pool]);
+        }
+        
+        renderUI();
+        updateProgress();
+        resetBottomPanel();
+    }
+
+    function selectWord(word, index) {
+        if(isChecked) return; 
+        
+        // 페르시아어 타일 선택 시 음성 즉시 재생
+        if (currentMode === 'ko2fa') {
+            playWordAudio(word);
+        }
+
+        selectedWords.push({ word: word, originalIndex: index });
+        renderUI();
+        checkButtonState();
+    }
+
+    function deselectWord(word, originalIndex, arrayIndex) {
+        if(isChecked) return;
+
+        if (currentMode === 'ko2fa') {
+            playWordAudio(word);
+        }
+
+        selectedWords.splice(arrayIndex, 1);
+        renderUI();
+        checkButtonState();
+    }
+
+    function renderUI() {
+        const bankEl = document.getElementById('word-bank');
+        const answerEl = document.getElementById('answer-zone');
+        
+        bankEl.innerHTML = '';
+        answerEl.innerHTML = '';
+
+        if (selectedWords.length > 0) {
+            answerEl.classList.add('active');
+        } else {
+            answerEl.classList.remove('active');
+        }
+
+        selectedWords.forEach((item, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'word-tile';
+            btn.innerText = item.word;
+            btn.onclick = () => deselectWord(item.word, item.originalIndex, idx);
+            answerEl.appendChild(btn);
+        });
+
+        currentPool.forEach((word, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'word-tile';
+            btn.innerText = word;
+            
+            if (selectedWords.some(item => item.originalIndex === idx)) {
+                btn.classList.add('disabled');
+            } else {
+                btn.onclick = () => selectWord(word, idx);
+            }
+            bankEl.appendChild(btn);
+        });
+    }
+
+    function checkButtonState() {
+        const btnSubmit = document.getElementById('btn-submit');
+        if (selectedWords.length > 0) {
+            btnSubmit.classList.add('ready');
+        } else {
+            btnSubmit.classList.remove('ready');
+        }
+    }
+
+    function resetBottomPanel() {
+        const btn = document.getElementById('btn-submit');
+        const box = document.getElementById('feedback-box');
+        
+        btn.className = 'btn-submit';
+        btn.innerText = '정답 확인';
+        box.style.display = 'none';
+        box.className = 'feedback-box';
+        isChecked = false;
+    }
+
+    function triggerDamageEffect() {
+        let container = document.querySelector('.container');
+        container.classList.add('damage-effect');
+        setTimeout(() => container.classList.remove('damage-effect'), 500);
+    }
+
+    function handleCheck() {
+        if (isDebouncing) return; 
+        if (selectedWords.length === 0 && !isChecked) return; 
+
+        const btn = document.getElementById('btn-submit');
+
+        if (isChecked) {
+            currentQuestionIdx++;
+            if (currentQuestionIdx >= totalQuestions) {
+                endGame();
+            } else {
+                loadQuestion();
+            }
+            return;
+        }
+
+        const data = gameQueue[currentQuestionIdx];
+        const userAnswer = selectedWords.map(item => item.word).join(' ');
+        
+        let correctAnswer;
+        if (currentMode === 'ko2fa') {
+            correctAnswer = data.fa_correct.join(' ');
+        } else {
+            correctAnswer = data.ko_correct.join(' ');
+        }
+        
+        const box = document.getElementById('feedback-box');
+        const title = document.getElementById('feedback-title');
+        const correctStr = document.getElementById('feedback-correct-answer');
+
+        if (userAnswer === correctAnswer) {
+            box.className = 'feedback-box success';
+            title.innerHTML = '<i class="fas fa-check-circle"></i> 정확합니다!';
+            correctStr.innerText = '';
+            
+            btn.className = 'btn-submit next-success';
+            btn.innerText = '다음 문제로';
+            
+            if(!currentQuestionMistake) perfectAnswers++;
+            
+        } else {
+            triggerDamageEffect();
+            penaltySec += 10; 
+            totalWrongCount++;
+            currentQuestionMistake = true; 
+            
+            let mistakeObj = { ko: data.ko_sentence, fa: data.fa_sentence };
+            if(!mistakes.find(m => m.fa === mistakeObj.fa)) mistakes.push(mistakeObj);
+
+            let timerEl = document.getElementById('game-timer');
+            timerEl.style.color = 'var(--primary)';
+            setTimeout(() => timerEl.style.color = 'var(--accent)', 300);
+
+            document.getElementById('answer-zone').classList.add('shake');
+            setTimeout(() => document.getElementById('answer-zone').classList.remove('shake'), 400);
+
+            box.className = 'feedback-box error';
+            title.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 올바른 어순은 다음과 같습니다 (+10초 페널티):';
+            correctStr.innerText = correctAnswer;
+            
+            if (currentMode === 'ko2fa') {
+                correctStr.className = 'fa-text';
+                correctStr.style.marginTop = '10px';
+                correctStr.style.textAlign = 'center'; 
+            } else {
+                correctStr.className = 'ko-text';
+                correctStr.style.marginTop = '15px';
+                correctStr.style.textAlign = 'center';
+            }
+            
+            btn.className = 'btn-submit next-error';
+            btn.innerText = '이해했습니다 (다음으로)';
+        }
+
+        box.style.display = 'block';
+        isChecked = true;
+
+        isDebouncing = true;
+        btn.style.opacity = '0.6';
+        btn.style.cursor = 'not-allowed';
+        setTimeout(() => {
+            isDebouncing = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+        }, 800);
+    }
+
+    function updateProgress() {
+        const progress = (currentQuestionIdx / totalQuestions) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+    }
+
+    function endGame() {
+        if (currentAudioObj) { currentAudioObj.pause(); currentAudioObj = null; }
+        clearInterval(timerInterval);
+        let totalSec = Math.floor((Date.now() - startTime) / 1000) + penaltySec;
+        
+        let accuracy = Math.floor((perfectAnswers / totalQuestions) * 100);
+
+        let rank = '';
+        if(gameDifficulty === 'repeat') {
+            if(accuracy < 80) rank = 'F';
+            else if(accuracy >= 95 && totalSec <= 350) rank = 'SSR';
+            else if(accuracy >= 90 && totalSec <= 450) rank = 'SR';
+            else rank = 'R';
+        } else {
+            if (accuracy < 60) rank = 'C';
+            else if (accuracy >= 90 && totalSec <= 150) rank = 'A+';
+            else if (accuracy >= 80 && totalSec <= 200) rank = 'A';
+            else rank = 'B';
+        }
+
+        showResultScreen(rank, totalSec, accuracy);
+    }
+
+    function showResultScreen(rank, totalSec, accuracy) {
+        showScreen('screen-result');
+        
+        let msg = '';
+        if (gameDifficulty === 'repeat') {
+            if (rank === 'SSR') msg = "경이로운 수준입니다. 어순이 뇌에 완벽히 각인되었습니다.";
+            else if (rank === 'SR') msg = "압도적인 실력입니다. 뼈대를 완벽히 꿰뚫고 있습니다.";
+            else if (rank === 'R') msg = "반복의 벽을 넘으셨군요. 대단한 끈기입니다.";
+            else msg = "체력적 한계에 부딪혔습니다. 오답 노트를 꼭 확인하십시오.";
+        } else {
+            if (rank === 'A+') msg = "완벽합니다! 원어민 수준의 직관력입니다.";
+            else if (rank === 'A') msg = "훌륭합니다! 어순 감각이 탁월하네요.";
+            else if (rank === 'B') msg = "준수합니다! 오답 노트만 확인해 보세요.";
+            else msg = "꾸준한 훈련이 정답입니다. 다시 도전해 보세요!";
+        }
+
+        let dashBox = document.getElementById('dashboard-box');
+        let badgeEl = document.getElementById('res-badge');
+        
+        if (gameDifficulty === 'repeat') {
+            dashBox.classList.add('extreme-mode');
+            badgeEl.className = 'mode-badge badge-extreme';
+            badgeEl.innerText = 'Repeat (50문항)';
+        } else {
+            dashBox.classList.remove('extreme-mode');
+            badgeEl.className = 'mode-badge badge-normal';
+            badgeEl.innerText = 'Normal (20문항)';
+        }
+
+        document.getElementById('res-mode').innerText = currentLevelName;
+        document.getElementById('res-rank').innerText = rank;
+        document.getElementById('res-msg').innerText = msg;
+        
+        document.getElementById('res-acc').innerText = `${accuracy}%`;
+        document.getElementById('res-wrong').innerText = `${totalWrongCount}회`;
+        document.getElementById('res-time').innerText = `${Math.floor(totalSec/60)}분 ${String(totalSec%60).padStart(2,'0')}초`;
+
+        let mistArea = document.getElementById('mistake-area');
+        if (mistakes.length > 0) {
+            mistArea.style.display = 'block';
+            let html = mistakes.map(m => {
+                return `<div class="mistake-item"><span>${m.fa}</span> <br> ${m.ko}</div>`;
+            }).join('');
+            document.getElementById('mistake-list').innerHTML = html;
+        } else {
+            mistArea.style.display = 'none';
+        }
+
+        lockResultScreen();
+    }
+
+    function lockResultScreen() {
+        if (mistakes.length === 0) return; 
+
+        isResultLocked = true;
+        const backBtn = document.querySelector('.top-nav .btn-home');
+        const portalBtn = document.querySelector('.portal-home-button');
+        const topNav = document.getElementById('top-nav');
+        const returnLobbyBtn = document.getElementById('btn-return-lobby');
+        const retryLevelBtn = document.getElementById('btn-retry-level'); 
+
+        backBtn.classList.add('btn-locked');
+        portalBtn.style.pointerEvents = 'none';
+        portalBtn.style.opacity = '0.4';
+        
+        if(returnLobbyBtn) {
+            returnLobbyBtn.classList.add('btn-locked');
+            returnLobbyBtn.innerHTML = `<i class="fas fa-lock"></i> 오답 확인 중...`;
+        }
+        if(retryLevelBtn) { 
+            retryLevelBtn.classList.add('btn-locked');
+            retryLevelBtn.innerHTML = `<i class="fas fa-lock"></i> 오답 확인 중...`;
+        }
+
+        let timerSpan = document.getElementById('lock-timer-display');
+        if(!timerSpan) {
+            timerSpan = document.createElement('span');
+            timerSpan.id = 'lock-timer-display';
+            timerSpan.className = 'lock-timer';
+            topNav.insertBefore(timerSpan, backBtn.nextSibling);
+        }
+
+        let timeLeft = 5;
+        backBtn.innerHTML = `<i class="fas fa-lock"></i> 오답 확인 중...`;
+        timerSpan.innerText = `(${timeLeft}초 후 해제)`;
+
+        let lockInterval = setInterval(() => {
+            timeLeft--;
+            timerSpan.innerText = `(${timeLeft}초 후 해제)`;
+            
+            if(timeLeft <= 0) {
+                clearInterval(lockInterval);
+                isResultLocked = false;
+                
+                backBtn.classList.remove('btn-locked');
+                portalBtn.style.pointerEvents = 'auto';
+                portalBtn.style.opacity = '1';
+                backBtn.innerHTML = `<i class="fas fa-arrow-left"></i> 뒤로가기`;
+                timerSpan.innerText = "";
+                
+                if(returnLobbyBtn) {
+                    returnLobbyBtn.classList.remove('btn-locked');
+                    returnLobbyBtn.innerHTML = `로비로 돌아가기`;
+                }
+                if(retryLevelBtn) { 
+                    retryLevelBtn.classList.remove('btn-locked');
+                    retryLevelBtn.innerHTML = `다시하기 <i class="fas fa-redo"></i>`;
+                }
+                
+                backBtn.style.transition = "0.3s";
+                backBtn.style.backgroundColor = "#e3f2fd";
+                backBtn.style.borderColor = "var(--primary)";
+                setTimeout(() => {
+                    backBtn.style.backgroundColor = "#ffffff";
+                    backBtn.style.borderColor = "#dee2e6";
+                }, 500);
+            }
+        }, 1000);
+    }
+
+    async function copyResultImage() {
+        const btn = document.querySelector('.btn-share');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 이미지 생성 중...';
+        try {
+            const el = document.getElementById('dashboard-box'); 
+            const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff' });
+            canvas.toBlob(async (blob) => {
+                try {
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    await navigator.clipboard.write([item]);
+                    btn.innerHTML = '<i class="fas fa-check"></i> 클립보드에 복사되었습니다! (Ctrl+V)';
+                    btn.style.background = '#0b2a4a';
+                } catch (err) {
+                    btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 브라우저 권한 필요';
+                }
+            });
+        } catch(e) {
+            btn.innerHTML = '<i class="fas fa-exclamation"></i> 오류 발생';
+        }
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-camera"></i> 리포트 캡처하기 (클립보드)';
+            btn.style.background = '#20c997';
+        }, 3000);
+    }
+
+    // === 히든 개발자 사운드 검수 보드 트리거 (타이틀 5연속 클릭) ===
+    function handleTitleClick() {
+        titleClickCount++;
+        clearTimeout(titleClickTimer);
+        titleClickTimer = setTimeout(() => titleClickCount = 0, 2000);
+
+        if (titleClickCount >= 5) {
+            titleClickCount = 0;
+            openTestBoard();
+        }
+    }
+
+    function openTestBoard() {
+        const grid = document.getElementById('test-board-grid');
+        grid.innerHTML = "";
+        let keys = Object.keys(audioMap);
+
+        keys.forEach(key => {
+            let btn = document.createElement('button');
+            btn.className = 'test-tile';
+            btn.innerText = key;
+            btn.onclick = () => {
+                // 검수 모달에서는 음소거 해제 상태로 테스트
+                let tempMute = isMuted;
+                isMuted = false;
+                playWordAudio(key, testGender);
+                isMuted = tempMute;
+            };
+            grid.appendChild(btn);
+        });
+
+        document.getElementById('hiddenAudioModal').style.display = 'flex';
+    }
+
+    function closeTestBoard() {
+        document.getElementById('hiddenAudioModal').style.display = 'none';
+        if (currentAudioObj) { currentAudioObj.pause(); currentAudioObj = null; }
+    }
+
+    // ESC 키 누르면 검수 모달 닫기
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeTestBoard();
+    });
+
+</script>
+</body>
+</html>
