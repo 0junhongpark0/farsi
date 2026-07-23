@@ -1064,9 +1064,7 @@
     function deselectWord(word, originalIndex, arrayIndex) {
         if(isChecked) return;
 
-        if (currentMode === 'ko2fa') {
-            playWordAudio(word);
-        }
+        // 페르시아어 타일 취소 시 음성 재생 로직 삭제 완료 (인지적 마찰 방지)
 
         selectedWords.splice(arrayIndex, 1);
         renderUI();
