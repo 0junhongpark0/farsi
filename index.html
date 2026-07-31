@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>페르시아어 라운지</title>
+    <title>페르시아어 통합 학습 포털</title>
 
     <script>
-        // 건의사항 구글 폼 링크(아래 따옴표 안에 주소 삽입) , 구글 애널리틱스 링크는 script 위 공백에 삽입
+        // 건의사항 구글 폼 링크
         const FEEDBACK_FORM_URL = "https://forms.gle/LFbLLqPWRK3j5mW19"; 
 
         function openFeedback() {
@@ -14,11 +14,10 @@
             else alert("건의사항 링크가 아직 연결되지 않았습니다.");
         }
 
-	// 하단 카피라이트 연도 자동 갱신 코드
+        // 하단 카피라이트 연도 자동 갱신 코드
         window.addEventListener('DOMContentLoaded', (event) => {
             document.getElementById('current-year').textContent = new Date().getFullYear();
         });
-
     </script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
@@ -27,9 +26,11 @@
     <style>
         :root {
             --primary-color: #0b2a4a;
+            --primary-hover: #1a3b5c;
             --accent-color: #fa5252;
             --bg-color: #f8f9fa;
             --card-bg: #ffffff;
+            --success-color: #087f5b;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -47,212 +48,217 @@
         header {
             background: var(--primary-color);
             color: white;
-            padding: 20px; 
+            padding: 30px 20px; 
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         header h1 { 
-            font-size: 1.8rem; 
-            margin-bottom: 5px; 
+            font-size: 2.2rem; 
+            margin-bottom: 10px; 
             letter-spacing: -1px;
         }
-        header p { opacity: 0.8; font-size: 0.95rem; }
+        header p { opacity: 0.85; font-size: 1.05rem; }
 
         /* --- Main Content --- */
         .container {
             width: 100%;
             max-width: 1000px;
-            margin: 15px auto;
+            margin: 40px auto;
             padding: 0 20px;
             flex-grow: 1; 
+            display: flex;
+            flex-direction: column;
         }
 
         .section-header-wrapper {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #dee2e6;
+            justify-content: flex-end;
+            margin-bottom: 20px;
         }
 
-        .section-title {
-            font-size: 1.2rem;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-        }
-
-        /* [수정 1] 건의사항 버튼 UI 확대 */
         .btn-feedback {
             background: #e3fafc;
             color: #0b2a4a;
             border: 1px solid #74c0fc;
-            padding: 8px 20px; /* 기존 6px 15px 에서 확대 */
+            padding: 8px 20px;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
-            font-size: 0.95rem; /* 기존 0.9rem 에서 확대 */
+            font-size: 0.95rem;
         }
         .btn-feedback:hover {
             background: #74c0fc;
             color: white;
         }
 
-        /* --- Grid System: 3열 강제 --- */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 15px;
-            margin-bottom: 20px;
+        /* --- Portal Dual Grid --- */
+        .portal-grid {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
         }
 
-        /* [수정 2] 카드 내부 여백 확대 및 [수정 3] 1,2열 카드 높이 강제 통일 */
-        .feature-card {
+        .portal-card {
+            flex: 1;
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px 15px; /* 기존 15px에서 상하 여백을 늘려 시원하게 만듦 */
-            min-height: 200px; /* 내용물이 적은 '준비 중' 카드도 앞선 카드들과 동일한 높이를 가지도록 강제 */
+            border: 3px solid transparent;
+            border-radius: 20px;
+            padding: 50px 30px;
             text-decoration: none;
             color: inherit;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            border: 1px solid transparent;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .feature-card:hover {
-            transform: translateY(-5px);
+        /* 왼쪽: 독학하기 (기존 톤앤매너 유지) */
+        .portal-card.self-study { border-color: #dee2e6; }
+        .portal-card.self-study .icon-box { color: var(--primary-color); }
+        .portal-card.self-study:hover {
+            transform: translateY(-10px);
             border-color: var(--primary-color);
-            box-shadow: 0 8px 25px rgba(11, 42, 74, 0.15);
+            box-shadow: 0 15px 35px rgba(11, 42, 74, 0.15);
+            background-color: #f1f3f5;
         }
+
+        /* 오른쪽: 수업하기 (강렬한 대비 효과) */
+        .portal-card.class-mode { border-color: #dee2e6; }
+        .portal-card.class-mode .icon-box { color: var(--success-color); }
+        .portal-card.class-mode:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 15px 35px rgba(11, 42, 74, 0.25);
+        }
+        .portal-card.class-mode:hover .icon-box { color: #63e6be; }
+        .portal-card.class-mode:hover h2 { color: white; }
+        .portal-card.class-mode:hover .desc { color: #e9ecef; }
+        .portal-card.class-mode:hover .feature-list li { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
 
         .icon-box {
-            font-size: 1.8rem;
-            color: var(--primary-color);
+            font-size: 4rem;
+            margin-bottom: 20px;
+            transition: 0.3s;
         }
 
-        .feature-card h3 { font-size: 1.15rem; color: var(--primary-color); }
-        .feature-card p { font-size: 0.9rem; color: #666; word-break: keep-all; line-height: 1.4; }
+        .portal-card h2 { 
+            font-size: 1.8rem; 
+            color: var(--primary-color); 
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
         
-	/* --- 뱃지(Badge) 공통 뼈대 --- */
-        .badge {
-            align-self: flex-start;
-            padding: 4px 10px;
-            border-radius: 6px; 
-            font-size: 0.75rem;
-            font-weight: bold;
-            letter-spacing: 1px;
+        .portal-card .desc { 
+            font-size: 1.05rem; 
+            color: #666; 
+            word-break: keep-all; 
+            line-height: 1.5; 
+            margin-bottom: 25px;
+            transition: 0.3s;
         }
 
-        /* --- 뱃지 시맨틱 컬러 팔레트 --- */
-        .badge-hot      { background-color: #ffe3e3; color: #e03131; border: 1px solid #ffc9c9; } /* 인기, 강조 (빨강) */
-        .badge-new      { background-color: #fff3bf; color: #f08c00; border: 1px solid #ffec99; } /* 신규 (노랑) */
-        .badge-beginner { background-color: #e3fafc; color: #0c8599; border: 1px solid #99e9f2; } /* 입문, 기초 (청록) */
-        .badge-advanced { background-color: #f3f0ff; color: #845ef7; border: 1px solid #e5dbff; } /* 심화, 고급 (보라) */
-        .badge-notice   { background-color: #e9ecef; color: #495057; border: 1px solid #ced4da; } /* 공지, 일반 (회색) */
-        .badge-success  { background-color: #d3f9d8; color: #099268; border: 1px solid #b2f2bb; } /* 성공, 완료 (초록) */
+        .feature-list {
+            list-style: none;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feature-list li {
+            background: var(--bg-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            transition: 0.3s;
+        }
 
         /* --- Footer --- */
+        .info-box {
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 1px solid #dee2e6;
+            margin-bottom: 30px;
+        }
+        .info-box h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
         footer {
             text-align: center;
-            padding: 20px;
+            padding: 25px;
             color: #adb5bd;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             background: #ffffff;
             border-top: 1px solid #dee2e6;
         }
 
         /* Responsive */
-        @media (max-width: 850px) {
-            .feature-grid { grid-template-columns: repeat(2, 1fr); } 
-        }
-        @media (max-width: 600px) {
-            header h1 { font-size: 1.5rem; }
-            .feature-grid { grid-template-columns: 1fr; } 
-            .section-header-wrapper { flex-direction: column; align-items: flex-start; gap: 10px; }
+        @media (max-width: 768px) {
+            .portal-grid { flex-direction: column; } 
+            header h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>페르시아어 라운지</h1>
+        <h1>페르시아어 통합 학습 포털</h1>
         <p>글자부터 문장까지, 체계적인 페르시아어 학습을 위한 도구 모음</p>
     </header>
 
     <div class="container">
         
         <div class="section-header-wrapper">
-            <div class="section-title">
-                <i class="fas fa-rocket"></i> 학습 도구 바로가기
-            </div>
             <button class="btn-feedback" onclick="openFeedback()"><i class="fas fa-lightbulb"></i> 건의 사항 / 버그 제보</button>
         </div>
 
-        <div class="feature-grid">
-            <a href="word_main.html" class="feature-card">
-                <div class="icon-box"><i class="fas fa-book-open"></i></div>
-                <div class="badge badge-success">기본</div>
-                <h3>기본 단어장</h3>
-                <p>필수 어휘를 검색하고 다양한 게임을 통해 암기합니다.</p>
+        <div class="portal-grid">
+            <!-- 1. 독학용 라운지 (기존 index.html -> lounge.html 로 변경 연결) -->
+            <a href="lounge.html" class="portal-card self-study">
+                <div class="icon-box"><i class="fas fa-book-reader"></i></div>
+                <h2>혼자 훈련하기</h2>
+                <p class="desc">내 페이스에 맞춰 문자와 단어, 어순을 반복 훈련하는 자습용 라운지입니다.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> 기초/기본 단어장 및 게임</li>
+                    <li><i class="fas fa-check"></i> 페르시아어 타자 및 숫자 연습</li>
+                    <li><i class="fas fa-check"></i> 문장 조립 반복 훈련 (Drill)</li>
+                </ul>
             </a>
 
-            <a href="number.html" class="feature-card">
-                <div class="icon-box"><i class="fas fa-calculator"></i></div>
-                <div class="badge badge-new">보충</div>
-                <h3>숫자 학습</h3>
-                <p>페르시아 숫자의 표기, 사칙연산, 날짜 및 시간 읽기를 훈련합니다.</p>
-            </a>
-
-            <a href="typing.html" class="feature-card">
-                <div class="icon-box"><i class="fas fa-keyboard"></i></div>
-                <div class="badge badge-hot">심화</div>
-                <h3>타자 연습</h3>
-                <p>자판 배열을 익히고 떨어지는 단어를 맞추는 산성비 게임으로 타이핑 속도를 올립니다.</p>
-            </a>
-
-            <a href="alefba.html" class="feature-card">
-                <div class="icon-box"><i class="fas fa-font"></i></div>
-                <div class="badge badge-beginner">입문</div>
-                <h3>문자 학습</h3>
-                <p>페르시아어 문자를 반복학습합니다.</p>
-            </a>
-
-            <a href="word_basic.html" class="feature-card">
-                <div class="icon-box"><i class="fas fa-book-open"></i></div>
-                <div class="badge badge-beginner">기초</div>
-                <h3>기초 단어장</h3>
-                <p>기초 어휘를 검색하고 다양한 게임을 통해 암기합니다.</p>
-            </a>
-
-            <a href="grammar.html" class="feature-card">
-                <div class="icon-box"><i class="fas fa-book-open"></i></div>
-                <div class="badge badge-success">기본</div>
-                <h3>문법 학습</h3>
-                <p>문법 규칙들을 간단한 게임을 통해 암기합니다.</p>
-            </a>
-
-	    <a href="syntax.html" class="feature-card">
-                <div class="icon-box"><i class="fas fa-puzzle-piece"></i></div>
-                <div class="badge badge-hot">심화</div>
-                <h3>문장 조립</h3>
-                <p>단어 블록을 직접 배열하며 페르시아어 어순과 문법의 뼈대를 체화합니다.</p>
+            <!-- 2. 대면 수업용 랩 (신규 class.html 로 연결) -->
+            <a href="class.html" class="portal-card class-mode">
+                <div class="icon-box"><i class="fas fa-chalkboard-teacher"></i></div>
+                <h2>수업 참여하기</h2>
+                <p class="desc">대면 강의 진도에 맞춰 교수님과 함께 진행하는 실시간 랩(Lab) 세션입니다.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> 주차별 교재 연동 단어/문법</li>
+                    <li><i class="fas fa-check"></i> 실시간 퀴즈 및 진도 동기화</li>
+                    <li><i class="fas fa-check"></i> 발화(음성) 및 즉각 피드백</li>
+                </ul>
             </a>
         </div>
 
-        <div class="section-title" style="margin-top: 30px; font-size: 1.1rem; border-bottom: none; margin-bottom: 10px;">
-            <i class="fas fa-info-circle"></i> 안내 사항
+        <div class="info-box">
+            <h4><i class="fas fa-info-circle"></i> 안내 사항</h4>
+            <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
+                본 사이트는 페르시아어 습득 편의성 개선을 위해 제작된 통합 포털입니다.<br>
+                목적에 맞는 버튼을 클릭하여 이동해 주십시오. 학습 중 발견되는 오타나 기능 개선 아이디어는 우측 상단의 <strong>[건의 사항]</strong> 버튼을 통해 자유롭게 남겨주시기 바랍니다.
+            </p>
         </div>
-        <p style="color: #666; font-size: 0.9rem; background: white; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
-            본 사이트는 페르시아어 습득 편의성 개선을 위해 제작된 학습 도구 모음 사이트입니다. <br>
-            학습 중 발견되는 오타나 기능 개선 아이디어는 우측 상단의 <strong>[건의 사항]</strong> 버튼을 통해 자유롭게 남겨주시기 바랍니다.
-        </p>
     </div>
 
     <footer>

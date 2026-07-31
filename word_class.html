@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>페르시아어 기초 단어장</title>
+    
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0b2a4a;
+            --accent: #fa5252;
+            --bg: #e9ecef;
+            --card: #ffffff;
+            --persian-font: 'Vazirmatn', 'Sahel', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        /* 글로벌 로딩 스크린 */
+        #global-loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        .container { width: 100%; max-width: 1200px; min-height: 750px; background: var(--card); border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); position: relative; overflow: hidden; display: flex; flex-direction: column; transition: 0.2s; }
+        
+        @keyframes damageFlash {
+            0% { box-shadow: inset 0 0 0px 0px rgba(250, 82, 82, 0); }
+            50% { box-shadow: inset 0 0 80px 15px rgba(250, 82, 82, 0.4); }
+            100% { box-shadow: inset 0 0 0px 0px rgba(250, 82, 82, 0); }
+        }
+        .damage-effect { animation: damageFlash 0.5s ease-out; }
+
+        .top-nav { display: none; background: #f8f9fa; padding: 20px 30px; border-bottom: 2px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; }
+        .btn-home { background: #ffffff; border: 2px solid #dee2e6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--primary); font-size: 1.1rem; }
+        .btn-home:hover { background: #e9ecef; border-color: #adb5bd; }
+        
+        /* 음소거 버튼 스타일 */
+        #btn-mute { width: 45px; padding: 10px 0; text-align: center; }
+
+        header { background: var(--primary); color: white; padding: 25px; text-align: center; }
+        header h2 { font-size: 2.5rem; margin: 0; }
+        header p { margin-top: 15px; opacity: 0.8; font-size: 1.2rem; }
+
+        .screen { display: none; padding: 40px 50px; flex-grow: 1; overflow-y: auto; max-height: calc(100vh - 150px); }
+        .screen.active { display: block; }
+
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 30px; width: 100%; }
+        @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } }
+        
+        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; }
+        .mode-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(11, 42, 74, 0.1); }
+        .mode-icon { font-size: 3.5rem; color: var(--primary); margin-bottom: 20px; }
+        .mode-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: var(--primary); }
+        .mode-card p { font-size: 1.05rem; color: #666; word-break: keep-all; }
+
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; font-weight: bold; font-size: 1.5rem; padding-bottom: 15px; border-bottom: 2px solid #f1f3f5; }
+        
+        /* 모드 선택 버튼 분리 */
+        .btn-group { display: flex; gap: 15px; margin-top: 40px; }
+        .btn-start { flex: 1; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-start:hover { background: #081e36; transform: translateY(-2px); }
+        .btn-extreme { flex: 1; padding: 20px; background: #8b0000; color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-extreme:hover { background: #5a0000; transform: translateY(-2px); }
+
+        .mcq-problem { font-family: var(--persian-font); font-size: 3.5rem; text-align: center; margin: 40px 0; font-weight: bold; color: var(--primary); }
+        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .mcq-btn { font-family: var(--persian-font); font-size: 1.8rem; padding: 25px; background: #fff; border: 3px solid #dee2e6; border-radius: 12px; cursor: pointer; transition: 0.1s; font-weight: bold; color: #495057; }
+        .mcq-btn.wrong { border-color: var(--accent); background: #fff5f5; animation: shake 0.4s; color: var(--accent); }
+
+        .match-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
+        @media (max-width: 600px) { .match-grid { grid-template-columns: repeat(3, 1fr); } }
+        .match-card { background: white; border: 3px solid #dee2e6; border-radius: 12px; height: 100px; display: flex; justify-content: center; align-items: center; font-size: 1.6rem; font-family: var(--persian-font); font-weight: bold; cursor: pointer; transition: 0.2s; text-align: center; padding: 10px; user-select: none; }
+        .match-card.selected { border-color: var(--primary); background: #e3f2fd; color: var(--primary); transform: scale(1.05); }
+        .match-card.matched { visibility: hidden; opacity: 0; pointer-events: none; }
+        .match-card.wrong { border-color: var(--accent); background: #ffe3e3; color: var(--accent); animation: shake 0.4s; }
+
+        .scramble-mean { font-size: 2.5rem; text-align: center; margin: 30px 0 10px 0; font-weight: bold; color: var(--primary); }
+        .scramble-input-area { min-height: 80px; background: #f8f9fa; border: 3px dashed #ced4da; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-bottom: 30px; padding: 10px; gap: 5px; font-family: var(--persian-font); font-size: 3rem; color: var(--primary); direction: rtl; }
+        .scramble-letters { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; direction: rtl; }
+        .letter-btn { width: 60px; height: 60px; font-family: var(--persian-font); font-size: 2rem; font-weight: bold; border: 2px solid var(--primary); background: white; color: var(--primary); border-radius: 12px; cursor: pointer; transition: 0.1s; display: flex; justify-content: center; align-items: center; }
+        .letter-btn.used { opacity: 0.3; pointer-events: none; transform: scale(0.9); }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        .vocab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 20px; }
+        .vocab-controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .vocab-count { font-weight: bold; color: var(--primary); font-size: 1.05rem; white-space: nowrap; }
+        
+        .search-bar { padding: 10px 18px; width: 100%; max-width: 450px; border: 2px solid #ced4da; border-radius: 8px; font-size: 1.05rem; outline: none; }
+        .search-bar:focus { border-color: var(--primary); }
+
+        .btn-control { padding: 8px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .btn-shuffle { background: #ffc107; color: #000; }
+        .btn-shuffle:hover { background: #fab005; }
+        .btn-download { background: #e9ecef; color: #495057; border: 1px solid #ced4da; }
+        .btn-download:hover { background: #dee2e6; }
+
+        .vocab-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .vocab-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; font-size: 1.2rem; transition: 0.2s; }
+        .vocab-item:hover { background: #e3f2fd; border-color: var(--primary); transform: translateX(5px); }
+        .vocab-per { font-family: var(--persian-font); font-size: 1.8rem; font-weight: bold; color: var(--primary); }
+        .vocab-kor { font-size: 1.1rem; color: #495057; font-weight: bold; }
+
+        .loading-view { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px; color: var(--primary); font-weight: bold; font-size: 1.2rem; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
+
+        .flashcard { width: 80%; max-width: 600px; height: 50vh; min-height: 350px; background: white; border-radius: 20px; cursor: pointer; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .fc-top { flex: 6; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 2px dashed #e9ecef; padding: 20px; text-align: center; }
+        .fc-bottom { flex: 4; display: flex; justify-content: center; align-items: center; background: #f8f9fa; border-radius: 0 0 20px 20px; padding: 20px; text-align: center; }
+        .fc-content-hidden { display: none !important; } 
+        
+        .card-per { font-family: var(--persian-font); font-size: 5rem; color: var(--primary); line-height: 1.2; }
+        .card-pron { font-size: 1.3rem; color: #868e96; margin-top: 10px; font-family: sans-serif; }
+        .card-mean { font-size: 2.2rem; font-weight: bold; color: var(--accent); }
+        
+        .card-controls { position: absolute; bottom: -70px; width: 100%; display: flex; justify-content: center; gap: 50px; }
+        .card-btn { background: white; border: none; font-size: 1.6rem; cursor: pointer; width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; color: var(--primary); display:flex; justify-content:center; align-items:center; }
+        .card-btn:hover { background: #e3f2fd; transform: scale(1.1); }
+        .close-modal { position: absolute; top: 20px; right: 25px; font-size: 2rem; cursor: pointer; border:none; background:none; color: #adb5bd; transition: 0.2s; }
+        .close-modal:hover { color: var(--accent); }
+
+        /* 결과 및 인증서 익스트림 디자인 추가 */
+        #certificate { background: #fff; padding: 40px; border: 8px solid var(--primary); border-radius: 16px; text-align: center; position: relative; margin-bottom: 30px; overflow: hidden;}
+        #certificate.extreme-mode { border-color: #8b0000; background: #fffdfd; }
+        #certificate.extreme-mode::before {
+            content: 'EXTREME MODE'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 6rem; color: rgba(250, 82, 82, 0.08); pointer-events: none;
+            white-space: nowrap; font-weight: bold; letter-spacing: 5px;
+        }
+
+        .cert-title { font-size: 2rem; color: var(--primary); margin-bottom: 15px; border-bottom: 2px dashed #ccc; padding-bottom: 15px; font-weight: bold; }
+        .extreme-mode .cert-title { color: #8b0000; border-bottom-color: #eebfbf; }
+        .cert-rank { font-size: 5rem; font-weight: bold; color: var(--accent); margin: 20px 0; text-shadow: 2px 2px 0px #ffe3e3; position: relative; z-index: 1;}
+        .extreme-mode .cert-rank { color: #8b0000; text-shadow: 2px 2px 0px #ffd0d0; }
+        .cert-msg { font-size: 1.3rem; color: #555; margin-bottom: 15px; font-weight: bold; position: relative; z-index: 1;}
+        .cert-accuracy { font-size: 1.2rem; color: #087f5b; margin-bottom: 30px; font-weight: bold; position: relative; z-index: 1;}
+        .cert-stamp { position: absolute; bottom: 20px; right: 25px; font-size: 1rem; color: #888; text-align: right; }
+        
+        .mistake-area { text-align: left; background: #f8f9fa; padding: 25px; border-radius: 12px; max-height: 250px; overflow-y: auto; border: 1px solid #dee2e6; margin-bottom: 20px; }
+        .mistake-item { border-bottom: 1px dashed #ccc; padding: 15px 0; font-size: 1.2rem; color: var(--accent); }
+        .mistake-item:last-child { border-bottom: none; }
+        .mistake-item span { color: #0b2a4a; margin-right: 15px; display: inline-block; font-family: var(--persian-font); font-weight: bold; font-size: 1.4rem; }
+
+        .btn-share { width: 100%; padding: 18px; background: #20c997; color: white; border: none; border-radius: 8px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-share:hover { background: #12b886; }
+
+	/* 홈 버튼 우측 하단으로 이동 (충돌 원천 차단) */
+.portal-home-button { position: fixed; top: auto !important; left: 25px !important; bottom: 25px; right: auto !important; width: 55px; height: 55px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; transition: all 0.3s ease; }
+        .portal-home-button:hover { background-color: #1a3a5a; transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .portal-home-button i { font-size: 1.5rem; }
+        
+        /* 모드 배지 스타일 */
+        .mode-badge { display: inline-block; padding: 3px 10px; border-radius: 5px; font-size: 1rem; font-weight: bold; vertical-align: middle; margin-left: 10px;}
+        .badge-normal { background: #e3f2fd; color: #0b2a4a; }
+        .badge-extreme { background: #ffe3e3; color: #8b0000; }
+
+/* 오답노트 발음 및 강제 체류(Lock) 관련 스타일 */
+.mistake-pron { font-size: 1.1rem; color: #868e96; margin-right: 15px; font-family: sans-serif; }
+.btn-locked {
+    pointer-events: none !important;
+    background: #f8f9fa !important;
+    color: #adb5bd !important;
+    border-color: #dee2e6 !important;
+}
+.lock-timer {
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: bold;
+    margin-left: 15px;
+    transition: 0.3s;
+}
+
+/* --- 모바일 및 태블릿 반응형 대응 --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px; /* 여백 축소 */
+        align-items: flex-start; /* 모바일에서는 상단부터 정렬 */
+    }
+
+    .container {
+        min-height: auto; /* 고정 높이 해제 */
+        height: calc(100vh - 20px); /* 화면 높이에 맞춤 */
+    }
+
+    header h2 {
+        font-size: 1.8rem; /* 헤더 크기 축소 */
+    }
+
+    .screen {
+        padding: 20px; /* 내부 여백 축소 */
+        max-height: calc(100vh - 120px);
+    }
+
+    /* 객관식 게임 문제 텍스트 크기 조절 */
+    .mcq-problem {
+        font-size: 2.2rem;
+        margin: 20px 0;
+    }
+
+    /* 객관식 버튼 1열로 배치 (선택 사항) */
+    .mcq-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .mcq-btn {
+        padding: 15px;
+        font-size: 1.3rem;
+    }
+
+    /* 스피드 매치 그리드 조정 */
+    .match-grid {
+        grid-template-columns: repeat(3, 1fr); /* 모바일에서는 3열이 적당 */
+        gap: 8px;
+    }
+
+    .match-card {
+        height: 80px;
+        font-size: 1.2rem;
+    }
+
+    /* 스크램블 입력 및 버튼 크기 조절 */
+    .scramble-mean {
+        font-size: 1.8rem;
+    }
+    
+    .scramble-input-area {
+        font-size: 2rem;
+        min-height: 60px;
+    }
+
+    .letter-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.5rem;
+    }
+
+    /* 플래시카드 크기 조정 */
+    .flashcard {
+        width: 95%;
+        height: 60vh;
+    }
+
+    .card-per {
+        font-size: 3.5rem;
+    }
+    
+    .card-mean {
+        font-size: 1.8rem;
+    }
+
+    /* 결과창 인증서 텍스트 조절 */
+    .cert-rank {
+        font-size: 3.5rem;
+    }
+    
+    .cert-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* 초소형 기기 (iPhone SE 등) 대응 */
+@media (max-width: 380px) {
+    .match-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    header h2 {
+        font-size: 1.5rem;
+    }
+}
+
+	/* 데스크톱(마우스) 환경에서만 hover 효과 적용 (모바일 터치 파란 잔상 제거) */
+        @media (hover: hover) and (pointer: fine) {
+            .mcq-btn:hover { border-color: var(--primary); background: #f8f9fa; transform: scale(1.02); color: var(--primary); }
+            .match-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: #adb5bd; }
+            .letter-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); }
+        }
+        /* 터치 시 즉각적인 피드백만 남김 */
+        .mcq-btn:active { background: #f8f9fa; transform: scale(0.98); }
+        .match-card:active { transform: scale(0.95); }
+        .letter-btn:active { transform: scale(0.95); }
+
+	/* 모바일 전용 UI 수정 (스피드 매치 4x4, 단어장 검색창 확장) */
+        @media (max-width: 768px) {
+            .match-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 6px; }
+            .match-card { height: 70px; font-size: 1.1rem; padding: 5px; }
+            
+            .vocab-header { flex-direction: column; align-items: stretch; gap: 15px; }
+            .search-bar { max-width: 100%; width: 100%; padding: 12px; font-size: 1.1rem; }
+            .vocab-controls { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+            .vocab-count { width: 100%; text-align: left; margin-bottom: 5px; font-size: 1.1rem; }
+            .btn-control { flex: 1; justify-content: center; padding: 12px; font-size: 1rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="global-loading">
+    <div class="spinner"></div>
+    <h2 style="margin-top:20px; color:var(--primary);">단어장 데이터 연동 중...</h2>
+</div>
+
+<a href="index.html" class="portal-home-button" title="메인 페이지로 돌아가기">
+    <i class="fas fa-home"></i>
+</a>
+
+<div class="container" id="main-container">
+    <div class="top-nav" id="top-nav" style="display: none;">
+        <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
+    </div>
+
+    <header id="main-header">
+        <h2>페르시아어 기초 단어장</h2>
+        <p>게임으로 완벽하게 체화하는 기초 단어 학습 공간</p>
+    </header>
+
+    <div id="screen-home" class="screen active">
+<div class="home-grid">
+            <!-- 1. 객관식 서바이벌 -->
+            <div class="mode-card" style="cursor: default; padding: 40px 30px; min-height: 380px;">
+                <i class="fas fa-tasks mode-icon" style="margin-bottom: 20px; font-size: 4rem;"></i>
+                <h3 style="margin-bottom: 20px; font-size: 1.8rem;">객관식 서바이벌</h3>
+                <div style="font-size: 1.05rem; color: #555; text-align: left; margin-bottom: 30px; line-height: 1.6; word-break: keep-all;">
+                    🎯 <strong>분량:</strong> 일반 30문 / 익스트림 100문<br>
+                    ⚠️ <strong>규칙:</strong> 오답 +5초 페널티 및 정확도 감점
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: auto;">
+                    <button class="btn-start" style="padding: 15px; font-size: 1.2rem; flex: 1;" onclick="currentMode='mcq'; startGame('normal')">일반</button>
+                    <button class="btn-extreme" style="padding: 15px; font-size: 1.2rem; flex: 1;" onclick="currentMode='mcq'; startGame('extreme')">익스트림</button>
+                </div>
+            </div>
+            
+            <!-- 2. 스피드 매치 -->
+            <div class="mode-card" style="cursor: default; padding: 40px 30px; min-height: 380px;">
+                <i class="fas fa-clone mode-icon" style="margin-bottom: 20px; font-size: 4rem;"></i>
+                <h3 style="margin-bottom: 20px; font-size: 1.8rem;">스피드 매치</h3>
+                <div style="font-size: 1.05rem; color: #555; text-align: left; margin-bottom: 30px; line-height: 1.6; word-break: keep-all;">
+                    ⏱️ <strong>분량:</strong> 일반 3R / 익스트림 7R<br>
+                    ⚠️ <strong>규칙:</strong> 시간 초과 즉시 탈락, 오클릭 감점
+                </div>
+                <div style="display: flex; gap: 15px; margin-top: auto;">
+                    <button class="btn-start" style="padding: 15px; font-size: 1.2rem; flex: 1;" onclick="currentMode='match'; startGame('normal')">일반</button>
+                    <button class="btn-extreme" style="padding: 15px; font-size: 1.2rem; flex: 1;" onclick="currentMode='match'; startGame('extreme')">익스트림</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="screen-onboarding" class="screen">
+        <h3 id="ob-title" style="font-size: 2rem; color: var(--primary); margin-bottom: 25px;"></h3>
+        <div id="ob-desc" style="font-size: 1.2rem; line-height: 1.8; background: #f8f9fa; padding: 35px; border-radius: 12px; border-left: 6px solid var(--primary);"></div>
+        <div class="btn-group">
+            <button class="btn-start" onclick="startGame('normal')">일반 모드 시작</button>
+            <button class="btn-extreme" onclick="startGame('extreme')">익스트림 모드 시작</button>
+        </div>
+    </div>
+
+    <div id="screen-dict" class="screen">
+        <div class="vocab-header">
+            <input type="text" id="searchInput" class="search-bar" placeholder="단어 또는 뜻 검색" oninput="filterDict()">
+            
+            <div class="vocab-controls">
+                <div class="vocab-count">총 단어: <span id="dict-count">0</span>개</div>
+                <button class="btn-control btn-shuffle" onclick="shuffleDict()"><i class="fas fa-random"></i> 단어 섞기</button>
+                <button class="btn-control btn-download" onclick="downloadCSV()"><i class="fas fa-download"></i> 단어 다운로드</button>
+            </div>
+        </div>
+        <div class="vocab-list" id="dict-list"></div>
+    </div>
+
+    <div id="screen-mcq" class="screen">
+        <div class="game-header">
+            <div>진행도: <span id="mcq-progress"></span></div>
+            <div>타이머: <span id="mcq-timer" style="color:var(--primary); transition: 0.3s;">00:00</span></div>
+        </div>
+        <div class="mcq-problem" id="mcq-prob-text"></div>
+        <div class="mcq-grid" id="mcq-buttons">
+            <button class="mcq-btn" onclick="checkMCQ(0)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(1)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(2)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(3)"></button>
+        </div>
+    </div>
+
+    <div id="screen-match" class="screen">
+        <div class="game-header">
+            <div>라운드: <span id="match-round" style="color:var(--primary);"></span></div>
+            <div>남은 시간: <span id="match-timer" style="color:var(--accent);"></span>초</div>
+        </div>
+        <div class="match-grid" id="match-board"></div>
+    </div>
+
+    <div id="screen-scramble" class="screen">
+        <div class="game-header">
+            <div>진행도: <span id="scramble-progress"></span></div>
+            <div>콤보: <span id="scramble-combo" style="color:#f59f00;">0</span></div>
+        </div>
+        <div class="scramble-mean" id="scramble-mean-text"></div>
+        <div class="scramble-input-area" id="scramble-input"></div>
+        <div class="scramble-letters" id="scramble-board"></div>
+    </div>
+
+    <div id="flashcardModal" class="modal-overlay" style="z-index: 10001;">
+        <div style="position:relative; width:100%; display:flex; justify-content:center;">
+            <div class="flashcard" id="fcContainer" onclick="toggleCard()">
+                <button class="close-modal" onclick="event.stopPropagation(); closeFlashcard()"><i class="fas fa-times"></i></button>
+                <div class="fc-top">
+                    <div class="card-per" id="fcPer"></div>
+                    <div class="card-pron" id="fcPron"></div>
+                </div>
+                <div class="fc-bottom">
+                    <div class="card-mean fc-content-hidden" id="fcMean"></div>
+                </div>
+            </div>
+            <div class="card-controls">
+                <button class="card-btn" onclick="event.stopPropagation(); prevCard()"><i class="fas fa-chevron-left"></i></button>
+                <button class="card-btn" onclick="event.stopPropagation(); nextCard()"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <div id="certificate">
+            <div class="cert-title">페르시아어 단어 검정 인증서 <span id="res-badge" class="mode-badge"></span></div>
+            <div id="res-mode" style="font-size:1.5rem; font-weight:bold; color:#666; margin-top: 10px;"></div>
+            <div class="cert-rank" id="res-rank"></div>
+            <div class="cert-msg" id="res-msg"></div>
+            <div class="cert-accuracy" id="res-acc"></div>
+            <div style="font-size: 1.5rem; margin-bottom: 10px;">기록: <strong id="res-score" style="color:var(--primary);"></strong></div>
+            <div class="cert-stamp" id="res-stamp"></div>
+        </div>
+        
+        <div id="mistake-area" class="mistake-area" style="display:none;">
+            <h4 style="margin-bottom: 15px; font-size:1.4rem; color:var(--primary);"><i class="fas fa-book-open"></i> 오답 노트</h4>
+            <div id="mistake-list"></div>
+        </div>
+
+        <button class="btn-share" onclick="copyResultImage()"><i class="fas fa-camera"></i> 인증서 복사하기 (클립보드)</button>
+    </div>
+</div>
+
+<script>
+    // 오디오 기능 완전 제거 (에러 방지용 더미 함수)
+    function initAudio() {}
+    function playTick() {}
+    function playBuzz() {}
+
+    // --- [ 1. A1 단어 데이터 ] ---
+    const wordDataA1 = [
+        { p: "دارا", k: "부유한, 부자", r: "dārā" },
+        { p: "بابا", k: "아빠, 아버지", r: "bābā" },
+        { p: "بادبان", k: "돛", r: "bādbān" },
+        { p: "آب", k: "물", r: "āb" },
+        { p: "ایران", k: "이란", r: "irān" },
+        { p: "میز", k: "책상, 테이블", r: "miz" },
+        { p: "آبی", k: "파란색", r: "ābi" },
+        { p: "زیر", k: "~아래에", r: "zir-e" },
+        { p: "نامه", k: "편지", r: "nāme" },
+        { p: "کباب", k: "케밥", r: "kabāb" },
+        { p: "گردش", k: "산책, 회전", r: "gardesh" },
+        { p: "نجار", k: "목수", r: "najjār" },
+        { p: "بچه", k: "아이", r: "bachche" },
+        { p: "نقاش", k: "화가", r: "naqqāsh" },
+        { p: "سلام", k: "안녕, 안녕하세요", r: "salām" },
+        { p: "صبح", k: "아침", r: "sobh" },
+        { p: "بخیر/به خیر", k: "좋게, 기쁘게", r: "bexeir" },
+        { p: "روز", k: "낮, 일(date)", r: "ruz" },
+        { p: "خدا حافظ", k: "잘 가, 안녕히 가세요, 안녕히 계세요", r: "xodā hāfez" },
+        { p: "خدا نگهدار", k: "잘 가, 안녕히 가세요, 안녕히 계세요", r: "xodā negahdār" },
+        { p: "علی", k: "(남성 이름) 알리", r: "ali" },
+        { p: "خوبی؟", k: "(2인칭 단수) 괜찮니? 좋니?", r: "xubi?" },
+        { p: "خوبم", k: "(1인칭 단수) 좋다, 좋습니다", r: "xubam" },
+        { p: "خیلی", k: "매우", r: "xeili" },
+        { p: "ممنون", k: "고마운, 고맙습니다", r: "mamnun" },
+        { p: "تو", k: "(2인칭 단수) 너", r: "to" },
+        { p: "من", k: "(1인칭 단수) 나", r: "man" },
+        { p: "مرسی", k: "고마워, 고맙습니다", r: "mersi" },
+        { p: "چطورید؟", k: "(2인칭 복수) 어떻습니까?", r: "chetorid?" },
+        { p: "خوبید؟", k: "(2인칭 복수) 괜찮으십니까? 좋으세요?", r: "xubid?" },
+        { p: "هم", k: "~도, ~또한", r: "ham" },
+        { p: "متشکرم", k: "(1인칭 단수) 고마워, 고맙습니다", r: "moteshakkeram" },
+        { p: "خانم", k: "(여성을 부르는 호칭) 부인, ~씨", r: "xānom" },
+        { p: "خوب", k: "좋은", r: "xub" },
+        { p: "خانواده", k: "가족", r: "xānevāde" },
+        { p: "خوبند", k: "(3인칭 복수) 좋다, 좋습니다", r: "xuband" },
+        { p: "همه", k: "모두", r: "hame" },
+        { p: "چطور", k: "어떻게", r: "chetor" },
+        { p: "خوشوقتم", k: "(1인칭 단수) 반갑습니다, 처음 뵙겠습니다.", r: "xoshvaqtam" },
+        { p: "خوشوقت", k: "기쁜", r: "xoshvaqt" },
+        { p: "جان", k: "(친근한 사이의 호칭) 친애하는", r: "jān" },
+        { p: "کیست", k: "누구입니까", r: "kist" },
+        { p: "کی", k: "누구, 누구의", r: "ki" },
+        { p: "محمد", k: "(남성 이름) 무함마드", r: "mohammad" },
+        { p: "هستم", k: "(1인칭 단수) 입니다, 있습니다", r: "hastam" },
+        { p: "دانشجو", k: "대학생", r: "dāneshju" },
+        { p: "بله", k: "(긍정 대답) 네", r: "bale" },
+        { p: "کجایی", k: "어디 출신의", r: "kojāyi" },
+        { p: "کجا", k: "어디, 어디에", r: "kojā" },
+        { p: "ایرانی", k: "이란인, 이란의", r: "irāni" },
+        { p: "هستید", k: "(2인칭 복수) 입니다, 있습니다", r: "hastid" },
+        { p: "کره ای", k: "한국인, 한국의", r: "kore-yi" },
+        { p: "آمریکایی", k: "미국인, 미국의", r: "āmrikā-yi" },
+        { p: "معلم", k: "선생님", r: "mo'allem" },
+        { p: "هستند", k: "(3인칭 복수) 입니다, 있습니다", r: "hastand" },
+        { p: "چینی", k: "중국인, 중국의", r: "chini" },
+        { p: "تهرانی", k: "테헤란 출신의, 테헤란의", r: "tehrāni" },
+        { p: "کارمند", k: "회사원", r: "kārmand" },
+        { p: "زهرا", k: "(여성 이름) 자흐러", r: "zahrā" },
+        { p: "ژاپنی", k: "일본인, 일본의", r: "zhāponi" },
+        { p: "مهندس", k: "엔지니어", r: "mohandes" },
+        { p: "این", k: "이, 이것, 이것은", r: "in" },
+        { p: "صندلی", k: "의자", r: "sandali" },
+        { p: "نه/خیر", k: "(부정 대답) 아니오", r: "na/xeir" },
+        { p: "چیست", k: "무엇입니까", r: "chist" },
+        { p: "آن", k: "저, 그", r: "ān" },
+        { p: "دفتر", k: "수첩", r: "daftar" },
+        { p: "پس", k: "그러면, 그래서", r: "pas" },
+        { p: "کتاب", k: "책", r: "ketāb" },
+        { p: "اینجا", k: "이곳, 여기", r: "injā" },
+        { p: "رستوران", k: "식당", r: "resturān" },
+        { p: "نیست", k: "(3인칭 단수) 아니다, 아닙니다", r: "nist" },
+        { p: "بانک", k: "은행", r: "bānk" },
+        { p: "آنجا", k: "그곳, 저곳, 저기", r: "ānjā" },
+        { p: "دبیرستان", k: "고등학교", r: "dabirestān" },
+        { p: "بیمارستان", k: "병원", r: "bimārestān" },
+        { p: "خودکار", k: "볼펜", r: "xodkār" },
+        { p: "مداد", k: "연필", r: "medād" },
+        { p: "قاشق", k: "숟가락", r: "qāshoq" },
+        { p: "چنگال", k: "포크", r: "changāl" },
+        { p: "نانوایی", k: "빵 가게", r: "nānvāyi" },
+        { p: "شیرینی فروشی", k: "디저트 가게", r: "shirini-forushi" },
+        { p: "دانشگاه", k: "대학교", r: "dāneshgāh" },
+        { p: "استاد", k: "교수", r: "ostād" },
+        { p: "دیکشنری/فرهنگ لغت", k: "사전", r: "diksheneri/farhang loqat" },
+        { p: "دختر", k: "소녀, 딸", r: "doxtar" },
+        { p: "در", k: "문", r: "dar" },
+        { p: "خانه", k: "집", r: "xāne" },
+        { p: "تنها", k: "혼자, 홀로", r: "tanhā" },
+        { p: "با", k: "~와 함께, ~와 같이", r: "bā" },
+        { p: "روی", k: "~의 위에", r: "ruy-e" },
+        { p: "کنار", k: "~의 옆에", r: "kenār-e" },
+        { p: "پشت", k: "~의 뒤에", r: "posht-e" },
+        { p: "الو", k: "(전화) 여보세요", r: "alo" },
+        { p: "الان", k: "지금, 곧", r: "alān" },
+        { p: "پارک", k: "공원", r: "pārk" },
+        { p: "از", k: "~로부터", r: "az" },
+        { p: "تا", k: "~까지", r: "tā" },
+        { p: "دور", k: "(거리가) 먼", r: "dur" },
+        { p: "نزدیک", k: "(거리가) 가까운", r: "nazdik" },
+        { p: "بعد از ظهر", k: "오후", r: "ba'd az zohr" },
+        { p: "معمولا", k: "보통, 일반적으로", r: "ma'mulan" },
+        { p: "شب", k: "밤", r: "shab" },
+        { p: "پسر", k: "소년, 아들", r: "pesar" },
+        { p: "همیشه", k: "항상", r: "hamishe" },
+        { p: "مهربان", k: "친절한", r: "mehrabān" },
+        { p: "اسم", k: "이름", r: "esm" },
+        { p: "چند سال", k: "몇 살, 몇 살의", r: "chand sāl" },
+        { p: "چند", k: "몇, 몇몇의", r: "chand" },
+        { p: "سال", k: "해(year)", r: "sāl" },
+        { p: "نه", k: "9", r: "noh" },
+        { p: "دارم", k: "(1인칭 단수) 가지고 있다", r: "dāram" },
+        { p: "خواهر", k: "언니, 누나, 여동생", r: "xāhar" },
+        { p: "داری", k: "(2인칭 단수) 가지고 있다", r: "dāri" },
+        { p: "یک", k: "1", r: "yek" },
+        { p: "کلاس", k: "수업, 교실", r: "kelās" },
+        { p: "دو", k: "2", r: "do" },
+        { p: "فارسی", k: "페르시아어", r: "fārsi" },
+        { p: "انگلیسی", k: "영어", r: "engelisi" },
+        { p: "سنگین", k: "무거운", r: "sangin" },
+        { p: "سبک", k: "가벼운", r: "sabok" },
+        { p: "تهران", k: "테헤란", r: "tehrān" },
+        { p: "اتاق", k: "방", r: "otāq" },
+        { p: "دارد", k: "(3인칭 단수) 가지고 있다", r: "dārad" },
+        { p: "کوچک", k: "작은, 어린", r: "kuchak" },
+        { p: "بزرگ", k: "큰", r: "bozorg" },
+        { p: "ولی", k: "그러나", r: "vali" },
+        { p: "قشنگ", k: "예쁜", r: "qashang" },
+        { p: "برادر", k: "형, 오빠, 남동생", r: "barādar" },
+        { p: "ده", k: "10", r: "dah" },
+        { p: "سه", k: "3", r: "se" },
+        { p: "پدر", k: "아빠, 아버지", r: "pedar" },
+        { p: "مادر", k: "엄마, 어머니", r: "mādar" },
+        { p: "سئول", k: "서울", r: "se'ul" },
+        { p: "طبقه", k: "(건물) 층", r: "tabaqe" },
+        { p: "زیبا", k: "아름다운", r: "zibā" },
+        { p: "پسر عمو", k: "남자 사촌", r: "pesar-'amu" },
+        { p: "شغل", k: "직업", r: "shoql" },
+        { p: "مجرد", k: "미혼(의)", r: "mojarrad" },
+        { p: "متأهل", k: "기혼(의)", r: "mota'ahel" },
+        { p: "اما", k: "그러나", r: "ammā" },
+        { p: "همسر", k: "배우자", r: "hamsar" },
+        { p: "حال", k: "상태, 기분", r: "hāl" },
+        { p: "نام خانوادگی", k: "성(family name)", r: "nām-e xānevādegi" },
+        { p: "نام فامیلی", k: "성(family name)", r: "nām-e fāmili" },
+        { p: "فامیل", k: "가족", r: "fāmil" },
+        { p: "دختر خاله", k: "여자 이종사촌", r: "doxtar xāle" },
+        { p: "خاله", k: "이모", r: "xāle" },
+        { p: "دایی", k: "외삼촌", r: "dāyi" },
+        { p: "پدربزرگ", k: "할아버지", r: "pedarbozorg" },
+        { p: "مادربزرگ", k: "할머니", r: "mādarbozorg" },
+        { p: "عمو", k: "삼촌", r: "amu" },
+        { p: "عمه", k: "고모", r: "amme" },
+        { p: "مناسب", k: "적당한, 알맞은", r: "monāseb" },
+        { p: "خانه دار", k: "주부", r: "xāne-dār" },
+        { p: "پانزده", k: "15", r: "pānzdah" },
+        { p: "سیزده", k: "13", r: "sizdah" },
+        { p: "دیگر", k: "다른, 그 밖의", r: "digar" },
+        { p: "برای", k: "~을 위하여", r: "barāy-e" },
+        { p: "مادرشوهر", k: "시어머니", r: "mādar-shouhar" },
+        { p: "امروز", k: "오늘", r: "emruz" },
+        { p: "هوا", k: "날씨, 공기", r: "havā" },
+        { p: "آفتابی", k: "화창한", r: "āftābi" },
+        { p: "گرم", k: "더운", r: "garm" },
+        { p: "خنک", k: "시원한", r: "xonak" },
+        { p: "تمیز", k: "깨끗한", r: "tamiz" },
+        { p: "دیروز", k: "어제", r: "diruz" },
+        { p: "بودی", k: "(2인칭 단수 과거) ~였다, 있었다", r: "budi" },
+        { p: "بودم", k: "(1인칭 단수 과거) ~였다, 있었다", r: "budam" },
+        { p: "داشتم", k: "(1인칭 단수 과거) 가지고 있었다", r: "dāshtam" },
+        { p: "ابری", k: "구름 낀, 흐린", r: "abri" },
+        { p: "کمی", k: "약간, 조금", r: "kami" },
+        { p: "سرد", k: "추운, 차가운", r: "sard" },
+        { p: "بارانی", k: "비 오는", r: "bārāni" },
+        { p: "چتر", k: "우산", r: "chatr" },
+        { p: "نداشتم", k: "(1인칭 단수 과거) 가지고 있지 않았다", r: "nadāshtam" },
+        { p: "سؤال", k: "질문", r: "so'āl" },
+        { p: "بفرمایید", k: "(만능 권장표현) 말씀하세요, 앉으세요, 드세요 ...", r: "befarmāyid" },
+        { p: "فصل", k: "계절", r: "fasl" },
+        { p: "بهار", k: "봄", r: "bahār" },
+        { p: "تابستان", k: "여름", r: "tābestān" },
+        { p: "پاییز", k: "가을", r: "pāyiz" },
+        { p: "زمستان", k: "겨울", r: "zemestān" },
+        { p: "یا", k: "또는, 혹은", r: "yā" },
+        { p: "مثل", k: "~와 같이, ~처럼", r: "mesl-e" },
+        { p: "شرجی", k: "무더운, 후덥지근한", r: "sharji" },
+        { p: "خشک", k: "마른, 건조한", r: "xoshk" },
+        { p: "گاهی", k: "때때로, 종종", r: "gāhi" },
+        { p: "برفی", k: "눈 오는", r: "barfi" },
+        { p: "آسمان", k: "하늘", r: "āsemān" },
+        { p: "صاف", k: "맑은, (표면이) 고른", r: "sāf" },
+        { p: "متأسفانه", k: "유감스럽게도", r: "mota'assefāne" },
+        { p: "امسال", k: "올해", r: "emsāl" },
+        { p: "باد", k: "바람", r: "bād" },
+        { p: "کشور", k: "국가, 나라", r: "keshvar" },
+        { p: "آسیا", k: "아시아", r: "āsiā" },
+        { p: "غربی", k: "서쪽의, 서양의", r: "qarbi" },
+        { p: "همسایه", k: "이웃", r: "hamsāye" },
+        { p: "ارمنستان", k: "아르메니아", r: "armanestān" },
+        { p: "ترکمنستان", k: "투르크메니스탄", r: "torkamanestān" },
+        { p: "آذربایجان", k: "아제르바이잔", r: "āzarbāyjān" },
+        { p: "عراق", k: "이라크", r: "erāq" },
+        { p: "ترکیه", k: "터키", r: "torkiye" },
+        { p: "افغانستان", k: "아프가니스탄", r: "afqānestān" },
+        { p: "پاکستان", k: "파키스탄", r: "pākestān" },
+        { p: "شهر", k: "도시", r: "shahr" },
+        { p: "جنوب", k: "남쪽", r: "jonub" },
+        { p: "شمال", k: "북쪽", r: "shomāl" },
+        { p: "معتدل", k: "온화한", r: "mo'tadel" },
+        { p: "ملایم", k: "온화한, 잔잔한", r: "molāyem" },
+        { p: "عالی", k: "최상의, 높은", r: "āli" }
+    ];
+
+    // --- [ 2. A2 단어 데이터 (교재 1~10과) ] ---
+    const wordDataA2 = [
+        // --- [ 1과: 화요일에 페르시아어 수업이 있었습니다 ] ---
+        { p: "مدرسه", k: "학교", r: "" },
+        { p: "هفته", k: "주, 일주일", r: "" },
+        { p: "پریروز", k: "그제, 엊그제", r: "" },
+        { p: "دیشب", k: "어젯밤", r: "" },
+        { p: "رستوران", k: "식당", r: "" },
+        { p: "فیلم", k: "영화", r: "" },
+        { p: "سینما", k: "영화관", r: "" },
+        { p: "کتابفروشی", k: "서점", r: "" },
+        { p: "لباس", k: "옷, 의복", r: "" },
+        { p: "کمدی", k: "코미디의", r: "" },
+        { p: "خنده دار", k: "웃긴, 재미있는", r: "" },
+        { p: "جالب", k: "흥미로운", r: "" },
+        { p: "جدید", k: "새로운", r: "" },
+        { p: "سرد", k: "추운", r: "" },
+        { p: "گرم", k: "더운", r: "" },
+        { p: "پوشیدن", k: "입다", r: "" },
+        { p: "خریدن", k: "사다, 구매하다", r: "" },
+        { p: "خواندن", k: "읽다", r: "" },
+        { p: "دادن", k: "주다", r: "" },
+        { p: "چرا", k: "왜", r: "" },
+
+        // --- [ 2과: 넌 휴일에 무엇을 했니? ] ---
+        { p: "تعطیلات", k: "휴일, 연휴", r: "" },
+        { p: "نوروز", k: "노루즈 (이란 새해)", r: "" },
+        { p: "کافی شاپ", k: "커피숍, 카페", r: "" },
+        { p: "تکلیف", k: "숙제, 과제", r: "" },
+        { p: "درس", k: "수업, 교훈", r: "" },
+        { p: "بلیط", k: "티켓, 표", r: "" },
+        { p: "قطار", k: "기차", r: "" },
+        { p: "هواپیما", k: "비행기", r: "" },
+        { p: "باغ", k: "정원", r: "" },
+        { p: "آرامگاه", k: "영묘, 묘지", r: "" },
+        { p: "حمام", k: "목욕탕, 욕실", r: "" },
+        { p: "بازار", k: "시장", r: "" },
+        { p: "سوغاتی", k: "기념품", r: "" },
+        { p: "جهان", k: "세계, 우주", r: "" },
+        { p: "سفر", k: "여행", r: "" },
+        { p: "کیلومتر", k: "킬로미터", r: "" },
+        { p: "فاصله", k: "거리, 간격", r: "" },
+        { p: "معروف", k: "유명한", r: "" },
+        { p: "زیبا", k: "아름다운", r: "" },
+        { p: "دیدنی", k: "볼만한, 구경할 만한", r: "" },
+        { p: "گران", k: "비싼", r: "" },
+        { p: "ماندن", k: "머물다, 남다", r: "" },
+        { p: "خوابیدن", k: "자다", r: "" },
+        { p: "نوشتن", k: "쓰다", r: "" },
+        { p: "رسیدن", k: "도착하다", r: "" },
+        { p: "صحبت کردن", k: "말하다, 대화하다", r: "" },
+        { p: "مطالعه کردن", k: "공부하다, 독서하다", r: "" },
+        { p: "تماشا کردن", k: "시청하다, 관람하다", r: "" },
+        { p: "دیدن کردن", k: "방문하다, 구경하다", r: "" },
+        { p: "درباره", k: "~에 대하여", r: "" },
+        { p: "سپس", k: "그리고 나서", r: "" },
+
+        // --- [ 3과: 제 누나는 25세입니다 ] ---
+        { p: "خیابان", k: "거리, 도로", r: "" },
+        { p: "دندانپزشک", k: "치과의사", r: "" },
+        { p: "پرستار", k: "간호사", r: "" },
+        { p: "پزشک", k: "의사", r: "" },
+        { p: "زبان", k: "언어, 혀", r: "" },
+        { p: "مجموعه", k: "단지, 컬렉션", r: "" },
+        { p: "کاخ", k: "궁전", r: "" },
+        { p: "مکان", k: "장소", r: "" },
+        { p: "مرکز", k: "중심, 센터", r: "" },
+        { p: "میدان", k: "광장", r: "" },
+        { p: "ساختمان", k: "건물", r: "" },
+        { p: "تالار", k: "홀(Hall)", r: "" },
+        { p: "آینه", k: "거울", r: "" },
+        { p: "بنا", k: "건축물", r: "" },
+        { p: "برج", k: "탑, 타워", r: "" },
+        { p: "متر", k: "미터", r: "" },
+        { p: "ارتفاع", k: "높이, 고도", r: "" },
+        { p: "نماد", k: "상징", r: "" },
+        { p: "مجرد", k: "미혼의", r: "" },
+        { p: "مهم", k: "중요한", r: "" },
+        { p: "باز", k: "열린", r: "" },
+        { p: "بسته", k: "닫힌", r: "" },
+        { p: "زندگی کردن", k: "살다, 생활하다", r: "" },
+        { p: "برگشتن", k: "돌아가다", r: "" },
+
+        // --- [ 4과: 우리는 12시에 회의가 있습니다 ] ---
+        { p: "جلسه", k: "회의", r: "" },
+        { p: "دوش", k: "샤워", r: "" },
+        { p: "صبحانه", k: "아침 식사", r: "" },
+        { p: "ناهار", k: "점심 식사", r: "" },
+        { p: "شام", k: "저녁 식사", r: "" },
+        { p: "اتوبوس", k: "버스", r: "" },
+        { p: "اداره", k: "사무실, 관공서", r: "" },
+        { p: "همکار", k: "동료", r: "" },
+        { p: "موزه", k: "박물관", r: "" },
+        { p: "بخش", k: "구역, 부분", r: "" },
+        { p: "اشیاء", k: "물건들 (복수형)", r: "" },
+        { p: "سنگ", k: "돌", r: "" },
+        { p: "فلز", k: "금속", r: "" },
+        { p: "سفال", k: "도자기", r: "" },
+        { p: "شیشه", k: "유리", r: "" },
+        { p: "پارچه", k: "천, 직물", r: "" },
+        { p: "چوب", k: "나무, 목재", r: "" },
+        { p: "ملی", k: "국가적인, 국립의", r: "" },
+        { p: "باستان", k: "고대의", r: "" },
+        { p: "اسلامی", k: "이슬람의", r: "" },
+        { p: "بیدار شدن", k: "일어나다, 깨다", r: "" },
+        { p: "ورزش کردن", k: "운동하다", r: "" },
+        { p: "دوش گرفتن", k: "샤워하다", r: "" },
+        { p: "مسواک زدن", k: "양치하다", r: "" },
+        { p: "کار کردن", k: "일하다", r: "" },
+
+        // --- [ 5과: 나는 초록색 셔츠를 샀습니다 ] ---
+        { p: "رنگ", k: "색", r: "" },
+        { p: "دیوار", k: "벽", r: "" },
+        { p: "سال نو", k: "새해", r: "" },
+        { p: "کت و شلوار", k: "정장 (상하의)", r: "" },
+        { p: "کمربند", k: "벨트", r: "" },
+        { p: "کت و دامن", k: "여성용 정장 (스커트)", r: "" },
+        { p: "چادر", k: "차도르, 텐트", r: "" },
+        { p: "کراوات", k: "넥타이", r: "" },
+        { p: "مانتو", k: "만토 (여성 외투)", r: "" },
+        { p: "روسری", k: "루싸리 (스카프)", r: "" },
+        { p: "کلاه", k: "모자", r: "" },
+        { p: "فروشگاه", k: "상점, 매장", r: "" },
+        { p: "کیف", k: "가방", r: "" },
+        { p: "کفش", k: "신발", r: "" },
+        { p: "قنادی", k: "제과점", r: "" },
+        { p: "شیرینی", k: "과자, 달콤함", r: "" },
+        { p: "آجیل", k: "견과류", r: "" },
+        { p: "سفید", k: "하얀색의", r: "" },
+        { p: "طوسی", k: "회색의", r: "" },
+        { p: "آبی", k: "파란색의", r: "" },
+        { p: "سبز", k: "초록색의", r: "" },
+        { p: "نارنجی", k: "주황색의", r: "" },
+        { p: "بنفش", k: "보라색의", r: "" },
+        { p: "روشن", k: "밝은", r: "" },
+        { p: "کرم", k: "크림색의", r: "" },
+        { p: "سرمه ای", k: "남색의", r: "" },
+        { p: "چرمی", k: "가죽의", r: "" },
+        { p: "مشکی", k: "검은색의", r: "" },
+        { p: "کوتاه", k: "짧은", r: "" },
+        { p: "رنگ کردن", k: "색칠하다", r: "" },
+
+        // --- [ 6과: 너 25만 토만 더 싸게 샀니? ] ---
+        { p: "وسایل", k: "도구들, 짐", r: "" },
+        { p: "کوچه", k: "골목", r: "" },
+        { p: "ماشین ظرفشویی", k: "식기세척기", r: "" },
+        { p: "پنجره", k: "창문", r: "" },
+        { p: "گلدان", k: "화분", r: "" },
+        { p: "میز ناهارخوری", k: "식탁", r: "" },
+        { p: "گاز", k: "가스레인지", r: "" },
+        { p: "لیوان", k: "유리잔", r: "" },
+        { p: "بشقاب", k: "접시", r: "" },
+        { p: "کابینت", k: "캐비닛", r: "" },
+        { p: "ماشین لباسشویی", k: "세탁기", r: "" },
+        { p: "مردم", k: "사람들, 대중", r: "" },
+        { p: "پاساژ", k: "쇼핑몰, 아케이드", r: "" },
+        { p: "قدیمی", k: "오래된, 옛날의", r: "" },
+        { p: "قبلی", k: "이전의", r: "" },
+        { p: "سنتی", k: "전통적인", r: "" },
+        { p: "ارزان", k: "싼, 저렴한", r: "" },
+        { p: "شلوغ", k: "붐비는, 복잡한", r: "" },
+        { p: "خسته", k: "피곤한", r: "" },
+        { p: "سخت", k: "어려운, 단단한", r: "" },
+        { p: "زرنگ", k: "영리한, 부지런한", r: "" },
+        { p: "بردن", k: "가져가다, 데려가다", r: "" },
+        { p: "گذاشتن", k: "두다, 놓다", r: "" },
+        { p: "روبرو", k: "맞은편, 마주보는", r: "" },
+        { p: "وسط", k: "가운데, 중간", r: "" },
+        { p: "تقریبا", k: "거의, 대략", r: "" },
+        { p: "قبلا", k: "이전에", r: "" },
+        { p: "دویست", k: "200 (이백)", r: "" },
+        { p: "سیصد", k: "300 (삼백)", r: "" },
+        { p: "چهارصد", k: "400 (사백)", r: "" },
+        { p: "پانصد", k: "500 (오백)", r: "" },
+        { p: "ششصد", k: "600 (육백)", r: "" },
+        { p: "هفتصد", k: "700 (칠백)", r: "" },
+        { p: "هشتصد", k: "800 (팔백)", r: "" },
+        { p: "نهصد", k: "900 (구백)", r: "" },
+        { p: "هزار", k: "1000 (천)", r: "" },
+
+        // --- [ 7과: 저에게 메뉴를 주세요 ] ---
+        { p: "منو", k: "메뉴", r: "" },
+        { p: "پخت", k: "요리, 굽기", r: "" },
+        { p: "پیاز", k: "양파", r: "" },
+        { p: "قابلمه", k: "냄비", r: "" },
+        { p: "روغن", k: "기름, 오일", r: "" },
+        { p: "دقیقه", k: "분 (Minute)", r: "" },
+        { p: "نمک", k: "소금", r: "" },
+        { p: "زردچوبه", k: "강황", r: "" },
+        { p: "لوبیا قرمز", k: "강낭콩", r: "" },
+        { p: "غذا", k: "음식", r: "" },
+        { p: "گوشت", k: "고기", r: "" },
+        { p: "برنج", k: "쌀, 밥", r: "" },
+        { p: "ادویه", k: "향신료", r: "" },
+        { p: "خورشت", k: "스튜", r: "" },
+        { p: "ماهی", k: "물고기, 생선", r: "" },
+        { p: "خامه", k: "생크림", r: "" },
+        { p: "کره", k: "버터", r: "" },
+        { p: "عسل", k: "꿀", r: "" },
+        { p: "مربا", k: "잼", r: "" },
+        { p: "آش", k: "아쉬 (전통 수프)", r: "" },
+        { p: "دسر", k: "디저트", r: "" },
+        { p: "بستنی", k: "아이스크림", r: "" },
+        { p: "آماده", k: "준비된", r: "" },
+        { p: "آبپز", k: "삶은", r: "" },
+        { p: "اصلی", k: "주요한, 메인의", r: "" },
+        { p: "متنوع", k: "다양한", r: "" },
+        { p: "مخصوص", k: "특별한, 전용의", r: "" },
+        { p: "خوشمزه", k: "맛있는", r: "" },
+        { p: "پاک کردن", k: "치우다, 청소하다", r: "" },
+        { p: "خرد کردن", k: "자르다, 다지다", r: "" },
+        { p: "سرخ کردن", k: "튀기다, 굽다", r: "" },
+        { p: "اضافه کردن", k: "추가하다", r: "" },
+        { p: "شستن", k: "씻다", r: "" },
+        { p: "ریختن", k: "붓다, 흘리다", r: "" },
+        { p: "افتادن", k: "떨어지다", r: "" },
+        { p: "امتحان کردن", k: "시험하다, 시도하다", r: "" },
+
+        // --- [ 8과: 일곱 번째 정류장에서 하차하세요 ] ---
+        { p: "ایستگاه", k: "정류장, 역", r: "" },
+        { p: "مهمانی", k: "파티, 연회", r: "" },
+        { p: "فرزند", k: "자녀", r: "" },
+        { p: "شرکت", k: "회사", r: "" },
+        { p: "خبر", k: "소식, 뉴스", r: "" },
+        { p: "نمایشگاه", k: "전시회, 박람회", r: "" },
+        { p: "ناشر", k: "출판사", r: "" },
+        { p: "تعداد", k: "수, 수량", r: "" },
+        { p: "غرفه", k: "부스, 가판대", r: "" },
+        { p: "بزرگراه", k: "고속도로", r: "" },
+        { p: "مترو", k: "지하철", r: "" },
+        { p: "ماشین", k: "자동차", r: "" },
+        { p: "بین المللی", k: "국제적인", r: "" },
+        { p: "خارجی", k: "외국의", r: "" },
+        { p: "خوشحال", k: "기쁜, 행복한", r: "" },
+        { p: "پیاده شدن", k: "하차하다, 내리다", r: "" },
+        { p: "ازدواج کردن", k: "결혼하다", r: "" },
+        { p: "پیدا کردن", k: "찾다, 발견하다", r: "" },
+        { p: "جشن گرفتن", k: "기념하다, 축하하다", r: "" },
+        { p: "دعوت کردن", k: "초대하다", r: "" },
+
+        // --- [ 9과: 이 알약을 하루 세 번 식사 후에 먹어야 해 ] ---
+        { p: "قرص", k: "알약", r: "" },
+        { p: "سلامتی", k: "건강", r: "" },
+        { p: "بیماری", k: "질병", r: "" },
+        { p: "میوه", k: "과일", r: "" },
+        { p: "سبزی", k: "채소, 허브", r: "" },
+        { p: "نوشیدنی", k: "음료", r: "" },
+        { p: "استرس", k: "스트레스", r: "" },
+        { p: "نگرانی", k: "걱정, 불안", r: "" },
+        { p: "طبیعت", k: "자연", r: "" },
+        { p: "درمان", k: "치료", r: "" },
+        { p: "چشمه", k: "샘, 온천", r: "" },
+        { p: "اطراف", k: "주변, 근처", r: "" },
+        { p: "استراحت", k: "휴식", r: "" },
+        { p: "تفریح", k: "오락, 레크리에이션", r: "" },
+        { p: "دارو", k: "약", r: "" },
+        { p: "عطاری", k: "전통 약재상", r: "" },
+        { p: "سالم", k: "건강한", r: "" },
+        { p: "چرب", k: "기름진", r: "" },
+        { p: "الکلی", k: "알코올의", r: "" },
+        { p: "طبیعی", k: "자연의", r: "" },
+        { p: "مفید", k: "유용한, 이로운", r: "" },
+        { p: "جذاب", k: "매력적인", r: "" },
+        { p: "گیاهی", k: "식물의, 허브의", r: "" },
+        { p: "خاص", k: "특수한, 구체적인", r: "" },
+        { p: "سیگار کشیدن", k: "담배를 피우다", r: "" },
+        { p: "استفاده کردن", k: "사용하다", r: "" },
+        { p: "لذت بردن", k: "즐기다", r: "" },
+        { p: "روزی", k: "하루에", r: "" },
+        { p: "بار", k: "번, 회 (Time)", r: "" },
+        { p: "بنابراین", k: "그러므로", r: "" },
+        { p: "حتما", k: "반드시, 꼭", r: "" },
+        { p: "اصلا", k: "전혀, 아예", r: "" },
+        { p: "داخل", k: "안에, 내부", r: "" },
+
+        // --- [ 10과: 남부 쪽 여행에 가장 좋은 계절은 겨울입니다 ] ---
+        { p: "دریاچه", k: "호수", r: "" },
+        { p: "قایق", k: "보트", r: "" },
+        { p: "کلیسا", k: "교회, 성당", r: "" },
+        { p: "مراسم", k: "의식, 행사", r: "" },
+        { p: "دولت", k: "정부", r: "" },
+        { p: "سازمان", k: "조직, 기구", r: "" },
+        { p: "دریا", k: "바다", r: "" },
+        { p: "ساحل", k: "해변, 연안", r: "" },
+        { p: "مزرعه", k: "농장", r: "" },
+        { p: "چای", k: "차(Tea)", r: "" },
+        { p: "درخت", k: "나무", r: "" },
+        { p: "برگ", k: "나뭇잎", r: "" },
+        { p: "ماه", k: "달(Month), 달(Moon)", r: "" },
+        { p: "بهار", k: "봄", r: "" },
+        { p: "تابستان", k: "여름", r: "" },
+        { p: "پاییز", k: "가을", r: "" },
+        { p: "زمستان", k: "겨울", r: "" },
+        { p: "سرپوشیده", k: "지붕이 덮인, 실내의", r: "" },
+        { p: "زرد", k: "노란색의", r: "" },
+        { p: "قرمز", k: "빨간색의", r: "" },
+        { p: "مسافرت کردن", k: "여행하다", r: "" },
+        { p: "برگزار کردن", k: "개최하다", r: "" },
+        { p: "ثبت کردن", k: "등록하다", r: "" },
+        { p: "بهترین", k: "가장 좋은 (Best)", r: "" }
+    ];
+
+    let wordData = [];
+
+    // 로딩 숨기기 헬퍼 함수
+    function hideGlobalLoading() {
+        document.getElementById('global-loading').style.display = 'none';
+    }
+
+    // --- [ 3. 핵심 라우팅 로직 (window.onload) ] ---
+    window.onload = function() {
+        // 주소창에서 꼬리표(?level=...) 읽어오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const level = urlParams.get('level');
+
+        // [방안 B] 꼬리표가 없거나 이상한 값이면 강제 튕겨내기 (입구 컷)
+        if (level !== 'A1' && level !== 'A2') {
+            alert("잘못된 접근입니다. 수업 포털을 통해 정상적으로 입장해 주세요.");
+            window.location.href = 'class.html'; // 대문으로 강제 이동
+            return; // 이후 코드 실행 중단
+        }
+
+        // 레벨에 따른 데이터 동기화 및 메인 타이틀 변경
+        const headerTitle = document.querySelector('#main-header h2');
+        
+        if (level === 'A1') {
+            wordData = [...wordDataA1];
+            headerTitle.innerText = "A1 기초반 단어장";
+        } else if (level === 'A2') {
+            wordData = [...wordDataA2];
+            headerTitle.innerText = "A2 심화반 단어장";
+            
+            // A2 모드일 경우 배경색을 퍼플 톤으로 변경하여 직관성 강화
+            document.querySelector('#main-header').style.backgroundColor = '#4c1192';
+            document.querySelectorAll('.btn-start').forEach(btn => btn.style.backgroundColor = '#4c1192');
+        }
+
+        // 화면 세팅 완료 후 렌더링
+        if (wordData.length > 0) {
+            renderDict();
+        } else {
+            // A1 데이터가 비어있을 경우 대비
+            document.getElementById('dict-list').innerHTML = "<div style='padding:20px; text-align:center;'>단어 데이터가 준비되지 않았습니다.</div>";
+        }
+        
+        hideGlobalLoading();
+    };
+
+let currentMode = '';
+let gameDifficulty = 'normal'; 
+let isResultLocked = false; 
+let matchCorrectClicks = 0; 
+let stageTimeout = null; // 뒤로가기 시 타이머 꼬임 방지용
+let timerInterval = null; 
+let startTime = 0;        
+let mistakes = [];        
+let gameDeck = [];        // 추가: 100% 비중복 단어 추출용 덱
+
+    function getFormattedDate() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const h = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        return `${y}.${m}.${d} ${h}:${min}`;
+    }
+
+function goHome() {
+    if (isResultLocked) return; 
+    clearInterval(timerInterval);
+    clearTimeout(stageTimeout); // 추가: 대기열 타이머 분쇄
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-home').classList.add('active');
+    document.getElementById('top-nav').style.display = 'none';
+    document.getElementById('main-header').style.display = 'block';
+}
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('top-nav').style.display = 'flex';
+        document.getElementById('main-header').style.display = 'none';
+        initAudio();
+    }
+
+    function showOnboarding(mode) {
+        if(wordData.length < 4) {
+            alert("단어장 데이터가 너무 적거나 연동되지 않았습니다.");
+            return;
+        }
+        currentMode = mode;
+        const titleEl = document.getElementById('ob-title');
+        const descEl = document.getElementById('ob-desc');
+        
+        if (mode === 'mcq') {
+            titleEl.innerHTML = '<i class="fas fa-tasks"></i> 객관식 서바이벌';
+            descEl.innerHTML = `- <strong>일반 모드:</strong> 30문제<br>- <strong>익스트림:</strong> 100문제<br>- <strong>공통 규칙:</strong> 오답 시 타이머에 <strong>+5초 페널티</strong>. 모든 클릭은 '정확도'에 산정됩니다.`;
+        } else if (mode === 'match') {
+            titleEl.innerHTML = '<i class="fas fa-clone"></i> 스피드 매치';
+            descEl.innerHTML = `- <strong>일반 모드:</strong> 3라운드 (40초 / 30초 / 20초)<br>- <strong>익스트림:</strong> 7라운드 (45➔40➔35➔30➔25➔22➔20초). 시간 초과 시 즉시 F랭크.<br>- <strong>공통 규칙:</strong> 16장 세팅. 무지성 광클은 정확도를 수직 하락시킵니다.`;
+        } else if (mode === 'scramble') {
+            titleEl.innerHTML = '<i class="fas fa-font"></i> 단어 스크램블';
+            descEl.innerHTML = `- <strong>일반 모드:</strong> 15문제<br>- <strong>익스트림:</strong> 30문제<br>- <strong>공통 규칙:</strong> 철자 조립. 오답 클릭 시 입력창 리셋 및 콤보 초기화. 철자 선택 하나하나가 정확도에 반영됩니다.`;
+        }
+        showScreen('screen-onboarding');
+    }
+
+function startGame(difficulty) {
+        if(wordData.length < 8) {
+            alert("단어장 데이터가 부족합니다.");
+            return;
+        }
+        clearInterval(timerInterval); 
+        clearTimeout(stageTimeout);   
+        gameDifficulty = difficulty;
+        mistakes = [];
+        if (currentMode === 'mcq') startMCQ();
+        else if (currentMode === 'match') startMatch();
+        else if (currentMode === 'scramble') startScramble();
+    }
+
+    function triggerDamageEffect() {
+        let container = document.getElementById('main-container');
+        container.classList.add('damage-effect');
+        setTimeout(() => container.classList.remove('damage-effect'), 500);
+    }
+
+    // ==========================================
+    // 1. 객관식 서바이벌
+    // ==========================================
+    let mcqStep = 0, mcqTotal = 30, mcqPenaltySec = 0, mcqClicks = 0;
+    let mcqCurrentAnsIdx = -1;
+    let currentWordObj = null;
+
+    function startMCQ() {
+mcqTotal = gameDifficulty === 'extreme' ? 100 : 30;
+        mcqStep = 0; mcqPenaltySec = 0; mcqClicks = 0;
+        gameDeck = [...wordData].sort(() => 0.5 - Math.random()); // 시작 시 덱 섞기
+        showScreen('screen-mcq');
+        document.getElementById('mcq-timer').style.color = 'var(--primary)';
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+            let sec = Math.floor((Date.now() - startTime) / 1000) + mcqPenaltySec;
+            document.getElementById('mcq-timer').innerText = `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+        }, 1000);
+        nextMCQ();
+    }
+
+    function nextMCQ() {
+        mcqStep++;
+        if (mcqStep > mcqTotal) return endMCQ();
+        
+        document.getElementById('mcq-progress').innerText = `${mcqStep} / ${mcqTotal}`;
+	let isFaToKo = mcqStep <= (mcqTotal / 2); 
+        
+        // --- 비중복 덱에서 정답 단어 추출 및 리필 로직 ---
+        if (gameDeck.length === 0) gameDeck = [...wordData].sort(() => 0.5 - Math.random());
+        currentWordObj = gameDeck.pop();
+        
+        let opts = [currentWordObj];
+        // 오답 선지는 정답과 겹치지 않게 전체 단어장에서 무작위로 가져옴
+        let wrongOpts = [...wordData].filter(w => w.p !== currentWordObj.p).sort(() => 0.5 - Math.random());
+        for(let i=0; i<3; i++) {
+            opts.push(wrongOpts[i % wrongOpts.length]); 
+        }
+        opts.sort(() => 0.5 - Math.random());
+        // ------------------------------------------
+
+        document.getElementById('mcq-prob-text').innerText = isFaToKo ? currentWordObj.p : currentWordObj.k;
+        document.getElementById('mcq-prob-text').style.direction = isFaToKo ? 'rtl' : 'ltr';
+
+        let btns = document.querySelectorAll('.mcq-btn');
+        btns.forEach((btn, idx) => {
+            btn.innerText = isFaToKo ? opts[idx].k : opts[idx].p;
+            btn.style.direction = isFaToKo ? 'ltr' : 'rtl';
+            if (opts[idx].p === currentWordObj.p) mcqCurrentAnsIdx = idx;
+        });
+    }
+
+    function checkMCQ(idx) {
+        mcqClicks++;
+        let btn = document.querySelectorAll('.mcq-btn')[idx];
+        if (idx === mcqCurrentAnsIdx) {
+            playTick();
+            nextMCQ();
+        } else {
+            playBuzz();
+            mcqPenaltySec += 5;
+            triggerDamageEffect();
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 400);
+            if(!mistakes.find(m => m.p === currentWordObj.p)) mistakes.push(currentWordObj);
+        }
+    }
+
+    function endMCQ() {
+        clearInterval(timerInterval);
+        let totalSec = Math.floor((Date.now() - startTime) / 1000) + mcqPenaltySec;
+        let accuracy = Math.floor((mcqTotal / mcqClicks) * 100);
+        if(accuracy > 100) accuracy = 100;
+
+let rank = '';
+    if(gameDifficulty === 'extreme') {
+        if(accuracy < 80) rank = 'F';
+        else if(accuracy >= 95 && totalSec <= 150) rank = 'SSR';
+        else if(accuracy >= 90 && totalSec <= 200) rank = 'SR';
+        else rank = 'R';
+    } else {
+        // 일반 모드 대폭 완화
+        if (accuracy < 60) rank = 'C';
+        else if (totalSec <= 120 && accuracy >= 90) rank = 'A+';
+        else if (totalSec <= 180 && accuracy >= 80) rank = 'A';
+        else rank = 'B';
+    }
+        
+        showResult('객관식 서바이벌', rank, `${Math.floor(totalSec/60)}분 ${String(totalSec%60).padStart(2,'0')}초`, accuracy);
+    }
+
+    // ==========================================
+    // 2. 스피드 매치
+    // ==========================================
+    let matchRound = 1, matchTotalRounds = 3, matchTimeLeft = 40, matchPairsLeft = 8;
+    let matchTotalScore = 0; 
+    let selectedMatchCard = null;
+    let matchClicks = 0;
+    const extremeTimes = [45, 40, 35, 30, 25, 22, 20];
+    const normalTimes = [40, 30, 20];
+
+function startMatch() {
+matchRound = 1; matchTotalScore = 0; matchClicks = 0; 
+    matchCorrectClicks = 0; 
+    matchTotalRounds = gameDifficulty === 'extreme' ? 7 : 3;
+    gameDeck = [...wordData].sort(() => 0.5 - Math.random()); // 시작 시 덱 섞기
+    showScreen('screen-match');
+    initMatchRound();
+}
+
+    function initMatchRound() {
+        if(gameDifficulty === 'extreme') matchTimeLeft = extremeTimes[matchRound - 1];
+        else matchTimeLeft = normalTimes[matchRound - 1];
+        
+        matchPairsLeft = 8; // 16장 셋팅
+        selectedMatchCard = null;
+        document.getElementById('match-round').innerText = `${matchRound} / ${matchTotalRounds}`;
+	document.getElementById('match-timer').innerText = matchTimeLeft;
+        
+        // --- 비중복 덱에서 8쌍 추출 및 리필 로직 ---
+        let pool = [];
+        for(let i=0; i<8; i++) {
+            if (gameDeck.length === 0) gameDeck = [...wordData].sort(() => 0.5 - Math.random());
+            pool.push(gameDeck.pop());
+        }
+        // ----------------------------------------
+
+        let cards = [];
+        pool.forEach(w => {
+            cards.push({ text: w.p, obj: w, type: 'fa' });
+            cards.push({ text: w.k, obj: w, type: 'ko' });
+        });
+        cards.sort(() => 0.5 - Math.random());
+
+        let board = document.getElementById('match-board');
+        board.innerHTML = "";
+        cards.forEach((c, idx) => {
+            let el = document.createElement('div');
+            el.className = 'match-card';
+            el.innerText = c.text;
+            el.style.direction = c.type === 'fa' ? 'rtl' : 'ltr';
+            el.onclick = () => clickMatchCard(el, c);
+            board.appendChild(el);
+        });
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            matchTimeLeft--;
+            document.getElementById('match-timer').innerText = matchTimeLeft;
+            if(matchTimeLeft <= 0) {
+                playBuzz();
+                clearInterval(timerInterval);
+                let acc = calculateMatchAccuracy();
+                showResult('스피드 매치', gameDifficulty === 'extreme' ? 'F' : 'C', `실패 (라운드 ${matchRound} 타임오버)`, acc);
+            }
+        }, 1000);
+    }
+
+function calculateMatchAccuracy() {
+    if (matchClicks === 0) return 0;
+    // 정확도 = (매치에 성공한 횟수*2 / 총 클릭 횟수) * 100
+    let accuracy = Math.floor((matchCorrectClicks / matchClicks) * 100);
+    return accuracy > 100 ? 100 : accuracy;
+}
+
+    function clickMatchCard(el, cardData) {
+        if(el.classList.contains('matched') || el.classList.contains('selected')) return;
+        matchClicks++;
+
+        if(!selectedMatchCard) {
+            playTick();
+            el.classList.add('selected');
+            selectedMatchCard = { el, data: cardData };
+        } else {
+            if(selectedMatchCard.data.obj.p === cardData.obj.p && selectedMatchCard.data.type !== cardData.type) {
+                playTick();
+                matchCorrectClicks += 2;
+                el.classList.add('matched');
+                selectedMatchCard.el.classList.add('matched');
+                matchPairsLeft--;
+                selectedMatchCard = null;
+                
+if(matchPairsLeft === 0) {
+                    clearInterval(timerInterval);
+                    matchTotalScore += matchTimeLeft;
+                    stageTimeout = setTimeout(() => { // 수정
+                        matchRound++;
+                        if(matchRound > matchTotalRounds) endMatch();
+                        else initMatchRound();
+                    }, 500);
+                }
+            } else {
+                playBuzz();
+                triggerDamageEffect();
+                el.classList.add('wrong');
+                selectedMatchCard.el.classList.add('wrong');
+                if(!mistakes.find(m => m.p === cardData.obj.p)) mistakes.push(cardData.obj);
+                
+                let prevEl = selectedMatchCard.el;
+                selectedMatchCard = null;
+                setTimeout(() => {
+                    el.classList.remove('wrong');
+                    prevEl.classList.remove('selected', 'wrong');
+                }, 400);
+            }
+        }
+    }
+
+    function endMatch() {
+        let accuracy = calculateMatchAccuracy();
+let rank = '';
+    if(gameDifficulty === 'extreme') {
+        if(accuracy < 80) rank = 'F';
+        else if(accuracy >= 95 && matchTotalScore >= 80) rank = 'SSR';
+        else if(accuracy >= 90 && matchTotalScore >= 40) rank = 'SR';
+        else rank = 'R';
+    } else {
+        // 일반 모드 대폭 완화
+        if (matchTotalScore >= 30 && accuracy >= 85) rank = 'A+';
+        else if (matchTotalScore >= 15 && accuracy >= 70) rank = 'A';
+        else if (matchTotalScore >= 0 && accuracy >= 60) rank = 'B';
+        else rank = 'C';
+    }
+        
+        showResult('스피드 매치', rank, `클리어 (누적 보너스: ${matchTotalScore}초)`, accuracy);
+    }
+
+    // ==========================================
+    // 3. 단어 스크램블
+    // ==========================================
+    let scrambleStep = 0, scrambleTotal = 15, scrambleScore = 0, scrambleCombo = 0;
+    let scrambleTarget = "", scrambleInput = "";
+    let validScrambleData = [];
+    let scrambleTargetTotalLen = 0, scrambleClicks = 0;
+
+    function startScramble() {
+        scrambleTotal = gameDifficulty === 'extreme' ? 30 : 15;
+        scrambleStep = 0; scrambleScore = 0; scrambleCombo = 0;
+        scrambleTargetTotalLen = 0; scrambleClicks = 0;
+        
+	validScrambleData = wordData.filter(w => !w.p.includes(' ') && w.p.length <= 10);
+        if(validScrambleData.length < 5) validScrambleData = wordData; 
+        
+        gameDeck = [...validScrambleData].sort(() => 0.5 - Math.random()); // 시작 시 덱 섞기
+        showScreen('screen-scramble');
+        startTime = Date.now();
+        nextScramble();
+    }
+
+    function nextScramble() {
+        scrambleStep++;
+        if(scrambleStep > scrambleTotal) return endScramble();
+        
+        document.getElementById('scramble-progress').innerText = `${scrambleStep} / ${scrambleTotal}`;
+	document.getElementById('scramble-combo').innerText = scrambleCombo;
+        
+        // --- 비중복 덱에서 단어 추출 및 리필 로직 ---
+        if (gameDeck.length === 0) gameDeck = [...validScrambleData].sort(() => 0.5 - Math.random());
+        let wObj = gameDeck.pop();
+        // ------------------------------------------
+
+        currentWordObj = wObj;
+        scrambleTarget = wObj.p;
+        scrambleTargetTotalLen += scrambleTarget.length;
+        scrambleInput = "";
+        
+        document.getElementById('scramble-mean-text').innerText = wObj.k;
+        document.getElementById('scramble-input').innerText = "";
+        
+        let chars = Array.from(scrambleTarget);
+        chars.sort(() => 0.5 - Math.random());
+        
+        let board = document.getElementById('scramble-board');
+        board.innerHTML = "";
+        chars.forEach(ch => {
+            let btn = document.createElement('button');
+            btn.className = 'letter-btn';
+            btn.innerText = ch;
+            btn.onclick = () => clickScrambleLetter(btn, ch);
+            board.appendChild(btn);
+        });
+    }
+
+    function clickScrambleLetter(btn, ch) {
+        scrambleClicks++;
+        let expectedChar = scrambleTarget[scrambleInput.length];
+        
+        if (ch === expectedChar) {
+            playTick();
+            scrambleInput += ch;
+            btn.classList.add('used');
+            document.getElementById('scramble-input').innerText = scrambleInput;
+            
+if (scrambleInput === scrambleTarget) {
+                scrambleCombo++;
+                scrambleScore += 100 + (scrambleCombo * 10);
+                stageTimeout = setTimeout(nextScramble, 400); // 수정
+            }
+        } else {
+            playBuzz();
+            triggerDamageEffect();
+            scrambleCombo = 0;
+            document.getElementById('scramble-combo').innerText = "0";
+            if(!mistakes.find(m => m.p === currentWordObj.p)) mistakes.push(currentWordObj);
+            
+            scrambleInput = "";
+            document.getElementById('scramble-input').innerText = "";
+            document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('used'));
+        }
+    }
+
+    function endScramble() {
+        let totalSec = Math.floor((Date.now() - startTime) / 1000);
+        let accuracy = Math.floor((scrambleTargetTotalLen / (scrambleClicks === 0 ? 1 : scrambleClicks)) * 100);
+        if(accuracy > 100) accuracy = 100;
+
+let rank = '';
+    if(gameDifficulty === 'extreme') {
+        if(accuracy < 80) rank = 'F';
+        else if(accuracy >= 95 && totalSec <= 100) rank = 'SSR';
+        else if(accuracy >= 90 && totalSec <= 150) rank = 'SR';
+        else rank = 'R';
+    } else {
+        // 일반 모드 대폭 완화
+        if (accuracy >= 85 && totalSec <= 90) rank = 'A+';
+        else if (accuracy >= 75 && totalSec <= 120) rank = 'A';
+        else if (accuracy >= 60) rank = 'B';
+        else rank = 'C';
+    }
+        
+        showResult('단어 스크램블', rank, `${scrambleScore} 점 (소요시간: ${totalSec}초)`, accuracy);
+    }
+
+    // ==========================================
+    // 공통 결과창 및 오답노트
+    // ==========================================
+    function showResult(modeName, rank, scoreStr, accuracy) {
+        document.getElementById('top-nav').style.display = 'flex';
+        showScreen('screen-result');
+        
+        let msg = '';
+        if (gameDifficulty === 'extreme') {
+            if (rank === 'SSR') msg = "경이로운 수준입니다. 사실상 원어민과 다를 바 없는 반응 속도입니다.";
+            else if (rank === 'SR') msg = "압도적인 실력입니다. 페르시아어 단어의 뼈대를 완벽히 꿰뚫고 있습니다.";
+            else if (rank === 'R') msg = "익스트림의 벽을 넘으셨군요. 대단한 집중력과 끈기입니다.";
+            else msg = "한계에 부딪혔습니다. 일반 모드에서 기본기를 더 다지고 오십시오.";
+        } else {
+            if (rank === 'A+') msg = "🏆 완벽합니다! 원어민 수준의 암기력입니다.";
+            else if (rank === 'A') msg = "👏 훌륭합니다! 단어의 달인이네요.";
+            else if (rank === 'B') msg = "👍 준수합니다! 오답 노트만 확인해 보세요.";
+            else msg = "💪 꾸준한 훈련이 정답입니다. 다시 도전!";
+        }
+
+        let certBox = document.getElementById('certificate');
+        let badgeEl = document.getElementById('res-badge');
+        
+        if (gameDifficulty === 'extreme') {
+            certBox.classList.add('extreme-mode');
+            badgeEl.className = 'mode-badge badge-extreme';
+            badgeEl.innerText = 'Extreme';
+        } else {
+            certBox.classList.remove('extreme-mode');
+            badgeEl.className = 'mode-badge badge-normal';
+            badgeEl.innerText = 'Normal';
+        }
+
+        document.getElementById('res-mode').innerText = modeName;
+        document.getElementById('res-rank').innerText = rank;
+        document.getElementById('res-msg').innerText = msg;
+        document.getElementById('res-acc').innerText = `최종 정확도: ${accuracy}%`;
+document.getElementById('res-score').innerText = scoreStr;
+        document.getElementById('res-stamp').innerText = `${getFormattedDate()} 인증됨`;
+
+        let mistArea = document.getElementById('mistake-area');
+        if (mistakes.length > 0) {
+            mistArea.style.display = 'block';
+            // 발음 기호(r)가 존재하면 span 태그로 감싸서 노출
+            let html = mistakes.map(m => {
+                let pron = m.r ? `<span class="mistake-pron">/${m.r}/</span>` : '';
+                return `<div class="mistake-item"><span>${m.p}</span> ${pron}${m.k}</div>`;
+            }).join('');
+            document.getElementById('mistake-list').innerHTML = html;
+        } else {
+            mistArea.style.display = 'none';
+        }
+
+function lockResultScreen() {
+        if (mistakes.length === 0) return; // 오답이 없으면 락을 걸지 않음
+
+        isResultLocked = true;
+        const backBtn = document.querySelector('.top-nav .btn-home:first-child');
+        const portalBtn = document.querySelector('.portal-home-button');
+        const topNav = document.getElementById('top-nav');
+
+        // 버튼 물리적/시각적 비활성화
+        backBtn.classList.add('btn-locked');
+        portalBtn.style.pointerEvents = 'none';
+        portalBtn.style.opacity = '0.4';
+
+        // 타이머 UI 생성
+        let timerSpan = document.getElementById('lock-timer-display');
+        if(!timerSpan) {
+            timerSpan = document.createElement('span');
+            timerSpan.id = 'lock-timer-display';
+            timerSpan.className = 'lock-timer';
+            topNav.insertBefore(timerSpan, backBtn.nextSibling);
+        }
+
+        let timeLeft = 5;
+        backBtn.innerHTML = `<i class="fas fa-lock"></i> 오답 확인 중...`;
+        timerSpan.innerText = `(${timeLeft}초 후 활성화)`;
+
+        let lockInterval = setInterval(() => {
+            timeLeft--;
+            timerSpan.innerText = `(${timeLeft}초 후 활성화)`;
+            
+            if(timeLeft <= 0) {
+                clearInterval(lockInterval);
+                isResultLocked = false;
+                
+                // 해금
+                backBtn.classList.remove('btn-locked');
+                portalBtn.style.pointerEvents = 'auto';
+                portalBtn.style.opacity = '1';
+                backBtn.innerHTML = `<i class="fas fa-arrow-left"></i> 뒤로가기`;
+                timerSpan.innerText = "";
+                
+                // 버튼이 풀렸다는 시각적 피드백 (잠깐 파란색으로 번쩍임)
+                backBtn.style.transition = "0.3s";
+                backBtn.style.backgroundColor = "#e3f2fd";
+                backBtn.style.borderColor = "var(--primary)";
+                setTimeout(() => {
+                    backBtn.style.backgroundColor = "#ffffff";
+                    backBtn.style.borderColor = "#dee2e6";
+                }, 500);
+            }
+        }, 1000);
+    }
+
+        // 결과창 표시 직후 5초 락 로직 실행
+        lockResultScreen();
+    } // <-- showResult 함수 끝
+
+    async function copyResultImage() {
+        const btn = document.querySelector('.btn-share');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 이미지 생성 중...';
+        try {
+            const el = document.getElementById('certificate');
+            const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff' });
+            canvas.toBlob(async (blob) => {
+                try {
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    await navigator.clipboard.write([item]);
+                    btn.innerHTML = '<i class="fas fa-check"></i> 클립보드에 복사되었습니다! (Ctrl+V)';
+                    btn.style.background = '#0b2a4a';
+                } catch (err) {
+                    btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 브라우저 권한 필요';
+                }
+            });
+        } catch(e) {
+            btn.innerHTML = '<i class="fas fa-exclamation"></i> 오류 발생';
+        }
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-camera"></i> 인증서 복사하기 (클립보드)';
+            btn.style.background = '#20c997';
+        }, 3000);
+    }
+
+    // ==========================================
+    // 단어 사전 리스트 및 플래시카드 연동
+    // ==========================================
+    let fcIndex = 0;
+    let filteredDict = [];
+
+    function renderDict() {
+        filteredDict = [...wordData];
+        document.getElementById('dict-count').innerText = filteredDict.length;
+        const listDiv = document.getElementById('dict-list');
+        listDiv.innerHTML = "";
+        filteredDict.forEach((w, idx) => {
+            let item = document.createElement('div');
+            item.className = 'vocab-item';
+            item.style.cursor = 'pointer'; 
+            item.innerHTML = `<span class="vocab-per">${w.p}</span><span class="vocab-kor">${w.k}</span>`;
+            item.onclick = () => openFlashcard(idx);
+            listDiv.appendChild(item);
+        });
+    }
+
+    function filterDict() {
+        let q = document.getElementById('searchInput').value.toLowerCase();
+        filteredDict = wordData.filter(w => w.p.includes(q) || w.k.includes(q));
+        document.getElementById('dict-count').innerText = filteredDict.length;
+        const listDiv = document.getElementById('dict-list');
+        listDiv.innerHTML = "";
+        filteredDict.forEach((w, idx) => {
+            let item = document.createElement('div');
+            item.className = 'vocab-item';
+            item.style.cursor = 'pointer';
+            item.innerHTML = `<span class="vocab-per">${w.p}</span><span class="vocab-kor">${w.k}</span>`;
+            item.onclick = () => openFlashcard(idx);
+            listDiv.appendChild(item);
+        });
+    }
+
+    function shuffleDict() {
+        for (let i = wordData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [wordData[i], wordData[j]] = [wordData[j], wordData[i]];
+        }
+        filterDict(); 
+    }
+
+    function openFlashcard(idx) {
+        fcIndex = idx;
+        document.getElementById('flashcardModal').style.display = 'flex';
+        updateFlashcard(); 
+    }
+    
+    function closeFlashcard() { document.getElementById('flashcardModal').style.display = 'none'; }
+    
+    function toggleCard() { 
+        const meanEl = document.getElementById('fcMean');
+        if (meanEl.classList.contains('fc-content-hidden')) meanEl.classList.remove('fc-content-hidden');
+        else meanEl.classList.add('fc-content-hidden');
+    }
+    
+    function nextCard() { fcIndex = (fcIndex + 1) % filteredDict.length; updateFlashcard(); }
+    function prevCard() { fcIndex = (fcIndex - 1 + filteredDict.length) % filteredDict.length; updateFlashcard(); }
+    
+    function updateFlashcard() {
+        document.getElementById('fcPer').innerText = filteredDict[fcIndex].p;
+        document.getElementById('fcPron').innerText = filteredDict[fcIndex].r ? `/${filteredDict[fcIndex].r}/` : '';
+        document.getElementById('fcMean').innerText = filteredDict[fcIndex].k;
+        document.getElementById('fcMean').classList.add('fc-content-hidden'); 
+    }
+
+    function downloadCSV() {
+        if(!WORD_CSV_URL) {
+            alert("다운로드할 수 있는 파일이 설정되어 있지 않습니다.");
+            return;
+        }
+        alert("⚠️ [필독 주의사항]\n\n다운받은 csv 파일을 더블클릭하여 엑셀로 열면 페르시아어가 100% 깨집니다.\n\n반드시 구글 스프레드시트를 열고 [파일] -> [가져오기] 메뉴를 통해 해당 파일을 여세요.");
+        window.open(WORD_CSV_URL, '_blank');
+    }
+</script>
+</body>
+</html>
