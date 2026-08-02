@@ -43,6 +43,16 @@
             min-height: 100vh;
         }
 
+	/* 메인 포털 복귀 홈 버튼 */
+        .portal-home-button {
+            position: fixed; top: 25px; left: 25px; width: 50px; height: 50px;
+            background-color: var(--card-bg); color: var(--primary-color); 
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; 
+            text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            z-index: 10000; transition: 0.3s; font-size: 1.3rem; border: 2px solid var(--primary-color);
+        }
+        .portal-home-button:hover { transform: scale(1.1); background-color: var(--primary-color); color: white; }
+
         /* --- Header --- */
         header {
             background: var(--primary-color);
@@ -170,7 +180,8 @@
 
         /* Responsive */
         @media (max-width: 850px) {
-            .feature-grid { grid-template-columns: repeat(2, 1fr); } 
+            .feature-grid { grid-template-columns: repeat(2, 1fr); }
+	    .portal-home-button { top: 15px; left: 15px; width: 45px; height: 45px; font-size: 1.1rem; }
         }
         @media (max-width: 600px) {
             header h1 { font-size: 1.5rem; }
@@ -180,6 +191,11 @@
     </style>
 </head>
 <body>
+
+    <!-- 메인 포털 복귀 버튼 추가 -->
+    <a href="index.html" class="portal-home-button" title="통합 포털로 돌아가기">
+        <i class="fas fa-home"></i>
+    </a>
 
     <header>
         <h1>페르시아어 라운지</h1>
@@ -196,7 +212,7 @@
         </div>
 
         <div class="feature-grid">
-            <a href="word_lounge.html" class="feature-card">
+            <a href="word.html" class="feature-card">
                 <div class="icon-box"><i class="fas fa-book-open"></i></div>
                 <div class="badge badge-success">기본</div>
                 <h3>기본 단어장</h3>
