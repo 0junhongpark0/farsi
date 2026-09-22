@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>페르시아어 단어장</title>
+    
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #0b2a4a;
+            --accent: #fa5252;
+            --bg: #e9ecef;
+            --card: #ffffff;
+            --persian-font: 'Vazirmatn', 'Sahel', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+    padding: 20px;
+    overflow: hidden;
+}
+        
+        /* 글로벌 로딩 스크린 */
+        #global-loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+
+    height: calc(100vh - 40px);
+    min-height: 0;
+
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: 0.2s;
+}
+        
+        @keyframes damageFlash {
+            0% { box-shadow: inset 0 0 0px 0px rgba(250, 82, 82, 0); }
+            50% { box-shadow: inset 0 0 80px 15px rgba(250, 82, 82, 0.4); }
+            100% { box-shadow: inset 0 0 0px 0px rgba(250, 82, 82, 0); }
+        }
+        .damage-effect { animation: damageFlash 0.5s ease-out; }
+
+        .top-nav { display: none; background: #f8f9fa; padding: 20px 30px; border-bottom: 2px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; }
+        .btn-home { background: #ffffff; border: 2px solid #dee2e6; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--primary); font-size: 1.1rem; }
+        .btn-home:hover { background: #e9ecef; border-color: #adb5bd; }
+        
+        header { background: var(--primary); color: white; padding: 25px; text-align: center; }
+        header h2 { font-size: 2.5rem; margin: 0; }
+        header p { margin-top: 15px; opacity: 0.8; font-size: 1.2rem; }
+
+        .screen {
+    display: none;
+    padding: 40px 50px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+        .screen.active { display: block; }
+
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 30px; width: 100%; }
+        @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } }
+        
+        .mode-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; }
+        .mode-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(11, 42, 74, 0.1); }
+        .mode-icon { font-size: 3.5rem; color: var(--primary); margin-bottom: 20px; }
+        .mode-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: var(--primary); }
+        .mode-card p { font-size: 1.05rem; color: #666; word-break: keep-all; }
+
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; font-weight: bold; font-size: 1.5rem; padding-bottom: 15px; border-bottom: 2px solid #f1f3f5; }
+        
+        .btn-start { flex: 1; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-start:hover { background: #081e36; transform: translateY(-2px); }
+
+/* --- 게임 분량 선택 UI --- */
+.amount-picker {
+    margin-top: auto;
+}
+
+.amount-label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.amount-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 10px;
+}
+
+.amount-chip {
+    flex: 1;
+    min-width: 52px;
+    padding: 8px 10px;
+    border: 2px solid #dee2e6;
+    border-radius: 7px;
+    background: #fff;
+    color: #495057;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.amount-chip:hover {
+    border-color: var(--primary);
+}
+
+.amount-chip.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.custom-amount-row {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.custom-amount-row.show {
+    display: flex;
+}
+
+.custom-amount-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 2px solid #ced4da;
+    border-radius: 7px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.custom-amount-input:focus {
+    border-color: var(--primary);
+}
+
+.game-start {
+    width: 100%;
+    flex: none;
+    padding: 12px;
+    font-size: 1.1rem;
+}
+
+/* --- 단순화된 결과 화면 --- */
+.result-summary {
+    background: #fff;
+    padding: 30px;
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.result-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.result-mode {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.result-detail {
+    font-size: 1.05rem;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.result-mistakes {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+        .mcq-problem { font-family: var(--persian-font); font-size: 3.5rem; text-align: center; margin: 40px 0; font-weight: bold; color: var(--primary); }
+        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .mcq-btn { font-family: var(--persian-font); font-size: 1.8rem; padding: 25px; background: #fff; border: 3px solid #dee2e6; border-radius: 12px; cursor: pointer; transition: 0.1s; font-weight: bold; color: #495057; }
+        .mcq-btn.wrong { border-color: var(--accent); background: #fff5f5; animation: shake 0.4s; color: var(--accent); }
+
+        .match-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
+        @media (max-width: 600px) { .match-grid { grid-template-columns: repeat(3, 1fr); } }
+        .match-card { background: white; border: 3px solid #dee2e6; border-radius: 12px; height: 100px; display: flex; justify-content: center; align-items: center; font-size: 1.6rem; font-family: var(--persian-font); font-weight: bold; cursor: pointer; transition: 0.2s; text-align: center; padding: 10px; user-select: none; }
+        .match-card.selected { border-color: var(--primary); background: #e3f2fd; color: var(--primary); transform: scale(1.05); }
+        .match-card.matched { visibility: hidden; opacity: 0; pointer-events: none; }
+        .match-card.wrong { border-color: var(--accent); background: #ffe3e3; color: var(--accent); animation: shake 0.4s; }
+
+        .scramble-mean { font-size: 2.5rem; text-align: center; margin: 30px 0 10px 0; font-weight: bold; color: var(--primary); }
+        .scramble-input-area { min-height: 80px; background: #f8f9fa; border: 3px dashed #ced4da; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-bottom: 30px; padding: 10px; gap: 5px; font-family: var(--persian-font); font-size: 3rem; color: var(--primary); direction: rtl; }
+        .scramble-letters { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; direction: rtl; }
+        .letter-btn { width: 60px; height: 60px; font-family: var(--persian-font); font-size: 2rem; font-weight: bold; border: 2px solid var(--primary); background: white; color: var(--primary); border-radius: 12px; cursor: pointer; transition: 0.1s; display: flex; justify-content: center; align-items: center; }
+        .letter-btn.used { opacity: 0.3; pointer-events: none; transform: scale(0.9); }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        .vocab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 20px; }
+        .vocab-controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .vocab-count { font-weight: bold; color: var(--primary); font-size: 1.05rem; white-space: nowrap; }
+        
+        .search-bar { padding: 10px 18px; width: 100%; max-width: 450px; border: 2px solid #ced4da; border-radius: 8px; font-size: 1.05rem; outline: none; }
+        .search-bar:focus { border-color: var(--primary); }
+
+        .btn-control { padding: 8px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .btn-shuffle { background: #ffc107; color: #000; }
+        .btn-shuffle:hover { background: #fab005; }
+        .btn-download { background: #e9ecef; color: #495057; border: 1px solid #ced4da; }
+        .btn-download:hover { background: #dee2e6; }
+
+        .vocab-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .vocab-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; font-size: 1.2rem; transition: 0.2s; }
+        .vocab-item:hover { background: #e3f2fd; border-color: var(--primary); transform: translateX(5px); }
+        .vocab-per { font-family: var(--persian-font); font-size: 1.8rem; font-weight: bold; color: var(--primary); }
+        .vocab-kor { font-size: 1.1rem; color: #495057; font-weight: bold; }
+
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
+
+        .flashcard { width: 80%; max-width: 600px; height: 50vh; min-height: 350px; background: white; border-radius: 20px; cursor: pointer; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .fc-top { flex: 6; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 2px dashed #e9ecef; padding: 20px; text-align: center; }
+        .fc-bottom { flex: 4; display: flex; justify-content: center; align-items: center; background: #f8f9fa; border-radius: 0 0 20px 20px; padding: 20px; text-align: center; }
+        .fc-content-hidden { display: none !important; } 
+        
+        .card-per { font-family: var(--persian-font); font-size: 5rem; color: var(--primary); line-height: 1.2; }
+        .card-pron { font-size: 1.3rem; color: #868e96; margin-top: 10px; font-family: sans-serif; }
+        .card-mean { font-size: 2.2rem; font-weight: bold; color: var(--accent); }
+        
+        .card-controls { position: absolute; bottom: -70px; width: 100%; display: flex; justify-content: center; gap: 50px; }
+        .card-btn { background: white; border: none; font-size: 1.6rem; cursor: pointer; width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; color: var(--primary); display:flex; justify-content:center; align-items:center; }
+        .card-btn:hover { background: #e3f2fd; transform: scale(1.1); }
+        .close-modal { position: absolute; top: 20px; right: 25px; font-size: 2rem; cursor: pointer; border:none; background:none; color: #adb5bd; transition: 0.2s; }
+        .close-modal:hover { color: var(--accent); }
+        
+        .mistake-area { text-align: left; background: #f8f9fa; padding: 25px; border-radius: 12px; max-height: 250px; overflow-y: auto; border: 1px solid #dee2e6; margin-bottom: 20px; }
+        .mistake-item { border-bottom: 1px dashed #ccc; padding: 15px 0; font-size: 1.2rem; color: var(--accent); }
+        .mistake-item:last-child { border-bottom: none; }
+        .mistake-item span { color: #0b2a4a; margin-right: 15px; display: inline-block; font-family: var(--persian-font); font-weight: bold; font-size: 1.4rem; }
+        
+/* 오답노트 발음 및 강제 체류(Lock) 관련 스타일 */
+.mistake-pron { font-size: 1.1rem; color: #868e96; margin-right: 15px; font-family: sans-serif; }
+.btn-locked {
+    pointer-events: none !important;
+    background: #f8f9fa !important;
+    color: #adb5bd !important;
+    border-color: #dee2e6 !important;
+}
+.lock-timer {
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: bold;
+    margin-left: 15px;
+    transition: 0.3s;
+}
+
+/* --- 모바일 및 태블릿 반응형 대응 --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px; /* 여백 축소 */
+        align-items: flex-start; /* 모바일에서는 상단부터 정렬 */
+    }
+
+    .container {
+        min-height: auto; /* 고정 높이 해제 */
+        height: calc(100vh - 20px); /* 화면 높이에 맞춤 */
+    }
+
+    header h2 {
+        font-size: 1.8rem; /* 헤더 크기 축소 */
+    }
+
+    .screen {
+        padding: 20px; /* 내부 여백 축소 */
+    }
+
+    /* 객관식 게임 문제 텍스트 크기 조절 */
+    .mcq-problem {
+        font-size: 2.2rem;
+        margin: 20px 0;
+    }
+
+    /* 객관식 버튼 1열로 배치 (선택 사항) */
+    .mcq-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .mcq-btn {
+        padding: 15px;
+        font-size: 1.3rem;
+    }
+
+    /* 스피드 매치 그리드 조정 */
+    .match-grid {
+        grid-template-columns: repeat(3, 1fr); /* 모바일에서는 3열이 적당 */
+        gap: 8px;
+    }
+
+    .match-card {
+        height: 80px;
+        font-size: 1.2rem;
+    }
+
+    /* 스크램블 입력 및 버튼 크기 조절 */
+    .scramble-mean {
+        font-size: 1.8rem;
+    }
+    
+    .scramble-input-area {
+        font-size: 2rem;
+        min-height: 60px;
+    }
+
+    .letter-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.5rem;
+    }
+
+    /* 플래시카드 크기 조정 */
+    .flashcard {
+        width: 95%;
+        height: 60vh;
+    }
+
+    .card-per {
+        font-size: 3.5rem;
+    }
+    
+    .card-mean {
+        font-size: 1.8rem;
+    }
+}
+
+/* 초소형 기기 (iPhone SE 등) 대응 */
+@media (max-width: 380px) {
+    .match-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    header h2 {
+        font-size: 1.5rem;
+    }
+}
+
+	/* 데스크톱(마우스) 환경에서만 hover 효과 적용 (모바일 터치 파란 잔상 제거) */
+        @media (hover: hover) and (pointer: fine) {
+            .mcq-btn:hover { border-color: var(--primary); background: #f8f9fa; transform: scale(1.02); color: var(--primary); }
+            .match-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: #adb5bd; }
+            .letter-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); }
+        }
+        /* 터치 시 즉각적인 피드백만 남김 */
+        .mcq-btn:active { background: #f8f9fa; transform: scale(0.98); }
+        .match-card:active { transform: scale(0.95); }
+        .letter-btn:active { transform: scale(0.95); }
+
+	/* 모바일 전용 UI 수정 (스피드 매치 4x4, 단어장 검색창 확장) */
+        @media (max-width: 768px) {
+            .match-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 6px; }
+            .match-card { height: 70px; font-size: 1.1rem; padding: 5px; }
+            
+            .vocab-header { flex-direction: column; align-items: stretch; gap: 15px; }
+            .search-bar { max-width: 100%; width: 100%; padding: 12px; font-size: 1.1rem; }
+            .vocab-controls { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+            .vocab-count { width: 100%; text-align: left; margin-bottom: 5px; font-size: 1.1rem; }
+            .btn-control { flex: 1; justify-content: center; padding: 12px; font-size: 1rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="global-loading">
+    <div class="spinner"></div>
+    <h2 style="margin-top:20px; color:var(--primary);">단어장 데이터 연동 중...</h2>
+</div>
+
+<div class="container" id="main-container">
+    <div class="top-nav" id="top-nav" style="display: none;">
+        <button class="btn-home" onclick="goHome()"><i class="fas fa-arrow-left"></i> 뒤로가기</button>
+    </div>
+
+    <header id="main-header">
+        <h2>페르시아어 단어장</h2>
+        <p>게임으로 완벽하게 체화하는 단어 학습 공간</p>
+    </header>
+
+    <div id="screen-home" class="screen active">
+<div class="home-grid">
+            <div class="mode-card" onclick="showScreen('screen-dict');">
+                <i class="fas fa-book mode-icon"></i>
+                <h3>단어 목록</h3>
+                <p>전체 단어 리스트 열람 및 검색</p>
+            </div>
+
+<div class="mode-card" style="cursor: default; padding: 18px 20px;">
+    <i class="fas fa-tasks mode-icon" style="margin-bottom: 10px;"></i>
+    <h3 style="margin-bottom: 15px;">객관식 서바이벌</h3>
+
+    <div class="amount-picker">
+        <div class="amount-label">문제 수</div>
+
+        <div class="amount-options">
+            <button class="amount-chip" data-mode="mcq" data-value="10"
+                    onclick="setPresetAmount('mcq', this)">10</button>
+
+            <button class="amount-chip active" data-mode="mcq" data-value="30"
+                    onclick="setPresetAmount('mcq', this)">30</button>
+
+            <button class="amount-chip" data-mode="mcq" data-value="50"
+                    onclick="setPresetAmount('mcq', this)">50</button>
+
+            <button class="amount-chip" data-mode="mcq" data-value="100"
+                    onclick="setPresetAmount('mcq', this)">100</button>
+
+            <button class="amount-chip" data-mode="mcq" data-custom="true"
+                    onclick="showCustomAmount('mcq', this)">직접 설정</button>
+        </div>
+
+        <div class="custom-amount-row" id="mcq-custom-row">
+            <input type="number"
+                   id="mcq-custom-input"
+                   class="custom-amount-input"
+                   min="1"
+                   max="500"
+                   value="30">
+            <span>문</span>
+        </div>
+
+        <button class="btn-start game-start" onclick="startGame('mcq')">
+            시작하기
+        </button>
+    </div>
+</div>
+            
+<div class="mode-card" style="cursor: default; padding: 18px 20px;">
+    <i class="fas fa-clone mode-icon" style="margin-bottom: 10px;"></i>
+    <h3 style="margin-bottom: 15px;">스피드 매치</h3>
+
+    <div class="amount-picker">
+        <div class="amount-label">라운드 수</div>
+
+        <div class="amount-options">
+            <button class="amount-chip" data-mode="match" data-value="1"
+                    onclick="setPresetAmount('match', this)">1</button>
+
+            <button class="amount-chip active" data-mode="match" data-value="3"
+                    onclick="setPresetAmount('match', this)">3</button>
+
+            <button class="amount-chip" data-mode="match" data-value="5"
+                    onclick="setPresetAmount('match', this)">5</button>
+
+            <button class="amount-chip" data-mode="match" data-value="7"
+                    onclick="setPresetAmount('match', this)">7</button>
+
+            <button class="amount-chip" data-mode="match" data-custom="true"
+                    onclick="showCustomAmount('match', this)">직접 설정</button>
+        </div>
+
+        <div class="custom-amount-row" id="match-custom-row">
+            <input type="number"
+                   id="match-custom-input"
+                   class="custom-amount-input"
+                   min="1"
+                   max="30"
+                   value="3">
+            <span>R</span>
+        </div>
+
+        <button class="btn-start game-start" onclick="startGame('match')">
+            시작하기
+        </button>
+    </div>
+</div>
+            
+<div class="mode-card" style="cursor: default; padding: 18px 20px;">
+    <i class="fas fa-font mode-icon" style="margin-bottom: 10px;"></i>
+    <h3 style="margin-bottom: 15px;">단어 스크램블</h3>
+
+    <div class="amount-picker">
+        <div class="amount-label">문제 수</div>
+
+        <div class="amount-options">
+            <button class="amount-chip" data-mode="scramble" data-value="10"
+                    onclick="setPresetAmount('scramble', this)">10</button>
+
+            <button class="amount-chip active" data-mode="scramble" data-value="15"
+                    onclick="setPresetAmount('scramble', this)">15</button>
+
+            <button class="amount-chip" data-mode="scramble" data-value="30"
+                    onclick="setPresetAmount('scramble', this)">30</button>
+
+            <button class="amount-chip" data-mode="scramble" data-value="50"
+                    onclick="setPresetAmount('scramble', this)">50</button>
+
+            <button class="amount-chip" data-mode="scramble" data-custom="true"
+                    onclick="showCustomAmount('scramble', this)">직접 설정</button>
+        </div>
+
+        <div class="custom-amount-row" id="scramble-custom-row">
+            <input type="number"
+                   id="scramble-custom-input"
+                   class="custom-amount-input"
+                   min="1"
+                   max="500"
+                   value="15">
+            <span>문</span>
+        </div>
+
+        <button class="btn-start game-start" onclick="startGame('scramble')">
+            시작하기
+        </button>
+    </div>
+</div>
+
+    </div>
+
+    <div id="screen-dict" class="screen">
+        <div class="vocab-header">
+            <input type="text" id="searchInput" class="search-bar" placeholder="단어 또는 뜻 검색" oninput="filterDict()">
+            
+            <div class="vocab-controls">
+                <div class="vocab-count">총 단어: <span id="dict-count">0</span>개</div>
+                <button class="btn-control btn-shuffle" onclick="shuffleDict()"><i class="fas fa-random"></i> 단어 섞기</button>
+                <button class="btn-control btn-download" onclick="downloadCSV()"><i class="fas fa-download"></i> 단어 다운로드</button>
+            </div>
+        </div>
+        <div class="vocab-list" id="dict-list"></div>
+    </div>
+
+    <div id="screen-mcq" class="screen">
+        <div class="game-header">
+            <div>진행도: <span id="mcq-progress"></span></div>
+            <div>타이머: <span id="mcq-timer" style="color:var(--primary); transition: 0.3s;">00:00</span></div>
+        </div>
+        <div class="mcq-problem" id="mcq-prob-text"></div>
+        <div class="mcq-grid" id="mcq-buttons">
+            <button class="mcq-btn" onclick="checkMCQ(0)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(1)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(2)"></button>
+            <button class="mcq-btn" onclick="checkMCQ(3)"></button>
+        </div>
+    </div>
+
+    <div id="screen-match" class="screen">
+        <div class="game-header">
+            <div>라운드: <span id="match-round" style="color:var(--primary);"></span></div>
+            <div>남은 시간: <span id="match-timer" style="color:var(--accent);"></span>초</div>
+        </div>
+        <div class="match-grid" id="match-board"></div>
+    </div>
+
+    <div id="screen-scramble" class="screen">
+        <div class="game-header">
+            <div>진행도: <span id="scramble-progress"></span></div>
+            <div>콤보: <span id="scramble-combo" style="color:#f59f00;">0</span></div>
+        </div>
+        <div class="scramble-mean" id="scramble-mean-text"></div>
+        <div class="scramble-input-area" id="scramble-input"></div>
+        <div class="scramble-letters" id="scramble-board"></div>
+    </div>
+
+    <div id="flashcardModal" class="modal-overlay" style="z-index: 10001;">
+        <div style="position:relative; width:100%; display:flex; justify-content:center;">
+            <div class="flashcard" id="fcContainer" onclick="toggleCard()">
+                <button class="close-modal" onclick="event.stopPropagation(); closeFlashcard()"><i class="fas fa-times"></i></button>
+                <div class="fc-top">
+                    <div class="card-per" id="fcPer"></div>
+                    <div class="card-pron" id="fcPron"></div>
+                </div>
+                <div class="fc-bottom">
+                    <div class="card-mean fc-content-hidden" id="fcMean"></div>
+                </div>
+            </div>
+            <div class="card-controls">
+                <button class="card-btn" onclick="event.stopPropagation(); prevCard()"><i class="fas fa-chevron-left"></i></button>
+                <button class="card-btn" onclick="event.stopPropagation(); nextCard()"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+<div id="screen-result" class="screen">
+
+    <div class="result-summary">
+        <div class="result-title">
+            학습 완료
+        </div>
+
+        <div id="res-mode" class="result-mode"></div>
+
+        <div id="res-summary" class="result-detail"></div>
+
+        <div id="res-mistake-count" class="result-mistakes"></div>
+    </div>
+
+    <div id="mistake-area"
+         class="mistake-area"
+         style="display:none;">
+
+        <h4 style="margin-bottom: 15px; font-size:1.4rem; color:var(--primary);">
+            <i class="fas fa-book-open"></i> 오답 노트
+        </h4>
+
+        <div id="mistake-list"></div>
+    </div>
+
+</div>
+
+<script>
+    // 단어장 링크
+    const WORD_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7kygc158HJLii5s2jwGoCPNhNRyIoK0GJVM6oZUBMyfbI0FIi7lYd0XN4N6v2PYGxtq22AsBZ6yFX/pub?output=csv"; 
+    
+    let wordData = [];
+
+    function parseCSV(str) {
+        const arr = []; let quote = false;
+        for (let row = 0, col = 0, c = 0; c < str.length; c++) {
+            let cc = str[c], nc = str[c+1];
+            arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
+            if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+            if (cc == '"') { quote = !quote; continue; }
+            if (cc == ',' && !quote) { ++col; continue; }
+            if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+            if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+            if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+            arr[row][col] += cc;
+        }
+        return arr;
+    }
+
+    // 로딩 숨기기 헬퍼 함수
+    function hideGlobalLoading() {
+        document.getElementById('global-loading').style.display = 'none';
+    }
+
+window.onload = async function() {
+    try {
+        if (!WORD_CSV_URL) {
+            throw new Error("단어장 URL이 설정되지 않았습니다.");
+        }
+
+        const res = await fetch(WORD_CSV_URL, { cache: 'no-store' });
+
+        if (!res.ok) {
+            throw new Error(`HTTP 오류: ${res.status}`);
+        }
+
+        const csvText = await res.text();
+        const parsed = parseCSV(csvText);
+
+        if (parsed.length <= 1) {
+            throw new Error("단어장 데이터가 비어 있습니다.");
+        }
+
+        wordData = [];
+
+        for (let i = 1; i < parsed.length; i++) {
+            if (parsed[i][0]) {
+                wordData.push({
+                    p: parsed[i][0].trim(),
+                    k: parsed[i][1] ? parsed[i][1].trim() : '',
+                    r: parsed[i][2] ? parsed[i][2].trim() : ''
+                });
+            }
+        }
+
+        if (wordData.length === 0) {
+            throw new Error("사용 가능한 단어가 없습니다.");
+        }
+
+        renderDict();
+
+    } catch (e) {
+        console.error(e);
+        alert("단어 데이터를 가져오지 못했습니다. 단어장 링크와 데이터를 다시 확인하세요.");
+
+    } finally {
+        hideGlobalLoading();
+    }
+};
+
+let selectedGameAmount = 0;
+let isResultLocked = false;
+
+let stageTimeout = null;
+let timerInterval = null;
+let startTime = 0;
+let mistakes = [];
+let gameDeck = [];
+
+function goHome() {
+    if (isResultLocked) return; 
+    clearInterval(timerInterval);
+    clearTimeout(stageTimeout); // 추가: 대기열 타이머 분쇄
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-home').classList.add('active');
+    document.getElementById('top-nav').style.display = 'none';
+    document.getElementById('main-header').style.display = 'block';
+}
+
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.getElementById('top-nav').style.display = 'flex';
+    document.getElementById('main-header').style.display = 'none';
+}
+
+function setPresetAmount(mode, button) {
+    document
+        .querySelectorAll(`.amount-chip[data-mode="${mode}"]`)
+        .forEach(btn => btn.classList.remove('active'));
+
+    button.classList.add('active');
+
+    const customRow = document.getElementById(`${mode}-custom-row`);
+    if (customRow) customRow.classList.remove('show');
+}
+
+function showCustomAmount(mode, button) {
+    document
+        .querySelectorAll(`.amount-chip[data-mode="${mode}"]`)
+        .forEach(btn => btn.classList.remove('active'));
+
+    button.classList.add('active');
+
+    const customRow = document.getElementById(`${mode}-custom-row`);
+    const input = document.getElementById(`${mode}-custom-input`);
+
+    customRow.classList.add('show');
+
+    input.focus();
+    input.select();
+}
+
+function getSelectedAmount(mode) {
+    const selected = document.querySelector(
+        `.amount-chip[data-mode="${mode}"].active`
+    );
+
+    if (!selected) return null;
+
+    let value;
+
+    if (selected.dataset.custom === 'true') {
+        const input = document.getElementById(`${mode}-custom-input`);
+        value = parseInt(input.value, 10);
+    } else {
+        value = parseInt(selected.dataset.value, 10);
+    }
+
+    const max = mode === 'match' ? 30 : 500;
+
+    if (!Number.isInteger(value) || value < 1 || value > max) {
+        return null;
+    }
+
+    return value;
+}
+
+function formatSeconds(totalSec) {
+    const min = Math.floor(totalSec / 60);
+    const sec = String(totalSec % 60).padStart(2, '0');
+
+    return min > 0 ? `${min}분 ${sec}초` : `${totalSec}초`;
+}
+
+function startGame(mode) {
+    if (wordData.length < 8) {
+        alert("단어장 데이터가 부족합니다.");
+        return;
+    }
+
+    const amount = getSelectedAmount(mode);
+
+    if (amount === null) {
+        alert(
+            mode === 'match'
+                ? "라운드 수를 1~30 사이로 입력하세요."
+                : "문제 수를 1~500 사이로 입력하세요."
+        );
+        return;
+    }
+
+    clearInterval(timerInterval);
+    clearTimeout(stageTimeout);
+
+    selectedGameAmount = amount;
+    mistakes = [];
+
+    if (mode === 'mcq') startMCQ();
+    else if (mode === 'match') startMatch();
+    else if (mode === 'scramble') startScramble();
+}
+
+    function triggerDamageEffect() {
+        let container = document.getElementById('main-container');
+        container.classList.add('damage-effect');
+        setTimeout(() => container.classList.remove('damage-effect'), 500);
+    }
+
+    // ==========================================
+    // 1. 객관식 서바이벌
+    // ==========================================
+    let mcqStep = 0, mcqTotal = 30, mcqPenaltySec = 0;
+    let mcqCurrentAnsIdx = -1;
+    let currentWordObj = null;
+
+function startMCQ() {
+    mcqTotal = selectedGameAmount;
+
+    mcqStep = 0;
+    mcqPenaltySec = 0;
+
+    gameDeck = [...wordData].sort(() => 0.5 - Math.random());
+
+    showScreen('screen-mcq');
+
+    document.getElementById('mcq-timer').style.color = 'var(--primary)';
+
+    startTime = Date.now();
+
+    timerInterval = setInterval(() => {
+        const sec =
+            Math.floor((Date.now() - startTime) / 1000)
+            + mcqPenaltySec;
+
+        document.getElementById('mcq-timer').innerText =
+            `${String(Math.floor(sec / 60)).padStart(2, '0')}:` +
+            `${String(sec % 60).padStart(2, '0')}`;
+    }, 1000);
+
+    nextMCQ();
+}
+
+    function nextMCQ() {
+        mcqStep++;
+        if (mcqStep > mcqTotal) return endMCQ();
+        
+        document.getElementById('mcq-progress').innerText = `${mcqStep} / ${mcqTotal}`;
+	let isFaToKo = mcqStep <= (mcqTotal / 2); 
+        
+        // --- 비중복 덱에서 정답 단어 추출 및 리필 로직 ---
+        if (gameDeck.length === 0) gameDeck = [...wordData].sort(() => 0.5 - Math.random());
+        currentWordObj = gameDeck.pop();
+        
+        let opts = [currentWordObj];
+        // 오답 선지는 정답과 겹치지 않게 전체 단어장에서 무작위로 가져옴
+        let wrongOpts = [...wordData].filter(w => w.p !== currentWordObj.p).sort(() => 0.5 - Math.random());
+        for(let i=0; i<3; i++) {
+            opts.push(wrongOpts[i % wrongOpts.length]); 
+        }
+        opts.sort(() => 0.5 - Math.random());
+        // ------------------------------------------
+
+        document.getElementById('mcq-prob-text').innerText = isFaToKo ? currentWordObj.p : currentWordObj.k;
+        document.getElementById('mcq-prob-text').style.direction = isFaToKo ? 'rtl' : 'ltr';
+
+        let btns = document.querySelectorAll('.mcq-btn');
+        btns.forEach((btn, idx) => {
+            btn.innerText = isFaToKo ? opts[idx].k : opts[idx].p;
+            btn.style.direction = isFaToKo ? 'ltr' : 'rtl';
+            if (opts[idx].p === currentWordObj.p) mcqCurrentAnsIdx = idx;
+        });
+    }
+
+    function checkMCQ(idx) {
+        let btn = document.querySelectorAll('.mcq-btn')[idx];
+        if (idx === mcqCurrentAnsIdx) {
+            nextMCQ();
+        } else {
+            mcqPenaltySec += 5;
+            triggerDamageEffect();
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 400);
+            if(!mistakes.find(m => m.p === currentWordObj.p)) mistakes.push(currentWordObj);
+        }
+    }
+
+function endMCQ() {
+    clearInterval(timerInterval);
+
+    const totalSec =
+        Math.floor((Date.now() - startTime) / 1000)
+        + mcqPenaltySec;
+
+    showResult(
+        '객관식 서바이벌',
+        `${mcqTotal}문제 · 소요 ${formatSeconds(totalSec)}`
+    );
+}
+
+    // ==========================================
+    // 2. 스피드 매치
+    // ==========================================
+let matchRound = 1;
+let matchTotalRounds = 3;
+let matchTimeLeft = 30;
+let matchPairsLeft = 8;
+let selectedMatchCard = null;
+
+function startMatch() {
+    matchRound = 1;
+    matchTotalRounds = selectedGameAmount;
+
+    gameDeck = [...wordData].sort(() => 0.5 - Math.random());
+
+    startTime = Date.now();
+
+    showScreen('screen-match');
+    initMatchRound();
+}
+
+    function initMatchRound() {
+    matchTimeLeft = 30;
+        
+        matchPairsLeft = 8; // 16장 셋팅
+        selectedMatchCard = null;
+        document.getElementById('match-round').innerText = `${matchRound} / ${matchTotalRounds}`;
+	document.getElementById('match-timer').innerText = matchTimeLeft;
+        
+        // --- 비중복 덱에서 8쌍 추출 및 리필 로직 ---
+        let pool = [];
+        for(let i=0; i<8; i++) {
+            if (gameDeck.length === 0) gameDeck = [...wordData].sort(() => 0.5 - Math.random());
+            pool.push(gameDeck.pop());
+        }
+        // ----------------------------------------
+
+        let cards = [];
+        pool.forEach(w => {
+            cards.push({ text: w.p, obj: w, type: 'fa' });
+            cards.push({ text: w.k, obj: w, type: 'ko' });
+        });
+        cards.sort(() => 0.5 - Math.random());
+
+        let board = document.getElementById('match-board');
+        board.innerHTML = "";
+        cards.forEach((c, idx) => {
+            let el = document.createElement('div');
+            el.className = 'match-card';
+            el.innerText = c.text;
+            el.style.direction = c.type === 'fa' ? 'rtl' : 'ltr';
+            el.onclick = () => clickMatchCard(el, c);
+            board.appendChild(el);
+        });
+
+clearInterval(timerInterval);
+
+timerInterval = setInterval(() => {
+    matchTimeLeft--;
+    document.getElementById('match-timer').innerText = matchTimeLeft;
+
+    if (matchTimeLeft <= 0) {
+        clearInterval(timerInterval);
+
+        const totalSec =
+            Math.floor((Date.now() - startTime) / 1000);
+
+        showResult(
+            '스피드 매치',
+            `${matchRound} / ${matchTotalRounds}라운드에서 시간 초과 · 소요 ${formatSeconds(totalSec)}`
+        );
+    }
+}, 1000);
+}
+
+function clickMatchCard(el, cardData) {
+        if(el.classList.contains('matched') || el.classList.contains('selected')) return;
+
+        if(!selectedMatchCard) {
+            el.classList.add('selected');
+            selectedMatchCard = { el, data: cardData };
+        } else {
+            if(selectedMatchCard.data.obj.p === cardData.obj.p && selectedMatchCard.data.type !== cardData.type) {
+                el.classList.add('matched');
+                selectedMatchCard.el.classList.add('matched');
+                matchPairsLeft--;
+                selectedMatchCard = null;
+                
+if(matchPairsLeft === 0) {
+                    clearInterval(timerInterval);
+                    stageTimeout = setTimeout(() => { // 수정
+                        matchRound++;
+                        if(matchRound > matchTotalRounds) endMatch();
+                        else initMatchRound();
+                    }, 500);
+                }
+            } else {
+                triggerDamageEffect();
+                el.classList.add('wrong');
+                selectedMatchCard.el.classList.add('wrong');
+                if(!mistakes.find(m => m.p === cardData.obj.p)) mistakes.push(cardData.obj);
+                
+                let prevEl = selectedMatchCard.el;
+                selectedMatchCard = null;
+                setTimeout(() => {
+                    el.classList.remove('wrong');
+                    prevEl.classList.remove('selected', 'wrong');
+                }, 400);
+            }
+        }
+    }
+
+function endMatch() {
+    const totalSec =
+        Math.floor((Date.now() - startTime) / 1000);
+
+    showResult(
+        '스피드 매치',
+        `${matchTotalRounds}라운드 완료 · 소요 ${formatSeconds(totalSec)}`
+    );
+}
+
+    // ==========================================
+    // 3. 단어 스크램블
+    // ==========================================
+let scrambleStep = 0;
+let scrambleTotal = 15;
+let scrambleCombo = 0;
+
+let scrambleTarget = "";
+let scrambleInput = "";
+
+let validScrambleData = [];
+
+function startScramble() {
+    scrambleTotal = selectedGameAmount;
+
+    scrambleStep = 0;
+    scrambleCombo = 0;
+
+    validScrambleData =
+        wordData.filter(w => !w.p.includes(' ') && w.p.length <= 10);
+
+    if (validScrambleData.length < 5) {
+        validScrambleData = wordData;
+    }
+
+    gameDeck =
+        [...validScrambleData].sort(() => 0.5 - Math.random());
+
+    showScreen('screen-scramble');
+
+    startTime = Date.now();
+
+    nextScramble();
+}
+
+    function nextScramble() {
+        scrambleStep++;
+        if(scrambleStep > scrambleTotal) return endScramble();
+        
+        document.getElementById('scramble-progress').innerText = `${scrambleStep} / ${scrambleTotal}`;
+	document.getElementById('scramble-combo').innerText = scrambleCombo;
+        
+        // --- 비중복 덱에서 단어 추출 및 리필 로직 ---
+        if (gameDeck.length === 0) gameDeck = [...validScrambleData].sort(() => 0.5 - Math.random());
+        let wObj = gameDeck.pop();
+        // ------------------------------------------
+
+        currentWordObj = wObj;
+        scrambleTarget = wObj.p;
+        scrambleInput = "";
+        
+        document.getElementById('scramble-mean-text').innerText = wObj.k;
+        document.getElementById('scramble-input').innerText = "";
+        
+        let chars = Array.from(scrambleTarget);
+        chars.sort(() => 0.5 - Math.random());
+        
+        let board = document.getElementById('scramble-board');
+        board.innerHTML = "";
+        chars.forEach(ch => {
+            let btn = document.createElement('button');
+            btn.className = 'letter-btn';
+            btn.innerText = ch;
+            btn.onclick = () => clickScrambleLetter(btn, ch);
+            board.appendChild(btn);
+        });
+    }
+
+    function clickScrambleLetter(btn, ch) {
+        let expectedChar = scrambleTarget[scrambleInput.length];
+        
+        if (ch === expectedChar) {
+            scrambleInput += ch;
+            btn.classList.add('used');
+            document.getElementById('scramble-input').innerText = scrambleInput;
+            
+if (scrambleInput === scrambleTarget) {
+                scrambleCombo++;
+                stageTimeout = setTimeout(nextScramble, 400); // 수정
+            }
+        } else {
+            triggerDamageEffect();
+            scrambleCombo = 0;
+            document.getElementById('scramble-combo').innerText = "0";
+            if(!mistakes.find(m => m.p === currentWordObj.p)) mistakes.push(currentWordObj);
+            
+            scrambleInput = "";
+            document.getElementById('scramble-input').innerText = "";
+            document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('used'));
+        }
+    }
+
+function endScramble() {
+    const totalSec =
+        Math.floor((Date.now() - startTime) / 1000);
+
+    showResult(
+        '단어 스크램블',
+        `${scrambleTotal}문제 · 소요 ${formatSeconds(totalSec)}`
+    );
+}
+
+    // ==========================================
+    // 공통 결과창 및 오답노트
+    // ==========================================
+function showResult(modeName, summaryText) {
+    showScreen('screen-result');
+
+    document.getElementById('res-mode').innerText = modeName;
+    document.getElementById('res-summary').innerText = summaryText;
+
+    const mistakeCount = mistakes.length;
+
+    document.getElementById('res-mistake-count').innerText =
+        mistakeCount === 0
+            ? '오답 없음'
+            : `오답 ${mistakeCount}개`;
+
+    const mistArea = document.getElementById('mistake-area');
+    const mistList = document.getElementById('mistake-list');
+
+    if (mistakeCount > 0) {
+        mistArea.style.display = 'block';
+
+        const html = mistakes.map(m => {
+            const pron =
+                m.r
+                    ? `<span class="mistake-pron">/${m.r}/</span>`
+                    : '';
+
+            return `
+                <div class="mistake-item">
+                    <span>${m.p}</span>
+                    ${pron}${m.k}
+                </div>
+            `;
+        }).join('');
+
+        mistList.innerHTML = html;
+    } else {
+        mistArea.style.display = 'none';
+        mistList.innerHTML = '';
+    }
+
+    lockResultScreen();
+}
+
+function lockResultScreen() {
+    if (mistakes.length === 0) return;
+
+    isResultLocked = true;
+
+    const backBtn =
+        document.querySelector('.top-nav .btn-home:first-child');
+
+    const topNav =
+        document.getElementById('top-nav');
+
+    backBtn.classList.add('btn-locked');
+
+    let timerSpan =
+        document.getElementById('lock-timer-display');
+
+    if (!timerSpan) {
+        timerSpan = document.createElement('span');
+        timerSpan.id = 'lock-timer-display';
+        timerSpan.className = 'lock-timer';
+
+        topNav.insertBefore(
+            timerSpan,
+            backBtn.nextSibling
+        );
+    }
+
+    let timeLeft = 5;
+
+    backBtn.innerHTML =
+        `<i class="fas fa-lock"></i> 오답 확인 중...`;
+
+    timerSpan.innerText =
+        `(${timeLeft}초 후 활성화)`;
+
+    const lockInterval = setInterval(() => {
+        timeLeft--;
+
+        timerSpan.innerText =
+            `(${timeLeft}초 후 활성화)`;
+
+        if (timeLeft <= 0) {
+            clearInterval(lockInterval);
+
+            isResultLocked = false;
+
+            backBtn.classList.remove('btn-locked');
+
+            backBtn.innerHTML =
+                `<i class="fas fa-arrow-left"></i> 뒤로가기`;
+
+            timerSpan.innerText = "";
+
+            backBtn.style.transition = "0.3s";
+            backBtn.style.backgroundColor = "#e3f2fd";
+            backBtn.style.borderColor = "var(--primary)";
+
+            setTimeout(() => {
+                backBtn.style.backgroundColor = "#ffffff";
+                backBtn.style.borderColor = "#dee2e6";
+            }, 500);
+        }
+    }, 1000);
+}
+
+    // ==========================================
+    // 단어 사전 리스트 및 플래시카드 연동
+    // ==========================================
+    let fcIndex = 0;
+    let filteredDict = [];
+
+    function renderDict() {
+        filteredDict = [...wordData];
+        document.getElementById('dict-count').innerText = filteredDict.length;
+        const listDiv = document.getElementById('dict-list');
+        listDiv.innerHTML = "";
+        filteredDict.forEach((w, idx) => {
+            let item = document.createElement('div');
+            item.className = 'vocab-item';
+            item.style.cursor = 'pointer'; 
+            item.innerHTML = `<span class="vocab-per">${w.p}</span><span class="vocab-kor">${w.k}</span>`;
+            item.onclick = () => openFlashcard(idx);
+            listDiv.appendChild(item);
+        });
+    }
+
+    function filterDict() {
+        let q = document.getElementById('searchInput').value.toLowerCase();
+        filteredDict = wordData.filter(w => w.p.includes(q) || w.k.includes(q));
+        document.getElementById('dict-count').innerText = filteredDict.length;
+        const listDiv = document.getElementById('dict-list');
+        listDiv.innerHTML = "";
+        filteredDict.forEach((w, idx) => {
+            let item = document.createElement('div');
+            item.className = 'vocab-item';
+            item.style.cursor = 'pointer';
+            item.innerHTML = `<span class="vocab-per">${w.p}</span><span class="vocab-kor">${w.k}</span>`;
+            item.onclick = () => openFlashcard(idx);
+            listDiv.appendChild(item);
+        });
+    }
+
+    function shuffleDict() {
+        for (let i = wordData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [wordData[i], wordData[j]] = [wordData[j], wordData[i]];
+        }
+        filterDict(); 
+    }
+
+    function openFlashcard(idx) {
+        fcIndex = idx;
+        document.getElementById('flashcardModal').style.display = 'flex';
+        updateFlashcard(); 
+    }
+    
+    function closeFlashcard() { document.getElementById('flashcardModal').style.display = 'none'; }
+    
+    function toggleCard() { 
+        const meanEl = document.getElementById('fcMean');
+        if (meanEl.classList.contains('fc-content-hidden')) meanEl.classList.remove('fc-content-hidden');
+        else meanEl.classList.add('fc-content-hidden');
+    }
+    
+    function nextCard() { fcIndex = (fcIndex + 1) % filteredDict.length; updateFlashcard(); }
+    function prevCard() { fcIndex = (fcIndex - 1 + filteredDict.length) % filteredDict.length; updateFlashcard(); }
+    
+    function updateFlashcard() {
+        document.getElementById('fcPer').innerText = filteredDict[fcIndex].p;
+        document.getElementById('fcPron').innerText = filteredDict[fcIndex].r ? `/${filteredDict[fcIndex].r}/` : '';
+        document.getElementById('fcMean').innerText = filteredDict[fcIndex].k;
+        document.getElementById('fcMean').classList.add('fc-content-hidden'); 
+    }
+
+    function downloadCSV() {
+        if(!WORD_CSV_URL) {
+            alert("다운로드할 수 있는 파일이 설정되어 있지 않습니다.");
+            return;
+        }
+        alert("⚠️ [필독 주의사항]\n\n다운받은 csv 파일을 더블클릭하여 엑셀로 열면 페르시아어가 100% 깨집니다.\n\n반드시 구글 스프레드시트를 열고 [파일] -> [가져오기] 메뉴를 통해 해당 파일을 여세요.");
+        window.open(WORD_CSV_URL, '_blank');
+    }
+</script>
+</body>
+</html>
