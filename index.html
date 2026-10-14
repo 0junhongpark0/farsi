@@ -115,22 +115,22 @@ html.share-mode .app-shell,html.share-mode #mobile-blocker{display:none!importan
 <body>
 <div id="mobile-blocker"><h2>물리 키보드로 체험해 주세요</h2><p>페르시아어 타이핑은 PC 또는 물리 키보드가 연결된 기기에서 가능합니다.<br>QR코드로 연 공유 결과 페이지는 휴대폰에서도 볼 수 있습니다.</p><a href="index.html">메인 페이지</a></div>
 <div class="app-shell" id="appShell">
-<header class="masthead"><div><h1>샤나메 타이핑 체험</h1><p>로스탐과 소흐랍 · Rostam & Sohrab</p></div><div class="mast-actions"><button id="helpBtn" type="button">사용법</button><button id="homeBtn" type="button">처음으로</button></div></header>
+<header class="masthead"><div><h1>샤나메 타이핑 체험</h1><p>로스탐과 소흐랍 · Rostam & Sohrab</p></div><div class="mast-actions"><button id="homeBtn" type="button">처음으로</button></div></header>
 <main>
 <section id="introScreen" class="screen active">
 <div class="eyebrow">SHAHNAMEH · TYPING EXPERIENCE</div><h2 class="intro-title">샤나메 타이핑 체험</h2><p class="intro-lead">로스탐과 소흐랍의 이야기를, 한 글자씩 따라가다.</p>
-<p class="subtext">페르시아어는 주로 이란에서 사용하는 언어입니다. 페르도시의 서사시 『샤나메』에 담긴 「로스탐과 소흐랍」 이야기를 직접 타이핑해 보세요.</p>
+<p class="subtext">페르시아어는 이란에서 주로 사용하는 언어입니다. 페르도시의 서사시 『샤나메』에 담긴 「로스탐과 소흐랍」 이야기를 직접 타이핑해 보세요.</p>
 <div class="intro-grid">
   <div class="panel direction-panel">
     <h3>← 오른쪽에서 왼쪽으로!</h3>
     <p>페르시아어는 한국어와 반대 방향으로 읽고 씁니다.</p>
     <div class="direction-example" lang="fa" dir="rtl">سلام</div>
-    <p class="direction-caption">읽는 방향: 오른쪽 ← 왼쪽</p>
+    <p class="direction-caption">읽는 방향: 왼쪽 ← 오른쪽</p>
   </div>
   <div class="panel howto-panel">
     <h3>체험 방법</h3>
     <ol>
-      <li><strong>한글·영문 자판 그대로</strong> 사용해도 됩니다. 화면에 표시된 키의 <strong>위치</strong>를 누르세요.</li>
+      <li>화면에 표시된 키의 <strong>위치</strong>를 누르세요.</li>
       <li>파란색 테두리는 눌러야 할 키, 노란색 손가락은 사용할 손가락을 나타냅니다.</li>
       <li>한 구절을 입력한 뒤 <strong>Enter</strong>로 확정하세요.</li>
       <li>한 구절 이상 완성하면 언제든 인스타그램용 이미지를 만들 수 있습니다.</li>
@@ -293,7 +293,7 @@ function closeShare(){el('shareModal').classList.remove('open');document.activeE
 function downloadImage(){if(!shareBlob||!shareImageUrl)return;const a=document.createElement('a');a.href=shareImageUrl;a.download='오늘의 샤나메 한 구절.png';document.body.appendChild(a);a.click();a.remove();}
 async function shareFile(){if(!shareBlob)return;try{const file=new File([shareBlob],'오늘의 샤나메 한 구절.png',{type:'image/png'});if(navigator.canShare?.({files:[file]}))await navigator.share({files:[file],title:'오늘의 샤나메 한 구절'});else downloadImage();}catch(e){if(e.name!=='AbortError')alert('공유를 열 수 없습니다. 이미지 저장 버튼을 이용하세요.');}}
 async function openMobileShare(){document.documentElement.classList.add('share-mode');let encoded=location.hash.startsWith('#share=')?location.hash.slice(7):null;if(!encoded){el('mobileStatus').textContent='공유 데이터가 없습니다.';return;}try{const s=sanitizeSnapshot(b64urlDecode(encoded));story=await loadStory();const src=await renderShareCard(s);el('mobilePreview').src=src;el('mobileDownload').disabled=false;el('mobileNativeShare').hidden=!(navigator.canShare&&navigator.canShare({files:[new File([shareBlob],'오늘의 샤나메 한 구절.png',{type:'image/png'})]}));el('mobileStatus').textContent='1080 × 1350px 이미지입니다. 아이폰에서는 사진 앱에 저장 / 공유 버튼을 눌러 이미지 저장을 선택하세요.';}catch(e){el('mobileStatus').textContent='공유 카드 로딩 실패: '+e.message;}}
-function initEvents(){el('tutorialBtn').onclick=startTutorial;el('skipBtn').onclick=beginPractice;el('tutorialRestart').onclick=startTutorial;el('tutorialFinish').onclick=beginPractice;el('nextBtn').onclick=nextPassage;el('openShareBtn').onclick=openShare;el('shareCloseBtn').onclick=closeShare;el('downloadBtn').onclick=downloadImage;el('mobileDownload').onclick=downloadImage;el('nativeShareBtn').onclick=shareFile;el('mobileNativeShare').onclick=shareFile;el('homeBtn').onclick=goIntro;el('helpBtn').onclick=()=>{if(screen==='practice'){pauseTimer();alert('파란색 표시가 다음 키, 노란색 표시가 사용할 손가락입니다. 잘못 친 글자는 Backspace로 지운 후 다시 입력하세요. 구절을 완성한 뒤 Enter로 확정합니다.');document.activeElement?.blur?.();resumeTimer();}else startTutorial();};el('resetBtn').onclick=()=>{if(confirm('현재 기록을 지우고 첫 번째 구절부터 다시 시작할까요?'))beginPractice();};window.addEventListener('keydown',typingKey);window.addEventListener('keyup',e=>{if(e.key==='Shift')setShift(false);});document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else resumeTimer();});setInterval(()=>{if(screen==='practice')updateStats();},500);el('shareModal').addEventListener('click',e=>{if(e.target===el('shareModal'))closeShare();});}
+function initEvents(){el('tutorialBtn').onclick=startTutorial;el('skipBtn').onclick=beginPractice;el('tutorialRestart').onclick=startTutorial;el('tutorialFinish').onclick=beginPractice;el('nextBtn').onclick=nextPassage;el('openShareBtn').onclick=openShare;el('shareCloseBtn').onclick=closeShare;el('downloadBtn').onclick=downloadImage;el('mobileDownload').onclick=downloadImage;el('nativeShareBtn').onclick=shareFile;el('mobileNativeShare').onclick=shareFile;el('homeBtn').onclick=goIntro;if(el('helpBtn')) el('helpBtn').onclick=()=>{if(screen==='practice'){pauseTimer();alert('파란색 표시가 다음 키, 노란색 표시가 사용할 손가락입니다. 잘못 친 글자는 Backspace로 지운 후 다시 입력하세요. 구절을 완성한 뒤 Enter로 확정합니다.');document.activeElement?.blur?.();resumeTimer();}else startTutorial();};el('resetBtn').onclick=()=>{if(confirm('현재 기록을 지우고 첫 번째 구절부터 다시 시작할까요?'))beginPractice();};window.addEventListener('keydown',typingKey);window.addEventListener('keyup',e=>{if(e.key==='Shift')setShift(false);});document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTimer();else resumeTimer();});setInterval(()=>{if(screen==='practice')updateStats();},500);el('shareModal').addEventListener('click',e=>{if(e.target===el('shareModal'))closeShare();});}
 async function boot(){initEvents();mountKeyboard();if(location.hash.startsWith('#share=')){openMobileShare();return;}try{story=await loadStory();el('dataStatus').textContent=`현재 ${story.length}개 구절을 순서대로 연습할 수 있습니다.`;}catch(e){el('dataStatus').className='error';el('dataStatus').textContent='데이터 로딩 실패: '+e.message+' 새로고침하거나 시트 주소와 게시 설정을 확인하세요.';el('tutorialBtn').disabled=true;el('skipBtn').disabled=true;}}
 boot();
 </script>
