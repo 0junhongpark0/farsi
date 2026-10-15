@@ -1211,6 +1211,144 @@ html.share-mode .modal-cover {
         zoom: .82
     }
 }
+
+/* ============================================================
+   샤나메 체험 학습 보조 UI
+   - 타이핑 중: 로마자 발음 + 1·3·6·9번째 구절의 상황 설명
+   - 완료 후: 기존 입력 안내 영역에 핵심 단어 표시
+   ============================================================ */
+#practiceScreen .passage-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+}
+
+#practiceScreen .passage-heading h3 {
+    flex: none;
+}
+
+#practiceScreen .scene-note {
+    min-width: 0;
+    margin: 0;
+    padding-left: 9px;
+    border-left: 3px solid #3c81a7;
+    color: #31576f;
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#practiceScreen .romanization {
+    margin: 0 0 5px;
+    color: #607992;
+    font-size: 14px;
+    line-height: 1.45;
+    text-align: right;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+#practiceScreen .instruction.lesson-complete {
+    color: #1b604b;
+    font-weight: 600;
+}
+
+/* 완료 상태와 핵심 단어는 위 안내 영역에서 함께 알려 중복 배너를 숨깁니다. */
+#practiceScreen #completionBanner {
+    display: none;
+}
+
+#practiceScreen .lesson-word-fa {
+    font-family: Sahel, Vazirmatn, sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: #0b2a4a;
+    margin: 0 3px;
+    unicode-bidi: isolate;
+}
+
+@media (min-width: 621px) and (max-height: 900px) {
+    #practiceScreen .paper {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    #practiceScreen .scene-note {
+        font-size: 12px;
+    }
+
+    #practiceScreen .romanization {
+        margin-bottom: 1px;
+        font-size: 13px;
+        line-height: 1.18;
+    }
+}
+
+/* ============================================================
+   이야기 상황 설명 팝업
+   - 첫 번째·세 번째·여섯 번째·아홉 번째 구절 진입 시 표시
+   - 기존 핵심 단어 / 키보드 / 공유 기능에는 영향을 주지 않음
+   ============================================================ */
+#practiceScreen #practiceContext {
+    display: none;
+}
+
+.scene-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 11000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(7, 21, 33, 0.78);
+}
+
+.scene-dialog {
+    width: min(540px, 100%);
+    padding: 34px 30px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.scene-count {
+    margin: 0 0 13px;
+    color: #47708c;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.scene-dialog h2 {
+    margin: 0 0 18px;
+    color: var(--navy);
+    font-size: clamp(24px, 3vw, 30px);
+    line-height: 1.35;
+}
+
+.scene-description {
+    margin: 0 0 26px;
+    color: #304b61;
+    font-size: clamp(17px, 2vw, 19px);
+    line-height: 1.85;
+    word-break: keep-all;
+}
+
+.scene-dialog .btn {
+    width: 100%;
+    max-width: 390px;
+}
+
+@media (max-width: 620px) {
+    .scene-dialog {
+        padding: 28px 20px;
+    }
+}
 </style>
     </head>
     <body>
@@ -1288,8 +1426,12 @@ html.share-mode .modal-cover {
                         </div>
                     </div>
                     <div class="paper">
-                        <h3 id="passageLabel">현재 구절</h3>
+                        <div class="passage-heading">
+                            <h3 id="passageLabel">현재 구절</h3>
+                            <div id="practiceContext" class="scene-note hidden"></div>
+                        </div>
                         <div class="text-top" id="practiceOriginal" lang="fa" dir="rtl"></div>
+                        <p id="practiceRomanization" class="romanization" dir="ltr"></p>
                         <div class="text-bottom" id="practiceInput" lang="fa" dir="rtl"></div>
                         <p class="translation" id="practiceTranslation"></p>
                     </div>
@@ -1300,6 +1442,25 @@ html.share-mode .modal-cover {
                 </section>
             </main>
         </div>
+        <!-- 이야기 상황 설명 전용 팝업: 학습용 4개 구절에서만 표시 -->
+        <div
+            id="sceneModal"
+            class="scene-modal hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sceneModalTitle"
+            aria-describedby="sceneModalText"
+        >
+            <div class="scene-dialog">
+                <p class="scene-count" id="sceneModalCount"></p>
+                <h2 id="sceneModalTitle">이야기의 흐름</h2>
+                <p class="scene-description" id="sceneModalText"></p>
+                <button class="btn" id="sceneStartBtn" type="button">
+                    이야기 읽고 타이핑 시작하기
+                </button>
+            </div>
+        </div>
+
         <div class="modal-cover" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
             <div class="modal-inner">
                 <div class="modal-header">
@@ -1416,6 +1577,100 @@ const STORY_DATA = [
         k: '로스탐은 소흐랍의 시신을 품에 끌어안았다.'
     }
 ];
+
+
+// ============================================================
+// 학습용 보조 데이터: 원문(STORY_DATA)과 완전히 분리되어 있습니다.
+// roman   : 쉬운 로마자 발음 표기 (학술적 전사 아님)
+// keyword : 구절 완료 후 표시할 핵심 단어 하나
+// scene   : 이야기 전환점(1, 3, 6, 9번째)에서만 표시
+// ============================================================
+const LESSON_NOTES = {
+    'rs-174': {
+        roman: 'khanjar-e Rostam barq zad',
+        keyword: {
+            fa: 'خنجر',
+            roman: 'khanjar',
+            meaning: '단검'
+        },
+        scene: '로스탐과 소흐랍은 사실 아버지와 아들입니다. 그러나 서로를 알아보지 못한 채 전장에서 적으로 마주합니다.'
+    },
+    'rs-175': {
+        roman: 'Rostam be pahlu-ye Sohrab khanjar zad',
+        keyword: {
+            fa: 'پهلوی',
+            roman: 'pahlu-ye',
+            meaning: '옆구리(의)'
+        }
+    },
+    'rs-185': {
+        roman: 'age pedaram befahme, to ro zende nemizare!',
+        keyword: {
+            fa: 'پدرم',
+            roman: 'pedaram',
+            meaning: '내 아버지'
+        },
+        scene: '치명상을 입은 소흐랍이, 자신을 찌른 전사에게 아버지의 복수를 경고합니다.'
+    },
+    'rs-187': {
+        roman: 'kasi ham bord su-ye Rostam neshan',
+        keyword: {
+            fa: 'نشان',
+            roman: 'neshan',
+            meaning: '징표, 소식'
+        }
+    },
+    'rs-188': {
+        roman: 'cho beshnid Rostam sarash khire gasht',
+        keyword: {
+            fa: 'بشنید',
+            roman: 'beshnid',
+            meaning: '들었다'
+        }
+    },
+    'rs-194': {
+        roman: 'Rostam manam!',
+        keyword: {
+            fa: 'منم',
+            roman: 'manam',
+            meaning: '내가 ~이다'
+        },
+        scene: '아버지의 이름을 들은 로스탐이 충격에 빠지고, 마침내 자신의 정체를 밝힙니다.'
+    },
+    'rs-195': {
+        roman: 'Sohrab goft, pedar toyi?',
+        keyword: {
+            fa: 'پدر',
+            roman: 'pedar',
+            meaning: '아버지'
+        }
+    },
+    'rs-199': {
+        roman: 'be bazum bar mohre-ye khod negar',
+        keyword: {
+            fa: 'مهره',
+            roman: 'mohre',
+            meaning: '징표'
+        }
+    },
+    'rs-201': {
+        roman: 'Rostam faryad zad, Sohrabam! ba dast-e khodam koshtamet!',
+        keyword: {
+            fa: 'فریاد',
+            roman: 'faryad',
+            meaning: '외침, 고함'
+        },
+        scene: '팔의 징표로 진실을 깨달은 로스탐. 자신의 손으로 아들을 찔렀다는 사실에 절규합니다.'
+    },
+    'rs-214': {
+        roman: 'Rostam peykar-e Sohrab ra dar aghush gereft',
+        keyword: {
+            fa: 'آغوش',
+            roman: 'aghush',
+            meaning: '품, 포옹'
+        }
+    }
+};
 
 const TUTORIAL_TEXT = 'سلام';
 // ========================================================================
@@ -2007,6 +2262,44 @@ function setShift(pressed) {
         }
     }
 }
+// 구절을 완성한 뒤에는 기존 안내문 자리에 핵심 단어 한 개를 표시합니다.
+function renderPracticeHint() {
+    const hint = el('practiceHint');
+    hint.classList.toggle('done', hasCompletedCurrent);
+    hint.classList.toggle('lesson-complete', hasCompletedCurrent);
+
+    if (!hasCompletedCurrent) {
+        hint.textContent = input.length === charList.length
+            ? 'Enter를 눌러 이 구절을 완료하세요.'
+            : '가상 키보드와 손가락 가이드의 파란색 표시를 따라 입력하세요.';
+        return;
+    }
+
+    const note = LESSON_NOTES[story[currentIndex]?.id];
+    const word = note?.keyword;
+
+    if (!word) {
+        hint.textContent = '한 구절을 완성했습니다. 다음 구절로 넘어가거나 공유 카드를 만들어 보세요.';
+        return;
+    }
+
+    const persian = document.createElement('span');
+    persian.className = 'lesson-word-fa';
+    persian.lang = 'fa';
+    persian.dir = 'rtl';
+    persian.textContent = word.fa;
+
+    const doneText = currentIndex === story.length - 1
+        ? '전체 연습 완료! 오늘의 단어 · '
+        : '완성! 오늘의 단어 · ';
+
+    hint.replaceChildren(
+        document.createTextNode(doneText),
+        persian,
+        document.createTextNode(` (${word.roman}) = ${word.meaning}`)
+    );
+}
+
 function renderInput() {
     const id = mode === 'tutorial' ? 'tutorialInput' : 'practiceInput';
     const display = el(id);
@@ -2028,8 +2321,7 @@ function renderInput() {
         el('tutorialFinish').disabled = !hasCompletedCurrent;
     } else if (mode === 'practice') {
         updateStats();
-        el('practiceHint').textContent = hasCompletedCurrent ? '완성한 구절입니다. 다음 구절로 넘어가거나 공유 카드를 만들어 보세요.' : input.length === charList.length ? 'Enter를 눌러 이 구절을 완료하세요.' : '가상 키보드와 손가락 가이드의 파란색 표시를 따라 입력하세요.';
-        el('practiceHint').classList.toggle('done', hasCompletedCurrent);
+        renderPracticeHint();
     }
 }
 function startTutorial() {
@@ -2055,6 +2347,52 @@ function beginPractice() {
     moveKeyboard('practiceKeyboardMount');
     loadPassage();
 }
+// 상황 설명은 타이핑 전에 딱 한 번 표시합니다.
+function openSceneModal(sceneText, passageNumber) {
+    if (!sceneText) return;
+
+    el('sceneModalCount').textContent = `샤나메 이야기 · ${passageNumber} / ${story.length}`;
+    el('sceneModalText').textContent = sceneText;
+    el('sceneModal').classList.remove('hidden');
+    el('sceneStartBtn').focus();
+}
+
+function closeSceneModal() {
+    el('sceneModal').classList.add('hidden');
+    el('sceneStartBtn').blur();
+}
+
+// 캡처 단계에서 키 입력을 가로채 기존 타이핑 기능에 전달하지 않습니다.
+function handleSceneModalKeydown(e) {
+    if (el('sceneModal').classList.contains('hidden')) return;
+
+    // 다음 구절 진입에 쓰인 Enter 키를 계속 누르고 있더라도 팝업이 자동으로 닫히지 않도록 합니다.
+    if (e.repeat) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+    }
+
+    const isConfirmKey = e.key === 'Enter' || e.key === 'Escape';
+    const isButtonSpace = e.key === ' ' && document.activeElement === el('sceneStartBtn');
+
+    if (isConfirmKey || isButtonSpace) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        closeSceneModal();
+        return;
+    }
+
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        el('sceneStartBtn').focus();
+    } else if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+        e.preventDefault();
+    }
+
+    e.stopImmediatePropagation();
+}
+
 function loadPassage() {
     document.activeElement?.blur?.();
     pauseTimer();
@@ -2072,6 +2410,15 @@ function loadPassage() {
     const p = story[currentIndex];
     charList = Array.from(p.p);
     el('practiceOriginal').textContent = p.p;
+
+    const note = LESSON_NOTES[p.id];
+    el('practiceRomanization').textContent = note?.roman || '';
+
+    const context = el('practiceContext');
+    context.textContent = note?.scene || '';
+    context.title = note?.scene || '';
+    context.classList.toggle('hidden', !note?.scene);
+
     el('practiceTranslation').textContent = p.k || '한국어 번역이 제공되지 않았습니다.';
     el('passageLabel').textContent = `현재 구절 · ${currentIndex + 1} / ${story.length}`;
     el('completionBanner').classList.add('hidden');
@@ -2079,6 +2426,11 @@ function loadPassage() {
     el('nextBtn').textContent = '다음 구절';
     renderInput();
     updateStats();
+
+    // 상황 설명이 지정된 1·3·6·9번째 구절에만 팝업 표시
+    if (note?.scene) {
+        openSceneModal(note.scene, currentIndex + 1);
+    }
 }
 function pauseTimer() {
     if (activeStartedAt !== null) {
@@ -2471,6 +2823,8 @@ function initEvents() {
     el('resetBtn').onclick = () => {
         if (confirm('현재 기록을 지우고 첫 번째 구절부터 다시 시작할까요?')) beginPractice();
     };
+    el('sceneStartBtn').onclick = closeSceneModal;
+    window.addEventListener('keydown', handleSceneModalKeydown, true);
     window.addEventListener('keydown', typingKey);
     window.addEventListener('keyup', e => {
         if (e.key === 'Shift') setShift(false);
