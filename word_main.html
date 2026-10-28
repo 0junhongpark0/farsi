@@ -305,6 +305,79 @@
             .btn-control { flex: 1; justify-content: center; padding: 12px; font-size: 1rem; }
         }
 
+.amount-picker {
+    margin-top: auto;
+}
+
+.amount-label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.amount-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 10px;
+}
+
+.amount-chip {
+    flex: 1;
+    min-width: 52px;
+    padding: 8px 10px;
+    border: 2px solid #dee2e6;
+    border-radius: 7px;
+    background: #fff;
+    color: #495057;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.amount-chip:hover {
+    border-color: var(--primary);
+}
+
+.amount-chip.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.custom-amount-row {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.custom-amount-row.show {
+    display: flex;
+}
+
+.custom-amount-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 2px solid #ced4da;
+    border-radius: 7px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.custom-amount-input:focus {
+    border-color: var(--primary);
+}
+
+.game-start {
+    width: 100%;
+    flex: none;
+    padding: 12px;
+    font-size: 1.1rem;
+}
+
     </style>
 </head>
 <body>
@@ -336,44 +409,125 @@
                 <p>전체 단어 리스트 열람 및 검색</p>
             </div>
 
-            <div class="mode-card" style="cursor: default; padding: 25px 20px;">
-                <i class="fas fa-tasks mode-icon" style="margin-bottom: 15px;"></i>
-                <h3 style="margin-bottom: 15px;">객관식 서바이벌</h3>
-                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
-                    🎯 <strong>분량:</strong> 일반 30문 / 익스트림 100문<br>
-                    ⚠️ <strong>규칙:</strong> 오답 +5초 페널티 및 정확도 감점
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: auto;">
-                    <button class="btn-start" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='mcq'; startGame('normal')">일반</button>
-                    <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='mcq'; startGame('extreme')">익스트림</button>
-                </div>
-            </div>
+<div class="mode-card" style="cursor: default; padding: 18px 20px;">
+    <i class="fas fa-tasks mode-icon" style="margin-bottom: 10px;"></i>
+    <h3 style="margin-bottom: 15px;">객관식 서바이벌</h3>
+
+    <div class="amount-picker">
+        <div class="amount-label">문제 수</div>
+
+        <div class="amount-options">
+            <button class="amount-chip" data-mode="mcq" data-value="10"
+                    onclick="setPresetAmount('mcq', this)">10</button>
+
+            <button class="amount-chip active" data-mode="mcq" data-value="30"
+                    onclick="setPresetAmount('mcq', this)">30</button>
+
+            <button class="amount-chip" data-mode="mcq" data-value="50"
+                    onclick="setPresetAmount('mcq', this)">50</button>
+
+            <button class="amount-chip" data-mode="mcq" data-value="100"
+                    onclick="setPresetAmount('mcq', this)">100</button>
+
+            <button class="amount-chip" data-mode="mcq" data-custom="true"
+                    onclick="showCustomAmount('mcq', this)">직접 설정</button>
+        </div>
+
+        <div class="custom-amount-row" id="mcq-custom-row">
+            <input type="number"
+                   id="mcq-custom-input"
+                   class="custom-amount-input"
+                   min="1"
+                   max="500"
+                   value="30">
+            <span>문</span>
+        </div>
+
+        <button class="btn-start game-start" onclick="startSelectedGame('mcq')">
+            시작하기
+        </button>
+    </div>
+</div>
             
-            <div class="mode-card" style="cursor: default; padding: 25px 20px;">
-                <i class="fas fa-clone mode-icon" style="margin-bottom: 15px;"></i>
-                <h3 style="margin-bottom: 15px;">스피드 매치</h3>
-                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
-                    ⏱️ <strong>분량:</strong> 일반 3R / 익스트림 7R<br>
-                    ⚠️ <strong>규칙:</strong> 시간 초과 즉시 탈락, 오클릭 감점
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: auto;">
-                    <button class="btn-start" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='match'; startGame('normal')">일반</button>
-                    <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='match'; startGame('extreme')">익스트림</button>
-                </div>
-            </div>
+<div class="mode-card" style="cursor: default; padding: 18px 20px;">
+    <i class="fas fa-clone mode-icon" style="margin-bottom: 10px;"></i>
+    <h3 style="margin-bottom: 15px;">스피드 매치</h3>
+
+    <div class="amount-picker">
+        <div class="amount-label">라운드 수</div>
+
+        <div class="amount-options">
+            <button class="amount-chip" data-mode="match" data-value="1"
+                    onclick="setPresetAmount('match', this)">1</button>
+
+            <button class="amount-chip active" data-mode="match" data-value="3"
+                    onclick="setPresetAmount('match', this)">3</button>
+
+            <button class="amount-chip" data-mode="match" data-value="5"
+                    onclick="setPresetAmount('match', this)">5</button>
+
+            <button class="amount-chip" data-mode="match" data-value="7"
+                    onclick="setPresetAmount('match', this)">7</button>
+
+            <button class="amount-chip" data-mode="match" data-custom="true"
+                    onclick="showCustomAmount('match', this)">직접 설정</button>
+        </div>
+
+        <div class="custom-amount-row" id="match-custom-row">
+            <input type="number"
+                   id="match-custom-input"
+                   class="custom-amount-input"
+                   min="1"
+                   max="30"
+                   value="3">
+            <span>R</span>
+        </div>
+
+        <button class="btn-start game-start" onclick="startSelectedGame('match')">
+            시작하기
+        </button>
+    </div>
+</div>
             
-            <div class="mode-card" style="cursor: default; padding: 25px 20px;">
-                <i class="fas fa-font mode-icon" style="margin-bottom: 15px;"></i>
-                <h3 style="margin-bottom: 15px;">단어 스크램블</h3>
-                <div style="font-size: 0.95rem; color: #555; text-align: left; margin-bottom: 20px; line-height: 1.6; word-break: keep-all;">
-                    🧩 <strong>분량:</strong> 일반 15문 / 익스트림 30문<br>
-                    ⚠️ <strong>규칙:</strong> 오타 시 콤보 리셋 및 정확도 감점
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: auto;">
-                    <button class="btn-start" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='scramble'; startGame('normal')">일반</button>
-                    <button class="btn-extreme" style="padding: 12px; font-size: 1.1rem; flex: 1;" onclick="currentMode='scramble'; startGame('extreme')">익스트림</button>
-                </div>
-            </div>
+<div class="mode-card" style="cursor: default; padding: 18px 20px;">
+    <i class="fas fa-font mode-icon" style="margin-bottom: 10px;"></i>
+    <h3 style="margin-bottom: 15px;">단어 스크램블</h3>
+
+    <div class="amount-picker">
+        <div class="amount-label">문제 수</div>
+
+        <div class="amount-options">
+            <button class="amount-chip" data-mode="scramble" data-value="10"
+                    onclick="setPresetAmount('scramble', this)">10</button>
+
+            <button class="amount-chip active" data-mode="scramble" data-value="15"
+                    onclick="setPresetAmount('scramble', this)">15</button>
+
+            <button class="amount-chip" data-mode="scramble" data-value="30"
+                    onclick="setPresetAmount('scramble', this)">30</button>
+
+            <button class="amount-chip" data-mode="scramble" data-value="50"
+                    onclick="setPresetAmount('scramble', this)">50</button>
+
+            <button class="amount-chip" data-mode="scramble" data-custom="true"
+                    onclick="showCustomAmount('scramble', this)">직접 설정</button>
+        </div>
+
+        <div class="custom-amount-row" id="scramble-custom-row">
+            <input type="number"
+                   id="scramble-custom-input"
+                   class="custom-amount-input"
+                   min="1"
+                   max="500"
+                   value="15">
+            <span>문</span>
+        </div>
+
+        <button class="btn-start game-start" onclick="startSelectedGame('scramble')">
+            시작하기
+        </button>
+    </div>
+</div>
         </div>
 
     </div>
@@ -591,7 +745,72 @@ function goHome() {
         showScreen('screen-onboarding');
     }
 
-function startGame(difficulty) {
+function setPresetAmount(mode, button) {
+    document
+        .querySelectorAll(`.amount-chip[data-mode="${mode}"]`)
+        .forEach(btn => btn.classList.remove('active'));
+
+    button.classList.add('active');
+
+    const customRow = document.getElementById(`${mode}-custom-row`);
+    if (customRow) customRow.classList.remove('show');
+}
+
+function showCustomAmount(mode, button) {
+    document
+        .querySelectorAll(`.amount-chip[data-mode="${mode}"]`)
+        .forEach(btn => btn.classList.remove('active'));
+
+    button.classList.add('active');
+
+    const customRow = document.getElementById(`${mode}-custom-row`);
+    const input = document.getElementById(`${mode}-custom-input`);
+
+    customRow.classList.add('show');
+
+    input.focus();
+    input.select();
+}
+
+function getSelectedAmount(mode) {
+    const selected = document.querySelector(
+        `.amount-chip[data-mode="${mode}"].active`
+    );
+
+    if (!selected) return null;
+
+    let value;
+
+    if (selected.dataset.custom === 'true') {
+        const input = document.getElementById(`${mode}-custom-input`);
+        value = Number(input.value);
+    } else {
+        value = Number(selected.dataset.value);
+    }
+
+    const max = mode === 'match' ? 30 : 500;
+
+    if (!Number.isInteger(value) || value < 1 || value > max) {
+        return null;
+    }
+
+    return value;
+}
+
+// 선택 분량만 전달하고 기존 난이도별 게임/채점 로직은 유지합니다.
+let selectedGameAmount = null;
+function startSelectedGame(mode) {
+    const amount = getSelectedAmount(mode);
+    if (amount === null) {
+        alert(mode === 'match' ? '라운드 수는 1~30 사이의 정수로 입력해주세요.' : '문제 수는 1~500 사이의 정수로 입력해주세요.');
+        return;
+    }
+    currentMode = mode;
+    const extremeAmount = { mcq: 100, match: 7, scramble: 30 };
+    startGame(amount >= extremeAmount[mode] ? 'extreme' : 'normal', amount);
+}
+
+function startGame(difficulty, amount = null) {
         if(wordData.length < 8) {
             alert("단어장 데이터가 부족합니다.");
             return;
@@ -599,6 +818,7 @@ function startGame(difficulty) {
         clearInterval(timerInterval); 
         clearTimeout(stageTimeout);   
         gameDifficulty = difficulty;
+        selectedGameAmount = amount;
         mistakes = [];
         if (currentMode === 'mcq') startMCQ();
         else if (currentMode === 'match') startMatch();
@@ -619,7 +839,7 @@ function startGame(difficulty) {
     let currentWordObj = null;
 
     function startMCQ() {
-mcqTotal = gameDifficulty === 'extreme' ? 100 : 30;
+mcqTotal = selectedGameAmount ?? (gameDifficulty === 'extreme' ? 100 : 30);
         mcqStep = 0; mcqPenaltySec = 0; mcqClicks = 0;
         gameDeck = [...wordData].sort(() => 0.5 - Math.random()); // 시작 시 덱 섞기
         showScreen('screen-mcq');
@@ -715,15 +935,15 @@ let rank = '';
 function startMatch() {
 matchRound = 1; matchTotalScore = 0; matchClicks = 0; 
     matchCorrectClicks = 0; 
-    matchTotalRounds = gameDifficulty === 'extreme' ? 7 : 3;
+    matchTotalRounds = selectedGameAmount ?? (gameDifficulty === 'extreme' ? 7 : 3);
     gameDeck = [...wordData].sort(() => 0.5 - Math.random()); // 시작 시 덱 섞기
     showScreen('screen-match');
     initMatchRound();
 }
 
     function initMatchRound() {
-        if(gameDifficulty === 'extreme') matchTimeLeft = extremeTimes[matchRound - 1];
-        else matchTimeLeft = normalTimes[matchRound - 1];
+        if(gameDifficulty === 'extreme') matchTimeLeft = extremeTimes[Math.min(matchRound - 1, extremeTimes.length - 1)];
+        else matchTimeLeft = normalTimes[Math.min(matchRound - 1, normalTimes.length - 1)];
         
         matchPairsLeft = 8; // 16장 셋팅
         selectedMatchCard = null;
@@ -847,7 +1067,7 @@ let rank = '';
     let scrambleTargetTotalLen = 0, scrambleClicks = 0;
 
     function startScramble() {
-        scrambleTotal = gameDifficulty === 'extreme' ? 30 : 15;
+        scrambleTotal = selectedGameAmount ?? (gameDifficulty === 'extreme' ? 30 : 15);
         scrambleStep = 0; scrambleScore = 0; scrambleCombo = 0;
         scrambleTargetTotalLen = 0; scrambleClicks = 0;
         
