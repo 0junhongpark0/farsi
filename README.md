@@ -1,2 +1,2 @@
-# typing
-acc typing webpage
+# farsi
+farsi learning webpage for Korean native speakers
